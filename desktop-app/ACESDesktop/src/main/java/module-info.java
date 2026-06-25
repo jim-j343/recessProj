@@ -3,6 +3,7 @@ module com.example.acesdesktop {
     requires javafx.fxml;
 
     requires org.kordamp.bootstrapfx.core;
+    requires java.desktop;
 
     opens com.example.acesdesktop to javafx.fxml;
     exports com.example.acesdesktop;
