@@ -43,17 +43,7 @@
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
-          <!-- Terms of Service Agreement -->
-  <div class="mt-4">
-    <label class="flex items-center">
-        <input type="checkbox" name="rules_accepted" required
-               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-        <span class="ml-2 text-sm text-gray-600">
-            I have read and agree to the
-            <a href="/rules" class="text-indigo-600 underline">Platform Rules</a>.
-        </span>
-    </label>
-   </div>
+       
             <x-primary-button class="ms-4">
                 {{ __('Register') }}
             </x-primary-button>
