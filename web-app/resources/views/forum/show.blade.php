@@ -29,7 +29,7 @@
                         </span>
                     @endif
                 </div>
-                <p class="text-gray-700">{{ $post->content }}</p>
+                <p class="text-gray-700">{{ $post->body }}</p>
             </div>
             @endforeach
 

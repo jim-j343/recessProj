@@ -41,6 +41,14 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        if ($user && $user->isBlacklisted()) {
+             throw ValidationException::withMessages([
+              'email' => 'Your account has been blacklisted. Contact an administrator.',
+           ]);
+}
+
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
