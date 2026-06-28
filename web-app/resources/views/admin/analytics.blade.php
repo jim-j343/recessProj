@@ -1,178 +1,182 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800">📊 Group Statistics & Analytics</h2>
-            <a href="{{ route('dashboard') }}"
-                class="text-sm text-gray-500 hover:text-gray-700">
-                ← Back to Dashboard
-            </a>
-        </div>
-    </x-slot>
+    <div class="min-h-screen bg-gray-50">
+        <div class="flex">
 
-    <div class="py-8">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-            {{-- OVERVIEW STATS --}}
-            <div class="grid grid-cols-4 gap-4">
-                <div class="bg-white rounded-lg shadow p-5 text-center">
-                    <p class="text-3xl font-bold text-indigo-600">24</p>
-                    <p class="text-sm text-gray-500 mt-1">Total Members</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-5 text-center">
-                    <p class="text-3xl font-bold text-green-600">142</p>
-                    <p class="text-sm text-gray-500 mt-1">Total Posts</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-5 text-center">
-                    <p class="text-3xl font-bold text-yellow-500">9</p>
-                    <p class="text-sm text-gray-500 mt-1">Quizzes Held</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-5 text-center">
-                    <p class="text-3xl font-bold text-purple-600">78%</p>
-                    <p class="text-sm text-gray-500 mt-1">Avg Quiz Score</p>
-                </div>
-            </div>
-
-            {{-- ACTIVITY CHART (visual bar chart using pure CSS/Tailwind) --}}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-semibold text-gray-700 mb-4">
-                    📈 Weekly Forum Activity (Posts per Week)
-                </h3>
-                <div class="flex items-end gap-3 h-40">
-                    @foreach([
-                        ['Week 1', 12, 'bg-indigo-400'],
-                        ['Week 2', 28, 'bg-indigo-500'],
-                        ['Week 3', 18, 'bg-indigo-400'],
-                        ['Week 4', 35, 'bg-indigo-600'],
-                        ['Week 5', 22, 'bg-indigo-400'],
-                        ['Week 6', 40, 'bg-indigo-700'],
-                    ] as [$label, $value, $color])
-                    <div class="flex-1 flex flex-col items-center gap-1">
-                        <span class="text-xs font-semibold text-gray-600">{{ $value }}</span>
-                        <div class="{{ $color }} rounded-t w-full"
-                             style="height: {{ ($value / 40) * 100 }}%">
-                        </div>
-                        <span class="text-xs text-gray-400">{{ $label }}</span>
+            {{-- LEFT SIDEBAR --}}
+            <aside class="w-64 min-h-screen bg-white border-r border-gray-200 p-6 shrink-0">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        🎓
                     </div>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- TOP CONTRIBUTORS --}}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="font-semibold text-gray-700">🏆 Top Contributors</h3>
-                </div>
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Rank</th>
-                            <th class="px-6 py-3 text-left">Member</th>
-                            <th class="px-6 py-3 text-left">Posts</th>
-                            <th class="px-6 py-3 text-left">Replies</th>
-                            <th class="px-6 py-3 text-left">Quiz Avg</th>
-                            <th class="px-6 py-3 text-left">Participation</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        {{-- Later: @foreach($topContributors as $i => $member) --}}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <span class="text-yellow-500 font-bold text-lg">🥇</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 bg-indigo-500 text-white rounded-full
-                                                flex items-center justify-center text-xs font-bold">
-                                        J
-                                    </div>
-                                    <span class="font-medium text-gray-800">Jane Doe</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">12</td>
-                            <td class="px-6 py-4 text-gray-600">34</td>
-                            <td class="px-6 py-4 text-green-600 font-semibold">92%</td>
-                            <td class="px-6 py-4">
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full"
-                                         style="width: 92%"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <span class="text-gray-400 font-bold text-lg">🥈</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 bg-purple-500 text-white rounded-full
-                                                flex items-center justify-center text-xs font-bold">
-                                        J
-                                    </div>
-                                    <span class="font-medium text-gray-800">John Smith</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">8</td>
-                            <td class="px-6 py-4 text-gray-600">21</td>
-                            <td class="px-6 py-4 text-green-600 font-semibold">85%</td>
-                            <td class="px-6 py-4">
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full"
-                                         style="width: 85%"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <span class="text-orange-400 font-bold text-lg">🥉</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 bg-pink-500 text-white rounded-full
-                                                flex items-center justify-center text-xs font-bold">
-                                        A
-                                    </div>
-                                    <span class="font-medium text-gray-800">Alice Nakato</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">5</td>
-                            <td class="px-6 py-4 text-gray-600">14</td>
-                            <td class="px-6 py-4 text-yellow-600 font-semibold">70%</td>
-                            <td class="px-6 py-4">
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full"
-                                         style="width: 70%"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        {{-- @endforeach --}}
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- QUIZ PERFORMANCE SUMMARY --}}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="font-semibold text-gray-700 mb-4">🧪 Quiz Performance Summary</h3>
-                <div class="space-y-3">
-                    @foreach([
-                        ['Week 1 Quiz', 92, 'bg-green-500'],
-                        ['Week 2 Quiz', 78, 'bg-green-400'],
-                        ['Week 3 Quiz', 65, 'bg-yellow-400'],
-                        ['Week 4 Quiz', 55, 'bg-red-400'],
-                    ] as [$quiz, $score, $color])
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-600 w-28 shrink-0">{{ $quiz }}</span>
-                        <div class="flex-1 bg-gray-200 rounded-full h-3">
-                            <div class="{{ $color }} h-3 rounded-full"
-                                 style="width: {{ $score }}%"></div>
-                        </div>
-                        <span class="text-sm font-semibold text-gray-700 w-10 text-right">
-                            {{ $score }}%
-                        </span>
+                    <div>
+                        <p class="font-bold text-gray-900 text-sm">Academic Portal</p>
+                        <p class="text-xs text-gray-400">Spring Semester 2024</p>
                     </div>
-                    @endforeach
                 </div>
-            </div>
+                <nav class="space-y-1">
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-blue-50 text-blue-700 font-semibold">
+                        ⊞ Dashboard
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+                        📚 My Courses
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+                        💬 Discussions
+                    </a>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+                        📝 Quiz Center
+                    </a>
+                </nav>
+                <div class="absolute bottom-8 left-6 flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gray-300 rounded-full"></div>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">Dr. Sarah Jenkins</p>
+                        <p class="text-xs text-gray-400">Lead Administrator</p>
+                    </div>
+                </div>
+            </aside>
 
+            {{-- MAIN CONTENT --}}
+            <main class="flex-1 p-8">
+
+                {{-- Header --}}
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Academic Insights</h1>
+                        <p class="text-sm text-gray-400 mt-1">Real-time performance metrics for the current semester.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select class="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none">
+                            <option>Advanced Calculus II</option>
+                            <option>Computer Science 101</option>
+                        </select>
+                        <button class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                            📅 Last 7 Days
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-6">
+
+                    {{-- Post Volume Chart --}}
+                    <div class="col-span-2 bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Post Volume Traffic</h3>
+                                <p class="text-xs text-gray-400">Engagement velocity across all modules</p>
+                            </div>
+                            <span class="flex items-center gap-1.5 text-xs text-green-600 font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                                Live Traffic
+                            </span>
+                        </div>
+                        <div class="flex items-end gap-3 h-40 mb-4">
+                            @foreach([
+                                ['Mon', 30, 'bg-blue-200'],
+                                ['Tue', 55, 'bg-blue-300'],
+                                ['Wed', 45, 'bg-blue-200'],
+                                ['Thu', 75, 'bg-blue-400'],
+                                ['Fri', 65, 'bg-blue-300'],
+                                ['Sat', 90, 'bg-blue-600'],
+                                ['Sun', 70, 'bg-blue-500'],
+                            ] as [$label, $h, $color])
+                            <div class="flex-1 flex flex-col items-center gap-1">
+                                <div class="{{ $color }} rounded-t w-full" style="height: {{ $h }}%"></div>
+                                <span class="text-xs text-gray-400">{{ $label }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- System Status --}}
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-lg">🔄</span>
+                                <span class="text-xs text-green-600 font-bold uppercase">Operational</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">System Sync</p>
+                            <p class="text-xl font-bold text-gray-900">99.8%</p>
+                            <div class="w-full bg-blue-200 rounded-full h-1 mt-2">
+                                <div class="bg-blue-600 h-1 rounded-full" style="width: 99.8%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-lg">📶</span>
+                                <span class="text-xs text-blue-600 font-bold uppercase">Stable</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Offline Reliability</p>
+                            <p class="text-xl font-bold text-gray-900">Active</p>
+                            <p class="text-xs text-gray-400 mt-1">Local caching layer active for 4.2k users</p>
+                        </div>
+                    </div>
+
+                    {{-- Trending Topics --}}
+                    <div class="col-span-2 bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Trending Topics</h3>
+                                <p class="text-xs text-gray-400">AI-curated semantic clusters</p>
+                            </div>
+                            <span class="text-gray-300 text-xl">✦</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach([
+                                ['Quantum Mechanics', true],
+                                ['Latex Formatting', false],
+                                ['Final Review', false],
+                                ['Study Groups', false],
+                                ['Peer Feedback', true],
+                                ['Neural Networks', false],
+                                ['Office Hours', false],
+                            ] as [$topic, $active])
+                            <span class="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-colors
+                                {{ $active
+                                    ? 'bg-gray-900 text-white'
+                                    : 'border border-gray-200 text-gray-700 hover:bg-gray-50' }}">
+                                {{ $topic }}
+                            </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Recent Activity --}}
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-gray-900">Recent Activity</h3>
+                            <a href="#" class="text-xs text-blue-600 font-semibold hover:underline">View All</a>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3 pb-4 border-b border-gray-50">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full shrink-0"></div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">Marcus V. posted in <span class="font-bold">Calculus II</span></p>
+                                    <p class="text-xs text-gray-400 mt-0.5">"Could anyone clarify the integration b...</p>
+                                    <p class="text-xs text-gray-400">2 minutes ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 pb-4 border-b border-gray-50">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full shrink-0"></div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">Lila K. uploaded <span class="font-bold">Assignment_3.pdf</span></p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Successfully submitted to Intro to Phil...</p>
+                                    <p class="text-xs text-gray-400">15 minutes ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full shrink-0"></div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">Chen J. joined <span class="font-bold">Macroeconomics</span></p>
+                                    <p class="text-xs text-gray-400 mt-0.5">New student enrollment completed su...</p>
+                                    <p class="text-xs text-gray-400">1 hour ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
         </div>
     </div>
 </x-app-layout>

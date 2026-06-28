@@ -1,220 +1,130 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800">👥 Member Management</h2>
-            <a href="{{ route('dashboard') }}"
-                class="text-sm text-gray-500 hover:text-gray-700">
-                ← Back to Dashboard
-            </a>
-        </div>
-    </x-slot>
+    <div class="min-h-screen bg-gray-50 py-8">
+        <div class="max-w-3xl mx-auto px-4">
 
-    <div class="py-8">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-            {{-- STATS ROW --}}
-            <div class="grid grid-cols-4 gap-4">
-                <div class="bg-white rounded-lg shadow p-4 text-center">
-                    <p class="text-2xl font-bold text-indigo-600">24</p>
-                    <p class="text-xs text-gray-500 mt-1">Total Members</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4 text-center">
-                    <p class="text-2xl font-bold text-green-600">18</p>
-                    <p class="text-xs text-gray-500 mt-1">Active</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4 text-center">
-                    <p class="text-2xl font-bold text-yellow-500">4</p>
-                    <p class="text-xs text-gray-500 mt-1">Warned</p>
-                </div>
-                <div class="bg-white rounded-lg shadow p-4 text-center">
-                    <p class="text-2xl font-bold text-red-600">2</p>
-                    <p class="text-xs text-gray-500 mt-1">Blacklisted</p>
-                </div>
+            {{-- Header --}}
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Compliance Monitoring</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage flagged accounts and system restrictions.</p>
             </div>
 
-            {{-- SEARCH & FILTER --}}
-            <div class="bg-white rounded-lg shadow p-4 flex gap-4 items-end">
-                <div class="flex-1">
-                    <x-input-label :value="__('Search Member')" />
-                    <x-text-input type="text" class="block mt-1 w-full"
-                        placeholder="Search by name or email..." />
-                </div>
-                <div>
-                    <x-input-label :value="__('Status')" />
-                    <select class="block mt-1 border-gray-300 rounded-md shadow-sm
-                                  focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                        <option value="">All</option>
-                        <option value="active">Active</option>
-                        <option value="warned">Warned</option>
-                        <option value="blacklisted">Blacklisted</option>
-                    </select>
-                </div>
-                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg
-                               text-sm hover:bg-indigo-700">
-                    Search
+            {{-- Filter Tabs --}}
+            <div class="flex gap-2 mb-6">
+                @foreach(['All Flags', 'Blacklisted', 'Warning', 'Review'] as $i => $tab)
+                <button class="px-4 py-2 rounded-full text-sm font-semibold transition-colors
+                    {{ $i === 0
+                        ? 'bg-gray-900 text-white'
+                        : 'border border-gray-200 text-gray-600 hover:bg-gray-50' }}">
+                    {{ $tab }}
                 </button>
+                @endforeach
             </div>
 
-            {{-- MEMBERS TABLE --}}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Member</th>
-                            <th class="px-6 py-3 text-left">Role</th>
-                            <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Last Active</th>
-                            <th class="px-6 py-3 text-left">Posts</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
+            {{-- Member Cards --}}
+            <div class="space-y-4">
 
-                        {{-- Later: @foreach($members as $member) --}}
+                {{-- Blacklisted Member (Expanded) --}}
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="flex items-center justify-between p-5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
+                                <span class="text-gray-600 font-bold">JV</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Julian Vance</h3>
+                                <p class="text-sm text-gray-400">ID: #UX-9021</p>
+                            </div>
+                            <span class="flex items-center gap-1.5 bg-red-50 text-red-600 text-xs font-semibold px-3 py-1 rounded-full border border-red-200">
+                                🚫 Blacklisted
+                            </span>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-700">∧</button>
+                    </div>
 
-                        {{-- Active member --}}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-indigo-500 text-white rounded-full
-                                                flex items-center justify-center text-sm font-bold">
-                                        J
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-800">Jane Doe</p>
-                                        <p class="text-xs text-gray-400">jane@example.com</p>
-                                    </div>
+                    {{-- Expanded Detail --}}
+                    <div class="px-5 pb-5 border-t border-gray-100">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 my-4 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm">⏱</span>
                                 </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">Student</td>
-                            <td class="px-6 py-4">
-                                <span class="bg-green-100 text-green-700 px-2 py-1
-                                             rounded-full text-xs font-medium">
-                                    Active
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-gray-500">2 hours ago</td>
-                            <td class="px-6 py-4 text-gray-500">24</td>
-                            <td class="px-6 py-4">
-                                <div class="flex gap-2">
-                                    <form method="POST" action="/admin/members/1/warn">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xs text-yellow-600 border border-yellow-300
-                                                   px-2 py-1 rounded hover:bg-yellow-50">
-                                            ⚠️ Warn
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="/admin/members/1/blacklist">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xs text-red-600 border border-red-300
-                                                   px-2 py-1 rounded hover:bg-red-50">
-                                            🚫 Blacklist
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="/admin/members/1/remove">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            onclick="return confirm('Remove this member?')"
-                                            class="text-xs text-gray-500 border border-gray-300
-                                                   px-2 py-1 rounded hover:bg-gray-50">
-                                            ✕ Remove
-                                        </button>
-                                    </form>
+                                <div>
+                                    <p class="text-xs text-red-600 font-bold uppercase tracking-wide">Access Restriction</p>
+                                    <p class="text-xl font-bold text-red-600">6 Days Remaining</p>
                                 </div>
-                            </td>
-                        </tr>
+                            </div>
+                            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700">
+                                Extend
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Reason for Flag</p>
+                                <p class="text-sm font-semibold text-gray-800">Academic Integrity Violation</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Reported By</p>
+                                <p class="text-sm font-semibold text-gray-800">AI Auditor (System)</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Detection Confidence</p>
+                                <p class="text-sm font-semibold text-gray-800">98.4%</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1">Last Action</p>
+                                <p class="text-sm font-semibold text-gray-800">Dec 12, 2023</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-4 border-t border-gray-100">
+                            <button class="flex-1 flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-lg text-sm font-semibold hover:bg-gray-700">
+                                🛡 Full Review
+                            </button>
+                            <button class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-3 rounded-lg text-sm font-semibold hover:bg-gray-50">
+                                ✉ Notify
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-                        {{-- Warned member --}}
-                        <tr class="hover:bg-yellow-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full
-                                                flex items-center justify-center text-sm font-bold">
-                                        J
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-800">John Smith</p>
-                                        <p class="text-xs text-gray-400">john@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">Student</td>
-                            <td class="px-6 py-4">
-                                <span class="bg-yellow-100 text-yellow-700 px-2 py-1
-                                             rounded-full text-xs font-medium">
-                                    ⚠️ Warned
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-gray-500">1 day ago</td>
-                            <td class="px-6 py-4 text-gray-500">8</td>
-                            <td class="px-6 py-4">
-                                <div class="flex gap-2">
-                                    <form method="POST" action="/admin/members/2/unwarn">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xs text-green-600 border border-green-300
-                                                   px-2 py-1 rounded hover:bg-green-50">
-                                            ✓ Remove Warn
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="/admin/members/2/blacklist">
-                                        @csrf
-                                        <button type="submit"
-                                            class="text-xs text-red-600 border border-red-300
-                                                   px-2 py-1 rounded hover:bg-red-50">
-                                            🚫 Blacklist
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                {{-- Warned Member --}}
+                <div class="bg-white border border-gray-200 rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                <span class="text-gray-600 font-bold">ER</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Elena Rodriguez</h3>
+                                <p class="text-sm text-gray-400">ID: #UX-7742</p>
+                            </div>
+                            <span class="flex items-center gap-1.5 bg-yellow-50 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full border border-yellow-200">
+                                ⚠ Warning
+                            </span>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-700">∨</button>
+                    </div>
+                </div>
 
-                        {{-- Blacklisted member --}}
-                        <tr class="hover:bg-red-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-400 text-white rounded-full
-                                                flex items-center justify-center text-sm font-bold">
-                                        A
-                                    </div>
-                                    <div>
-                                        <p class="font-medium text-gray-400 line-through">
-                                            Alice Nakato
-                                        </p>
-                                        <p class="text-xs text-gray-400">alice@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-400">Student</td>
-                            <td class="px-6 py-4">
-                                <span class="bg-red-100 text-red-700 px-2 py-1
-                                             rounded-full text-xs font-medium">
-                                    🚫 Blacklisted
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-gray-400">5 days ago</td>
-                            <td class="px-6 py-4 text-gray-400">3</td>
-                            <td class="px-6 py-4">
-                                <form method="POST" action="/admin/members/3/unblacklist">
-                                    @csrf
-                                    <button type="submit"
-                                        class="text-xs text-green-600 border border-green-300
-                                               px-2 py-1 rounded hover:bg-green-50">
-                                        ✓ Unblacklist
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                {{-- Active Member --}}
+                <div class="bg-white border border-gray-200 rounded-xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                <span class="text-gray-600 font-bold">KA</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Kaleb Aris</h3>
+                                <p class="text-sm text-gray-400">ID: #UX-5521</p>
+                            </div>
+                            <span class="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full border border-green-200">
+                                ✓ Active
+                            </span>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-700">∨</button>
+                    </div>
+                </div>
 
-                        {{-- @endforeach --}}
-
-                    </tbody>
-                </table>
             </div>
-
         </div>
     </div>
 </x-app-layout>
