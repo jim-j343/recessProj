@@ -36,12 +36,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // Quiz routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/quiz/{id}', function ($id) {
-        return view('quiz.show');
-    })->name('quiz.show');
     Route::get('/quiz/create', function () {
         return view('quiz.create');
     })->name('quiz.create');
+    Route::get('/quiz/{id}', function ($id) {
+        return view('quiz.show');
+    })->name('quiz.show');
 });
 
 // Participation routes
