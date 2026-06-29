@@ -39,7 +39,7 @@
                     </p>
                 </div>
                 <div class="text-right text-sm">
-                    @if($topic->has_unanswered)
+                    @if($topic->hasUnanswered())
                         <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
                             Unanswered
                         </span>

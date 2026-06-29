@@ -27,8 +27,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
     Route::get('/topics/{topic}/export-pdf', [TopicController::class, 'exportPdf'])->name('topics.pdf');
     Route::post('/topics/{topic}/posts', [PostController::class, 'store'])->name('posts.store');
-});
-
+    Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
+    Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
+    Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    });
 // Admin routes
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');

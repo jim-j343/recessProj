@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'role', 'is blacklisted', 'last_active_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -26,7 +26,34 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_active_at'    => 'datetime',
+            'is_blacklisted'    => 'boolean',
             'password' => 'hashed',
         ];
     }
+    public function isAdmin(): bool
+{
+    return $this->role === 'admin';
+}
+
+public function isLecturer(): bool
+{
+    return $this->role === 'lecturer';
+}
+
+public function isBlacklisted(): bool
+{
+    return $this->is_blacklisted;
+}
+// A user has many topics
+public function topics()
+{
+    return $this->hasMany(Topic::class);
+}
+
+// A user has many posts
+public function posts()
+{
+    return $this->hasMany(Post::class);
+}
 }

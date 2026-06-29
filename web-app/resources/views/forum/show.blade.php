@@ -150,6 +150,7 @@
                     <button onclick="document.getElementById('reply-input').focus()"
                         class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors">↩ Reply</button>
                 </div>
+                <p class="text-gray-700">{{ $post->body }}</p>
             </div>
         </div>
 
