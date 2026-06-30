@@ -43,7 +43,7 @@ public function isLecturer(): bool
 
 public function isBlacklisted(): bool
 {
-    return $this->is_blacklisted;
+    return (bool) $this->is_blacklisted;
 }
 // A user has many topics
 public function topics()
