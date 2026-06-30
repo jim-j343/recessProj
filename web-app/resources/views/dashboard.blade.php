@@ -21,34 +21,32 @@
     }">
 
         {{-- AI RECOMMENDED TOPICS ROW --}}
-        <div class="border-b border-gray-200 bg-white px-8 py-4">
+        <div class="border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8 py-4">
             <div class="max-w-7xl mx-auto">
                 <div class="flex justify-between items-center mb-3">
                     <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2 uppercase tracking-wide">
                         ✦ AI Recommended Topics
                     </h2>
-                    <a href="#" class="text-xs text-gray-400 hover:text-gray-800 uppercase tracking-wide font-semibold">
+                    <a href="{{ route('forum.index') }}" class="text-xs text-gray-400 hover:text-gray-800 uppercase tracking-wide font-semibold">
                         View All
                     </a>
                 </div>
-                <div class="grid grid-cols-4 gap-3">
-                    <a href="#" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">
-                        <span class="text-xs bg-gray-900 text-white px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">New For You</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <a href="{{ route('forum.index') }}" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">                        <span class="text-xs bg-gray-900 text-white px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">New For You</span>
                         <h3 class="font-semibold text-gray-900 mt-2 text-sm leading-snug">Introduction to Machine Learning</h3>
                         <div class="flex justify-between items-center mt-3">
                             <p class="text-xs text-gray-400">89 active members</p>
                             <span class="text-gray-400 group-hover:text-gray-900 transition-colors">→</span>
                         </div>
                     </a>
-                    <a href="#" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">
-                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">Recommended</span>
+                    <a href="{{ route('forum.index') }}" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">Recommended</span>
                         <h3 class="font-semibold text-gray-900 mt-2 text-sm leading-snug">Database Normalization Deep Dive</h3>
                         <div class="flex justify-between items-center mt-3">
                             <p class="text-xs text-gray-400">124 active members</p>
                             <span class="text-gray-400 group-hover:text-gray-900 transition-colors">→</span>
                         </div>
                     </a>
-                    <a href="#" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">
+                    <a href="{{ route('forum.index') }}" class="group border border-gray-200 rounded-lg p-3 bg-white hover:border-gray-400 transition-all">
                         <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">Recommended</span>
                         <h3 class="font-semibold text-gray-900 mt-2 text-sm leading-snug">Web Development with Laravel</h3>
                         <div class="flex justify-between items-center mt-3">
@@ -56,7 +54,7 @@
                             <span class="text-gray-400 group-hover:text-gray-900 transition-colors">→</span>
                         </div>
                     </a>
-                    <a href="#" class="group border border-gray-900 rounded-lg p-3 bg-gray-900 hover:bg-gray-800 transition-all">
+                    <a href="{{ route('forum.index') }}" class="group border border-gray-900 rounded-lg p-3 bg-gray-900 hover:bg-gray-800 transition-all">
                         <span class="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">Popular</span>
                         <h3 class="font-semibold text-white mt-2 text-sm leading-snug">Software Engineering Principles</h3>
                         <div class="flex justify-between items-center mt-3">
@@ -69,10 +67,31 @@
         </div>
 
         {{-- MAIN CONTENT --}}
-        <div class="max-w-7xl mx-auto px-8 py-6 flex gap-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
 
-            {{-- CENTER: Search + Discussions --}}
-            <main class="flex-1 space-y-4">
+            {{-- LEFT: Groups Sidebar --}}
+            <aside class="w-full lg:w-56 shrink-0 order-1 lg:order-1">
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">
+                        My Groups
+                    </h3>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#" class="block text-sm text-blue-600 hover:bg-blue-50 px-2 py-1.5 rounded">
+                                📁 Group Alpha
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block text-sm text-gray-700 hover:bg-gray-50 px-2 py-1.5 rounded">
+                                📁 Group Beta
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            {{-- CENTER: Recent Discussions --}}
+            <main class="flex-1 min-w-0 space-y-4 order-3 lg:order-2">
 
                 {{-- Search Bar (SDD Requirement) --}}
                 <div class="relative">
@@ -162,8 +181,8 @@
 
             </main>
 
-            {{-- RIGHT PANEL: Stats (prominent) + Unanswered + Quizzes --}}
-            <aside class="w-72 shrink-0 space-y-4">
+            {{-- RIGHT PANEL: Statistics + Unanswered --}}
+            <aside class="w-full lg:w-72 shrink-0 space-y-4 order-2 lg:order-3">
 
                 {{-- Your Statistics — prominent --}}
                 <div class="bg-gray-900 text-white rounded-xl p-5">
