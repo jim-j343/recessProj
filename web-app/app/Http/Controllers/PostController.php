@@ -3,67 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    // Store a new reply to a topic
-    public function store(Request $request, Topic $topic)
+    // Save a new post (reply) under a topic
+    public function store(Request $request, $topicId)
     {
-        $request->validate([
-            'content' => ['required', 'string'],
+        $validated = $request->validate([
+            'content'        => ['required', 'string'],
+            'parent_post_id' => ['nullable', 'exists:posts,post_id'],
         ]);
 
-        // Prevent replies on locked topics
-        if ($topic->is_locked) {
-            return back()->with('error', 'This topic is locked and cannot receive replies.');
-        }
-
-        Post::create([
-            'topic_id'    => $topic->id,
-            'user_id'     => Auth::id(),
-            'body'        => $request->content,
-            'is_solution' => false,
+        $post = Post::create([
+            'topic_id'       => $topicId,
+            'author_id'      => Auth::id(),
+            'parent_post_id' => $validated['parent_post_id'] ?? null,
+            'content'        => $validated['content'],
         ]);
 
-        return redirect()->route('topics.show', $topic)
-            ->with('success', 'Reply posted successfully!');
+        return redirect()->route('topics.show', $topicId)
+            ->with('success', 'Reply posted!');
     }
 
-    // Mark a post as the accepted solution
-    public function markSolution(Post $post)
+    // Flag a post as irrelevant (requirement 1)
+    public function flag(Post $post)
     {
-        $topic = $post->topic;
+        $post->update(['is_flagged' => true]);
 
-        // Only the topic owner or admin can mark a solution
-        if (Auth::id() !== $topic->user_id && !Auth::user()->isAdmin()) {
-            abort(403);
-        }
-
-        // Unmark any existing solution first
-        $topic->posts()->update(['is_solution' => false]);
-
-        // Mark this post as solution
-        $post->update(['is_solution' => true]);
-
-        return redirect()->route('topics.show', $topic)
-            ->with('success', 'Solution marked!');
+        return back()->with('success', 'Post flagged for review.');
     }
 
-    // Delete a post
+    // Delete a post (only the author or an admin)
     public function destroy(Post $post)
     {
-        $topic = $post->topic;
-
-        if (Auth::id() !== $post->user_id && !Auth::user()->isAdmin()) {
+        if (Auth::id() !== $post->author_id && ! Auth::user()->isAdmin()) {
             abort(403);
         }
 
         $post->delete();
 
-        return redirect()->route('topics.show', $topic)
-            ->with('success', 'Reply deleted.');
+        return back()->with('success', 'Post deleted.');
     }
 }

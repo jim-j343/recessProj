@@ -22,14 +22,15 @@
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
-                    {{-- Full Name --}}
-                    <div class="mb-4">
-                        <x-input-label for="name" :value="__('Full Legal Name')" />
-                        <x-text-input id="name" name="name" type="text"
-                            class="block mt-1 w-full"
-                            placeholder="Johnathan Doe"
-                            :value="old('name')" required autofocus />
-                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    <!-- Username -->
+                    <div>
+                        <x-input-label for="username" :value="__('Username')" />
+                        <x-text-input id="username" class="block mt-1 w-full"
+                            type="text"
+                            name="username"
+                            :value="old('username')"
+                            required autofocus autocomplete="username" />
+                        <x-input-error :messages="$errors->get('username')" class="mt-2" />
                     </div>
 
                     {{-- Email --}}
