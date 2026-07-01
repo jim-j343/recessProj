@@ -29,26 +29,25 @@ class RegisteredUserController extends Controller
      * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-           
-        ]);
+{
+    $request->validate([
+        'username' => ['required', 'string', 'max:80', 'unique:users,username'],
+        'email'    => ['required', 'string', 'lowercase', 'email', 'max:150', 'unique:users,email'],
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role'           => 'member',
-            'last_active_at' => now(),
-        ]);
+    $user = User::create([
+        'username'        => $request->username,
+        'email'           => $request->email,
+        'password_hash'   => Hash::make($request->password),
+        'system_role'     => 'student',
+        'status'          => 'active',
+        'agreed_to_rules' => true,
+    ]);
 
-        event(new Registered($user));
+    event(new Registered($user));
+    Auth::login($user);
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
-    }
+    return redirect(route('dashboard', absolute: false));
+}
 }
