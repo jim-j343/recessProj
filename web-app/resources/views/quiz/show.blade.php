@@ -110,9 +110,13 @@
                         class="px-4 py-2 text-sm text-gray-400 font-semibold rounded-lg opacity-50 cursor-not-allowed">
                         Previous
                     </button>
-                    <button onclick="nextQuestion()"
+                    <button onclick="nextQuestion()" id="next-btn"
                         class="flex items-center gap-2 px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition-all active:scale-95">
                         Next Question →
+                    </button>
+                    <button onclick="submitQuiz()" id="submit-btn"
+                        class="hidden items-center gap-2 px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-all active:scale-95">
+                        ✅ Submit Quiz
                     </button>
                 </div>
             </footer>
@@ -145,7 +149,11 @@
         let timeLeft = 24 * 60 + 59;
         const countdownEl = document.getElementById('countdown');
         const interval = setInterval(() => {
-            if (timeLeft <= 0) { clearInterval(interval); return; }
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                submitQuiz();
+                return;
+            }
             timeLeft--;
             const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
             const s = String(timeLeft % 60).padStart(2, '0');
@@ -161,6 +169,29 @@
             document.getElementById('current-q').textContent = currentQuestion;
             document.getElementById('progress-bar').style.width =
                 ((currentQuestion / totalQuestions) * 100) + '%';
+
+            // Toggle Next/Submit buttons on last question
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            if (currentQuestion === totalQuestions) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+                submitBtn.classList.add('flex');
+            } else {
+                nextBtn.classList.remove('hidden');
+                nextBtn.classList.add('flex');
+                submitBtn.classList.add('hidden');
+                submitBtn.classList.remove('flex');
+            }
+        }
+
+        function submitQuiz() {
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '✅ Submitted';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            // Later: send answers to backend via fetch/axios
+            alert('Quiz submitted! Your answers have been recorded.');
         }
 
         function nextQuestion() {
