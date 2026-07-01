@@ -12,9 +12,8 @@ class TopicController extends Controller
     // Show all topics
     public function index()
     {
-        $topics = Topic::with('user')
+        $topics = Topic::with('creator')
             ->withCount('posts')
-            ->orderBy('is_pinned', 'desc')
             ->latest()
             ->get();
 
@@ -30,30 +29,38 @@ class TopicController extends Controller
     // Save new topic to database
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title'    => ['required', 'string', 'max:255'],
-            'body'     => ['required', 'string'],
-            'category' => ['nullable', 'string', 'max:100'],
+            'content'  => ['required', 'string'],
+            'category' => ['nullable', 'string', 'max:80'],
+            'group_id' => ['required', 'exists:groups,group_id'],
         ]);
 
-        Topic::create([
-            'user_id'  => Auth::id(),
-            'title'    => $request->title,
-            'body'     => $request->body,
-            'category' => $request->category,
+        $topic = Topic::create([
+            'group_id'   => $validated['group_id'],
+            'creator_id' => Auth::id(),
+            'title'      => $validated['title'],
+            'category'   => $validated['category'] ?? null,
         ]);
 
-        return redirect()->route('forum.index')
+        // The first post IS the topic content — stored in the posts table
+        Post::create([
+            'topic_id'  => $topic->topic_id,
+            'author_id' => Auth::id(),
+            'content'   => $validated['content'],
+        ]);
+
+        return redirect()->route('topics.show', $topic->topic_id)
             ->with('success', 'Topic created successfully!');
     }
 
     // Show a single topic and its posts
     public function show(Topic $topic)
     {
-        // Increment view count
-        $topic->increment('views');
-
-        $posts = $topic->posts()->with('user')->get();
+        $posts = $topic->posts()
+            ->with('author')
+            ->orderBy('created_at')
+            ->get();
 
         return view('forum.show', compact('topic', 'posts'));
     }
@@ -61,35 +68,32 @@ class TopicController extends Controller
     // Save a reply (post) to a topic
     public function reply(Request $request, Topic $topic)
     {
-        $request->validate([
-            'body' => ['required', 'string'],
+        $validated = $request->validate([
+            'content'         => ['required', 'string'],
+            'parent_post_id'  => ['nullable', 'exists:posts,post_id'],
         ]);
-
-        // Prevent replies on locked topics
-        if ($topic->is_locked) {
-            return back()->with('error', 'This topic is locked.');
-        }
 
         Post::create([
-            'topic_id' => $topic->id,
-            'user_id'  => Auth::id(),
-            'body'     => $request->body,
+            'topic_id'        => $topic->topic_id,
+            'author_id'       => Auth::id(),
+            'parent_post_id'  => $validated['parent_post_id'] ?? null,
+            'content'         => $validated['content'],
         ]);
 
-        return redirect()->route('topics.show', $topic)
+        return redirect()->route('topics.show', $topic->topic_id)
             ->with('success', 'Reply posted!');
     }
 
     // Delete a topic (only owner or admin)
     public function destroy(Topic $topic)
     {
-        if (Auth::id() !== $topic->user_id && !Auth::user()->isAdmin()) {
+        if (Auth::id() !== $topic->creator_id && ! Auth::user()->isAdmin()) {
             abort(403);
         }
 
         $topic->delete();
 
-        return redirect()->route('topics.index')
+        return redirect()->route('forum.index')
             ->with('success', 'Topic deleted.');
     }
 }
