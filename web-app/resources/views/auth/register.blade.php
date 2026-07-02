@@ -22,14 +22,13 @@
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
-                    <!-- Username -->
-                    <div>
-                        <x-input-label for="username" :value="__('Username')" />
-                        <x-text-input id="username" class="block mt-1 w-full"
-                            type="text"
-                            name="username"
-                            :value="old('username')"
-                            required autofocus autocomplete="username" />
+                    {{-- Full Name --}}
+                    <div class="mb-4">
+                        <x-input-label for="name" :value="__('Full Legal Name')" />
+                        <x-text-input id="name" name="username" type="text"
+                            class="block mt-1 w-full"
+                            placeholder="Johnathan Doe"
+                            :value="old('username')" required autofocus />
                         <x-input-error :messages="$errors->get('username')" class="mt-2" />
                     </div>
 
@@ -55,6 +54,9 @@
                             </option>
                             <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>
                                 Lecturer
+                            </option>
+                            <option value="system_admin" {{ old('role') == 'system_admin' ? 'selected' : '' }}>
+                                Administrator
                             </option>
                         </select>
                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
@@ -208,14 +210,7 @@
 
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-       
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
+
         {{-- FOOTER --}}
         <div class="border-t border-gray-100 px-8 py-4 flex justify-between text-xs text-gray-400 flex-shrink-0">
             <span>Smart Discussion Forum</span>

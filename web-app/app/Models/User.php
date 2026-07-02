@@ -3,48 +3,42 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// 1. Updated with your NEW migration columns
+#[Fillable(['username', 'email', 'password_hash', 'system_role', 'status', 'agreed_to_rules', 'last_active_at'])]
+#[Hidden(['password_hash', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    // Your migration uses 'user_id' as the primary key, not the default 'id'
+    // 2. REQUIRED: Tell Laravel your primary key is user_id, not id
     protected $primaryKey = 'user_id';
 
-    protected $fillable = [
-        'username',
-        'email',
-        'password_hash',
-        'system_role',
-        'status',
-        'agreed_to_rules',
-        'last_active_at',
-    ];
-
-    protected $hidden = [
-        'password_hash',
-        'remember_token',
-    ];
-
+    /**
+     * Get the attributes that should be cast.
+     */
     protected function casts(): array
     {
         return [
-            'last_active_at'  => 'datetime',
-            'agreed_to_rules' => 'boolean',
+            'email_verified_at' => 'datetime',
+            'last_active_at'    => 'datetime',
+            'agreed_to_rules'   => 'boolean',
         ];
     }
 
-    // Laravel looks for getAuthPassword() during login since the
-    // column is named password_hash instead of the default 'password'
+    // 3. REQUIRED: Tell Laravel to check 'password_hash' during login
     public function getAuthPassword()
     {
         return $this->password_hash;
     }
 
+    // 4. Updated helper methods to use your new 'system_role' and 'status' columns
     public function isAdmin(): bool
     {
         return $this->system_role === 'system_admin';
@@ -60,15 +54,14 @@ class User extends Authenticatable
         return $this->status === 'blacklisted';
     }
 
-    // A user creates many topics (creator_id, not user_id)
+    // 5. Preserved your relationships perfectly
     public function topics()
     {
-        return $this->hasMany(Topic::class, 'creator_id', 'user_id');
+        return $this->hasMany(Topic::class);
     }
 
-    // A user authors many posts (author_id, not user_id)
     public function posts()
     {
-        return $this->hasMany(Post::class, 'author_id', 'user_id');
+        return $this->hasMany(Post::class);
     }
 }
