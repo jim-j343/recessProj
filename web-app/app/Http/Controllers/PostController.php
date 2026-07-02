@@ -46,4 +46,13 @@ class PostController extends Controller
 
         return back()->with('success', 'Post deleted.');
     }
+
+    public function markSolution(Post $post)
+    {
+        $topic = $post->topic;
+        if (Auth::id() !== $topic->creator_id && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        return back()->with('success', 'Post marked as solution.');
+    }
 }

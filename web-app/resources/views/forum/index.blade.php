@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Discussion Forum
             </h2>
-            @if(auth()->user()->role === 'lecturer')
+            @if(auth()->user()->system_role === 'lecturer')
                 <a href="/topics/create"
                    class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
                     + New Topic
@@ -22,24 +22,32 @@
                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
+            {{-- Empty state --}}
+            @if($topics->isEmpty())
+                <div class="bg-white p-8 rounded-lg shadow-sm text-center text-gray-500">
+                    No topics yet. Be the first to start a discussion!
+                </div>
+            @endif
+
             {{-- Loop through topics from the database --}}
             @foreach($topics as $topic)
             <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6 flex justify-between items-start">
                 <div>
                     <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
-                        {{ $topic->category }}
+                        {{ $topic->category ?? 'General' }}
                     </span>
                     <h3 class="mt-2 text-lg font-bold text-gray-800">
-                        <a href="/topics/{{ $topic->id }}" class="hover:text-indigo-600">
+                        <a href="/topics/{{ $topic->topic_id }}" class="hover:text-indigo-600">
                             {{ $topic->title }}
                         </a>
                     </h3>
                     <p class="text-sm text-gray-500 mt-1">
-                        Posted by {{ $topic->user->name }} · {{ $topic->posts_count }} replies
+                        Posted by {{ $topic->creator->username ?? 'Unknown' }}
+                        · {{ $topic->posts_count ?? 0 }} replies
                     </p>
                 </div>
                 <div class="text-right text-sm">
-                    @if($topic->hasUnanswered())
+                    @if($topic->posts_count === 0)
                         <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
                             Unanswered
                         </span>
