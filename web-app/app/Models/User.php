@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,50 +9,59 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'is blacklisted', 'last_active_at'])]
-#[Hidden(['password', 'remember_token'])]
+// 1. Updated with your NEW migration columns
+#[Fillable(['username', 'email', 'password_hash', 'system_role', 'status', 'agreed_to_rules', 'last_active_at'])]
+#[Hidden(['password_hash', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    // 2. REQUIRED: Tell Laravel your primary key is user_id, not id
+    protected $primaryKey = 'user_id';
+
     /**
      * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'last_active_at'    => 'datetime',
-            'is_blacklisted'    => 'boolean',
-            'password' => 'hashed',
+            'agreed_to_rules'   => 'boolean',
         ];
     }
+
+    // 3. REQUIRED: Tell Laravel to check 'password_hash' during login
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
+
+    // 4. Updated helper methods to use your new 'system_role' and 'status' columns
     public function isAdmin(): bool
-{
-    return $this->role === 'admin';
-}
+    {
+        return $this->system_role === 'system_admin';
+    }
 
-public function isLecturer(): bool
-{
-    return $this->role === 'lecturer';
-}
+    public function isLecturer(): bool
+    {
+        return $this->system_role === 'lecturer';
+    }
 
-public function isBlacklisted(): bool
-{
-    return (bool) $this->is_blacklisted;
-}
-// A user has many topics
-public function topics()
-{
-    return $this->hasMany(Topic::class);
-}
+    public function isBlacklisted(): bool
+    {
+        return $this->status === 'blacklisted';
+    }
 
-// A user has many posts
-public function posts()
-{
-    return $this->hasMany(Post::class);
-}
+    // 5. Preserved your relationships perfectly
+    public function topics()
+    {
+        return $this->hasMany(Topic::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
