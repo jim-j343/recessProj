@@ -21,7 +21,7 @@ class AdminController extends Controller
     $blacklisted  = \App\Models\User::where('status', 'blacklisted')->count();
 
     // Fetch the members collection for the table at the bottom
-    $members = \App\Models\User::orderBy('username')->paginate(20);
+    $members = \App\Models\User::withCount('posts')->orderBy('username')->paginate(20);
 
     // 2. Pass them all using compact()
     return view('admin.dashboard', compact(

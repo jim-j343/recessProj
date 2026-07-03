@@ -5,6 +5,7 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QuizController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,12 +50,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Quiz routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/quiz/create', function () {
-        return view('quiz.create');
-    })->name('quiz.create');
-    Route::get('/quiz/{id}', function ($id) {
-        return view('quiz.show');
-    })->name('quiz.show');
+    Route::get('/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
+    Route::post('/quiz/store', [QuizController::class, 'store'])->name('quiz.store');
+    Route::get('/quiz/{id}', [QuizController::class, 'show'])->name('quiz.show');
 });
 
 // Participation routes
