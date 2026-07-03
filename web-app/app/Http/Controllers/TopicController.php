@@ -96,4 +96,18 @@ class TopicController extends Controller
         return redirect()->route('forum.index')
             ->with('success', 'Topic deleted.');
     }
+
+    public function exportPdf(Topic $topic)
+    {
+        $posts = $topic->posts()->with('author')->orderBy('created_at')->get();
+
+        // Basic HTML export for now — can be upgraded to proper PDF later
+        $html = "<h1>{$topic->title}</h1>";
+        $html .= "<p>Category: {$topic->category}</p><hr>";
+        foreach ($posts as $post) {
+            $html .= "<p><strong>{$post->author->username}</strong>: {$post->content}</p>";
+        }
+
+        return response($html)->header('Content-Type', 'text/html');
+    }
 }

@@ -85,9 +85,9 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($members as $member)
                         <tr>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $member->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $member->last_activity_at?->diffForHumans() ?? 'Never' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $member->posts_count }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $member->username }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $member->last_active_at?->diffForHumans() ?? 'Never' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $member->posts_count?? 0 }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full
                                     {{ $member->status === 'active' ? 'bg-green-100 text-green-700' : '' }}
