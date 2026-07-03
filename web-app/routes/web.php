@@ -5,20 +5,35 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QuizController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
+// Dynamic authenticated dashboard director
+Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
+    $role = $request->user()->system_role;
+
+    if ($role === 'system_admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($role === 'lecturer') {
+        return redirect()->route('lecturer.dashboard');
+    } elseif ($role === 'student') {
+        return redirect()->route('student.dashboard');
+    }
+
+    // Secondary structural fallback layout if no role matches
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// User Profile routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 // Forum routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/forum', [TopicController::class, 'index'])->name('forum.index');
@@ -31,20 +46,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-    });
-// Admin routes
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
 
 // Quiz routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/quiz/create', function () {
-        return view('quiz.create');
-    })->name('quiz.create');
-    Route::get('/quiz/{id}', function ($id) {
-        return view('quiz.show');
-    })->name('quiz.show');
+    Route::get('/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
+    Route::post('/quiz/store', [QuizController::class, 'store'])->name('quiz.store');
+    Route::get('/quiz/{id}', [QuizController::class, 'show'])->name('quiz.show');
 });
 
 // Participation routes
@@ -57,8 +65,27 @@ Route::middleware(['auth'])->group(function () {
     })->name('participation.grade');
 });
 
-// Admin routes (additional pages)
-Route::middleware(['auth'])->group(function () {
+// ==========================================
+// ROLE-BASED DASHBOARD ROUTE GROUPS
+// ==========================================
+
+// Student-Specific Dashboards (Recess Brief Features)
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/student/dashboard', function () {
+        return view('student.dashboard');
+    })->name('student.dashboard');
+});
+
+// Lecturer-Specific Dashboards (Recess Brief Features)
+Route::middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/lecturer/dashboard', function () {
+        return view('lecturer.dashboard');
+    })->name('lecturer.dashboard');
+});
+
+// System Administrator Routes (Unified & Protected)
+Route::middleware(['auth', 'role:system_admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/members', function () {
         return view('admin.members');
     })->name('admin.members');
