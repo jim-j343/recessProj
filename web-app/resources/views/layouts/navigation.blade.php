@@ -15,13 +15,17 @@
                         Dashboard
                     </x-nav-link>
 
-                    @if(auth()->user()->role === 'student')
+                    <x-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.*')">
+                        Groups
+                    </x-nav-link>
+
+                    @if(auth()->user()->system_role === 'student')
                         <x-nav-link :href="route('participation.index')" :active="request()->routeIs('participation.index')">
                             My Progress
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->role === 'lecturer')
+                    @if(auth()->user()->system_role === 'lecturer')
                         <x-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
                             New Topic
                         </x-nav-link>
@@ -33,7 +37,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->system_role === 'admin')
                         <x-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                             Members
                         </x-nav-link>
@@ -49,7 +53,7 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>{{ Auth::user()->username }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -89,14 +93,17 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 🏠 Dashboard
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.*')">
+                👥 Groups
+            </x-responsive-nav-link>
 
-            @if(auth()->user()->role === 'student')
+            @if(auth()->user()->system_role === 'student')
                 <x-responsive-nav-link :href="route('participation.index')" :active="request()->routeIs('participation.index')">
                     📊 My Progress
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->role === 'lecturer')
+            @if(auth()->user()->system_role === 'lecturer')
                 <x-responsive-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
                     ✏️ New Topic
                 </x-responsive-nav-link>
@@ -108,7 +115,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->role === 'admin')
+            @if(auth()->user()->system_role === 'admin')
                 <x-responsive-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                     👥 Members
                 </x-responsive-nav-link>
@@ -121,7 +128,7 @@
         {{-- MOBILE: Profile --}}
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->username }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
             </div>
 

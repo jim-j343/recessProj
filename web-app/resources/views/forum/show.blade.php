@@ -71,12 +71,12 @@
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                     <span class="text-indigo-700 font-semibold text-sm">
-                        {{ strtoupper(substr($topic->creator->name ?? 'S', 0, 1)) }}
+                        {{ strtoupper(substr($topic->creator->username ?? 'S', 0, 1)) }}
                     </span>
                 </div>
                 <div>
                     <p class="text-sm font-semibold text-gray-900">
-                        {{ $topic->creator->name ?? 'Sarah Chen' }}
+                        {{ $topic->creator->username ?? 'Unknown' }}
                         <span class="font-normal text-gray-400 text-xs ml-2">{{ $topic->created_at?->diffForHumans() ?? '2h ago' }}</span>
                         <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full ml-1 font-medium">Author</span>
                     </p>
