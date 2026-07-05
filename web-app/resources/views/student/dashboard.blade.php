@@ -1,4 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
+
+@section('content')
     <div class="flex min-h-screen bg-gray-50">
         <!-- LEFT SIDEBAR -->
         <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-4">
@@ -6,6 +8,7 @@
             <nav class="flex flex-col gap-2">
                 <a href="#" class="bg-gray-100 text-gray-900 px-4 py-2 rounded font-medium">Forums</a>
                 <a href="#" class="text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">My Quizzes</a>
+                <a href="{{ route('groups.index') }}" class="text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">Browse Groups</a>
             </nav>
         </div>
 
@@ -57,4 +60,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

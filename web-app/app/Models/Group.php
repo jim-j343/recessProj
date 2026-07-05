@@ -33,4 +33,9 @@ class Group extends Model
     {
         return $this->belongsTo(User::class, 'admin_id', 'user_id');
     }
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'group_membership', 'group_id', 'user_id')
+                    ->withPivot('role', 'status', 'joined_at');
+    }
 }
