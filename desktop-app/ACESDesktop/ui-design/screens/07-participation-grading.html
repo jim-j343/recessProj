@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACES — Participation Grading</title>
+<link rel="stylesheet" href="../css/aces-design-system.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">A</div><div><div class="brand-name">ACES</div><div class="brand-sub">Lecturer Workspace</div></div></div>
+    <nav class="nav">
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Dashboard</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> My Courses</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Quiz Center</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> Participation</div>
+    </nav>
+    <div class="sidebar-foot"><div class="avatar">DK</div><div><div style="font-weight:600;font-size:13px;">Dr. K. Owen</div><div class="muted" style="font-size:12px;">Lecturer</div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar"><div class="page-title">Participation Grading</div><div class="spacer"></div><div class="searchbox" style="width:260px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search students…"></div></div>
+    <div class="content">
+      <div class="content-narrow" style="max-width:1080px;">
+        <div class="page-head"><h1 class="h-lg" style="margin-bottom:2px;">Participation Grading</h1><p>CS302: Interaction Design · Spring 2026</p></div>
+
+        <div class="grid grid-3" style="margin-bottom:24px;gap:16px;">
+          <div class="card metric"><div class="k">Avg. Participation</div><div class="v">84%</div><div class="trend-up">↑ 12% · Top 5% of all cohorts</div></div>
+          <div class="card metric"><div class="k">AI Relevance</div><div class="v">4.2<span class="muted" style="font-size:14px;font-weight:500;"> / 5.0</span></div><div class="d">Weighted content quality</div></div>
+          <div class="card metric"><div class="k">Pending Grades</div><div class="v">08</div><div class="d">Students awaiting review</div></div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="table">
+            <thead><tr><th>Student</th><th>Posts</th><th>AI Relevance</th><th>Peer Score</th><th style="text-align:right;">Mark</th></tr></thead>
+            <tbody>
+              <tr><td><div class="row" style="gap:12px;"><div class="avatar sm">AR</div><div><div style="font-weight:600;">Alex Rivera</div><div class="muted" style="font-size:12px;">ID: 442901</div></div></div></td><td>14</td><td>4.8</td><td>92%</td><td style="text-align:right;"><input class="input" value="95" style="width:64px;text-align:center;padding:6px;"></td></tr>
+              <tr><td><div class="row" style="gap:12px;"><div class="avatar sm">SC</div><div><div style="font-weight:600;">Sarah Chen</div><div class="muted" style="font-size:12px;">ID: 442915</div></div></div></td><td>08</td><td>3.2</td><td>76%</td><td style="text-align:right;"><input class="input" value="78" style="width:64px;text-align:center;padding:6px;"></td></tr>
+              <tr><td><div class="row" style="gap:12px;"><div class="avatar sm">MJ</div><div><div style="font-weight:600;">Marcus Jensen</div><div class="muted" style="font-size:12px;">ID: 442922</div></div></div></td><td>12</td><td>4.5</td><td>88%</td><td style="text-align:right;"><input class="input" placeholder="—" style="width:64px;text-align:center;padding:6px;"></td></tr>
+              <tr><td><div class="row" style="gap:12px;"><div class="avatar sm">LO</div><div><div style="font-weight:600;">Liam O'Connor</div><div class="muted" style="font-size:12px;">ID: 442938</div></div></div></td><td>04</td><td>2.1</td><td>54%</td><td style="text-align:right;"><input class="input" placeholder="—" style="width:64px;text-align:center;padding:6px;"></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row" style="gap:12px;margin-top:24px;">
+          <button class="btn btn-primary" style="flex:1;">✔ Submit All Grades</button>
+          <button class="btn btn-secondary">⬇ Export CSV Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

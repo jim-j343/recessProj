@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- ACES · Quiz Configuration  (UI only) -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <left>
+        <VBox styleClass="sidebar" spacing="2">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <padding><Insets bottom="24" left="8"/></padding>
+                <Label text="A" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Lecturer Workspace" styleClass="brand-sub"/></VBox>
+            </HBox>
+            <Button text="Dashboard"    styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="My Courses"    styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="Discussions"   styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="Quiz Center"   styleClass="nav-item,active" maxWidth="Infinity"/>
+            <Button text="Participation" styleClass="nav-item" maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
+                <Label text="DK" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <VBox><Label text="Dr. K. Owen" styleClass="label-strong"/><Label text="Lecturer" styleClass="brand-sub"/></VBox>
+            </HBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox>
+            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
+                <Label text="Quiz Center" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <ScrollPane fitToWidth="true" styleClass="content">
+                <VBox spacing="24" maxWidth="900">
+                    <VBox spacing="4">
+                        <Label text="Quiz Configuration" styleClass="h-lg"/>
+                        <Label text="Set up your assessment parameters and preview the student experience." styleClass="muted"/>
+                    </VBox>
+
+                    <VBox styleClass="card" spacing="16">
+                        <Label text="⚙ General Details" styleClass="card-title"/>
+                        <VBox spacing="6">
+                            <Label text="Quiz Title" styleClass="field-label"/>
+                            <TextField text="Advanced Macroeconomics Midterm"/>
+                        </VBox>
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Start Date &amp; Time" styleClass="field-label"/>
+                                <TextField text="05/20/2026 10:00 AM"/>
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Duration (Minutes)" styleClass="field-label"/>
+                                <TextField text="60"/>
+                            </VBox>
+                        </HBox>
+                        <VBox spacing="6">
+                            <Label text="Student Category" styleClass="field-label"/>
+                            <ComboBox promptText="Undergraduate — Level 3" maxWidth="Infinity"/>
+                        </VBox>
+                    </VBox>
+
+                    <VBox styleClass="card" spacing="16">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="👁 Student View Preview" styleClass="card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="LIVE PREVIEW" styleClass="badge,badge-accent"/>
+                        </HBox>
+                        <HBox styleClass="alert-danger" alignment="CENTER_LEFT">
+                            <Label text="⏱ TIME REMAINING" styleClass="alert-danger-text"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="14:32 MIN" styleClass="alert-danger-text"/>
+                        </HBox>
+                        <Label text="The red alert banner appears when 15 minutes remain, signalling the student to complete their submission." styleClass="muted" wrapText="true"/>
+                    </VBox>
+
+                    <HBox spacing="12">
+                        <Button text="🚀 Deploy Assessment" styleClass="btn,btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Button text="Save as Draft" styleClass="btn,btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
