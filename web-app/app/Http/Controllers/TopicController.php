@@ -30,7 +30,13 @@ class TopicController extends Controller
     // Show form to create a new topic
     public function create()
     {
-        return view('forum.create');
+        $groups = \App\Models\GroupMembership::where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->with('group')
+            ->get()
+            ->pluck('group');
+
+        return view('forum.create', compact('groups'));
     }
 
     // Save new topic to database
