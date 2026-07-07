@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- ACES - Student Assessment Overview  (UI only) -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <left>
+        <VBox styleClass="sidebar" spacing="2">
+            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
+                <Label text="A" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Academic Portal" styleClass="brand-sub"/></VBox>
+            </HBox>
+            <Button text="Dashboard"   styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="Assessments" styleClass="nav-item,active" maxWidth="Infinity"/>
+            <Button text="My Courses"   styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
+                <Label text="AR" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <VBox><Label text="Alex Rivers" styleClass="label-strong"/><Label text="Computer Science - Level 4" styleClass="brand-sub"/></VBox>
+            </HBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox>
+            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
+                <Label text="Assessment Overview" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="AR" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+            </HBox>
+            <ScrollPane fitToWidth="true" styleClass="content">
+                <VBox spacing="24" maxWidth="1080">
+                    <VBox spacing="4">
+                        <Label text="Assessment Overview" styleClass="h-lg"/>
+                        <Label text="Detailed breakdown of your academic consistency and recent performance." styleClass="muted"/>
+                    </VBox>
+
+                    <HBox spacing="24">
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <Label text="Participation Metrics" styleClass="card-title"/>
+                            <Label text="Consistency Score (Last 7 Days)" styleClass="muted"/>
+                            <VBox spacing="8">
+                                <HBox spacing="10" alignment="BOTTOM_LEFT" prefHeight="180">
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="108" maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="72"  maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="153" maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="54"  maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="126" maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="36"  maxWidth="Infinity"/></VBox>
+                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="162" maxWidth="Infinity"/></VBox>
+                                </HBox>
+                                <HBox spacing="10">
+                                    <Label text="Mon" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Tue" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Wed" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Thu" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Fri" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Sat" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                    <Label text="Sun" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                </HBox>
+                            </VBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <HBox><Label text="Forum Contribution Quality" styleClass="muted"/><Region HBox.hgrow="ALWAYS"/><Label text="94/100" styleClass="label-strong"/></HBox>
+                            <HBox><Label text="Peer Review Accuracy" styleClass="muted"/><Region HBox.hgrow="ALWAYS"/><Label text="88%" styleClass="label-strong"/></HBox>
+                        </VBox>
+
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT"><Label text="Assessment History" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/><Hyperlink text="Download All"/></HBox>
+                            <VBox spacing="10">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <VBox HBox.hgrow="ALWAYS"><Label text="Advanced React Patterns" styleClass="label-strong"/><Label text="Completed Oct 14" styleClass="muted"/></VBox>
+                                    <Label text="92%" styleClass="label-strong"/>
+                                    <Label text="+8%" styleClass="badge,badge-success"/>
+                                </HBox>
+                                <Region styleClass="divider" prefHeight="1"/>
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <VBox HBox.hgrow="ALWAYS"><Label text="Data Structures II" styleClass="label-strong"/><Label text="Completed Oct 08" styleClass="muted"/></VBox>
+                                    <Label text="85%" styleClass="label-strong"/>
+                                    <Label text="+4%" styleClass="badge,badge-success"/>
+                                </HBox>
+                                <Region styleClass="divider" prefHeight="1"/>
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <VBox HBox.hgrow="ALWAYS"><Label text="System Architecture" styleClass="label-strong"/><Label text="Completed Sep 29" styleClass="muted"/></VBox>
+                                    <Label text="78%" styleClass="label-strong"/>
+                                    <Label text="-3%" styleClass="badge,badge-danger"/>
+                                </HBox>
+                            </VBox>
+                            <Label text="Showing 3 of 12 assessments" styleClass="muted"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox styleClass="card,card-dark" spacing="12">
+                        <Label text="PROFESSOR'S INSIGHT" styleClass="eyebrow-invert"/>
+                        <Label text="Alex demonstrates exceptional mastery of front-end logic. For the final capstone, focus on optimizing the render cycles in the Advanced Patterns module to achieve top-tier performance benchmarks." styleClass="body-invert" wrapText="true"/>
+                        <HBox spacing="12">
+                            <Button text="Schedule Office Hours" styleClass="btn,btn-secondary"/>
+                            <Button text="View Curated Resources" styleClass="btn,btn-ghost-invert"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

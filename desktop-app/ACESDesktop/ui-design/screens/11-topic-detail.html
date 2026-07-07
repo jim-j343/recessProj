@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACES — Topic Discussion</title>
+<link rel="stylesheet" href="../css/aces-design-system.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">A</div><div><div class="brand-name">ACES</div><div class="brand-sub">Academic Portal</div></div></div>
+    <nav class="nav">
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Dashboard</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Discussions</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> My Courses</div>
+      <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Quiz Center</div>
+    </nav>
+    <div class="sidebar-foot"><div class="avatar">AR</div><div><div style="font-weight:600;font-size:13px;">Alex Rivera</div><div class="muted" style="font-size:12px;">Student · Level 4</div></div></div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar"><a href="03-forum-dashboard.html" class="row" style="gap:8px;color:var(--ink-2);font-weight:500;">← Back</a><div class="page-title" style="margin-left:8px;">Why are we still using Webpack in 2026?</div><div class="spacer"></div><button class="icon-btn">🔖</button><button class="icon-btn">⋯</button></div>
+    <div class="content">
+      <div class="content-narrow" style="max-width:820px;">
+        <!-- Original post -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="row" style="gap:12px;margin-bottom:12px;"><div class="avatar">SC</div><div><div style="font-weight:600;">Sarah Chen <span class="badge badge-accent" style="margin-left:6px;">Author</span></div><div class="muted" style="font-size:12px;">2h ago</div></div></div>
+          <p class="body-lg" style="margin:0 0 16px;color:var(--ink-2);">With Vite, Esbuild, and Turbopack offering near-instant cold starts and lightning-fast HMR, why is the industry still so tied to Webpack? Is it just inertia, or are there complex enterprise use cases that these newer tools still haven't solved?</p>
+          <div class="row wrap" style="gap:6px;margin-bottom:12px;"><span class="chip">#WebDev</span><span class="chip">#BuildTools</span><span class="chip">#Frontend</span></div>
+          <hr class="divider" style="margin:0 0 12px;">
+          <div class="row" style="gap:16px;color:var(--muted);"><span class="row" style="gap:6px;">👍 124</span><span class="row" style="gap:6px;">💬 42 replies</span><span class="row" style="gap:6px;">🔗 Share</span></div>
+        </div>
+
+        <div class="row between" style="margin:24px 0 12px;"><div class="h-sm">42 Replies</div><div class="segmented"><button class="active">Top</button><button>Newest</button></div></div>
+
+        <!-- Threaded replies -->
+        <div class="card pad-sm" style="margin-bottom:12px;">
+          <div class="row" style="gap:10px;margin-bottom:8px;"><div class="avatar sm">DM</div><div><span style="font-weight:600;">David Müller</span> <span class="muted" style="font-size:12px;">· 1h ago</span></div></div>
+          <p style="margin:0 0 8px;color:var(--ink-2);">Plugin ecosystem. If you have a custom build pipeline developed over 5 years with 20+ specialized plugins, migrating to Vite isn't a weekend project. Enterprise stability &gt; HMR speed for many.</p>
+          <div class="row" style="gap:16px;color:var(--muted);font-size:13px;"><span>👍 58</span><span>Reply</span></div>
+
+          <!-- nested -->
+          <div style="margin:12px 0 0 32px;border-left:2px solid var(--border);padding-left:16px;">
+            <div class="row" style="gap:10px;margin-bottom:6px;"><div class="avatar sm">AR</div><div><span style="font-weight:600;">Alex Rivera</span> <span class="muted" style="font-size:12px;">· 45m ago</span></div></div>
+            <p style="margin:0;color:var(--ink-2);">This. We tried migrating a legacy monorepo and hit a wall with some obscure federated module requirements that Vite didn't quite handle the same way.</p>
+          </div>
+        </div>
+
+        <div class="card pad-sm" style="margin-bottom:12px;">
+          <div class="row" style="gap:10px;margin-bottom:8px;"><div class="avatar sm">JW</div><div><span style="font-weight:600;">Jessica Wu</span> <span class="muted" style="font-size:12px;">· 30m ago</span></div></div>
+          <p style="margin:0 0 8px;color:var(--ink-2);">I think the "inertia" argument is getting weaker. New projects almost exclusively start with Vite now. Webpack is becoming the "COBOL of the frontend" — it'll be around forever in legacy, but the innovation has moved on.</p>
+          <div class="row" style="gap:16px;color:var(--muted);font-size:13px;"><span>👍 33</span><span>Reply</span></div>
+        </div>
+
+        <!-- composer -->
+        <div class="card pad-sm" style="position:sticky;bottom:16px;">
+          <div class="input-group"><input class="input" placeholder="Add to the conversation…" style="padding-right:88px;"><span class="trail" style="right:8px;"><button class="btn btn-primary btn-sm">Reply →</button></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

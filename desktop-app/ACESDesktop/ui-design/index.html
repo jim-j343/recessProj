@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACES — Unified UI Design System</title>
+<link rel="stylesheet" href="css/aces-design-system.css">
+<style>
+  .gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+  .screen-card { display:block; text-decoration:none; color:inherit; }
+  .screen-card:hover { text-decoration:none; }
+  .screen-card:hover .thumb { border-color:var(--accent); }
+  .thumb { border:1px solid var(--border); border-radius:var(--r-lg); background:var(--surface); height:150px; display:grid; place-items:center; margin-bottom:12px; overflow:hidden; }
+  .thumb iframe { width:1280px; height:800px; transform:scale(0.234); transform-origin:top left; border:0; pointer-events:none; }
+  .thumb.mini { position:relative; }
+</style>
+</head>
+<body>
+<div class="content" style="max-width:1200px;margin:0 auto;">
+  <div class="brand" style="padding-left:0;margin-bottom:8px;"><div class="logo" style="width:44px;height:44px;font-size:18px;">A</div><div><div class="display" style="font-size:28px;">ACES Unified UI</div><div class="muted">Precision Logic design system · 11 refined platform screens</div></div></div>
+
+  <div class="card" style="margin:24px 0;">
+    <div class="card-head"><h3>Design tokens</h3></div>
+    <div class="row wrap" style="gap:20px;">
+      <div class="col" style="gap:6px;"><div class="muted label">Ground</div><div class="row" style="gap:6px;"><span style="width:28px;height:28px;border-radius:6px;background:#f8fafc;border:1px solid var(--border);"></span><span style="width:28px;height:28px;border-radius:6px;background:#ffffff;border:1px solid var(--border);"></span><span style="width:28px;height:28px;border-radius:6px;background:#f1f5f9;border:1px solid var(--border);"></span></div></div>
+      <div class="col" style="gap:6px;"><div class="muted label">Ink</div><div class="row" style="gap:6px;"><span style="width:28px;height:28px;border-radius:6px;background:#0f172a;"></span><span style="width:28px;height:28px;border-radius:6px;background:#334155;"></span><span style="width:28px;height:28px;border-radius:6px;background:#64748b;"></span></div></div>
+      <div class="col" style="gap:6px;"><div class="muted label">Accent / state</div><div class="row" style="gap:6px;"><span style="width:28px;height:28px;border-radius:6px;background:#2563eb;"></span><span style="width:28px;height:28px;border-radius:6px;background:#16a34a;"></span><span style="width:28px;height:28px;border-radius:6px;background:#b45309;"></span><span style="width:28px;height:28px;border-radius:6px;background:#dc2626;"></span></div></div>
+      <div class="col" style="gap:6px;"><div class="muted label">Type</div><div class="row" style="gap:10px;align-items:baseline;"><span style="font-weight:700;">Inter</span><span class="btn btn-primary btn-sm">Primary</span><span class="btn btn-secondary btn-sm">Secondary</span><span class="chip">chip</span></div></div>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <a class="screen-card" href="screens/01-login.html"><div class="thumb"><iframe src="screens/01-login.html"></iframe></div><div style="font-weight:600;">01 · Login</div><div class="muted" style="font-size:12px;">Role-aware sign in</div></a>
+    <a class="screen-card" href="screens/02-register.html"><div class="thumb"><iframe src="screens/02-register.html"></iframe></div><div style="font-weight:600;">02 · Register / Onboarding</div><div class="muted" style="font-size:12px;">Account creation</div></a>
+    <a class="screen-card" href="screens/03-forum-dashboard.html"><div class="thumb"><iframe src="screens/03-forum-dashboard.html"></iframe></div><div style="font-weight:600;">03 · Forum Dashboard</div><div class="muted" style="font-size:12px;">AI topics · discussions</div></a>
+    <a class="screen-card" href="screens/04-admin-analytics.html"><div class="thumb"><iframe src="screens/04-admin-analytics.html"></iframe></div><div style="font-weight:600;">04 · Admin Analytics</div><div class="muted" style="font-size:12px;">Insights overview</div></a>
+    <a class="screen-card" href="screens/05-quiz-management.html"><div class="thumb"><iframe src="screens/05-quiz-management.html"></iframe></div><div style="font-weight:600;">05 · Quiz Management</div><div class="muted" style="font-size:12px;">Configuration + preview</div></a>
+    <a class="screen-card" href="screens/06-quiz-focus-mode.html"><div class="thumb"><iframe src="screens/06-quiz-focus-mode.html"></iframe></div><div style="font-weight:600;">06 · Quiz Focus Mode</div><div class="muted" style="font-size:12px;">Proctored takeover</div></a>
+    <a class="screen-card" href="screens/07-participation-grading.html"><div class="thumb"><iframe src="screens/07-participation-grading.html"></iframe></div><div style="font-weight:600;">07 · Participation Grading</div><div class="muted" style="font-size:12px;">Lecturer grading table</div></a>
+    <a class="screen-card" href="screens/08-compliance-monitoring.html"><div class="thumb"><iframe src="screens/08-compliance-monitoring.html"></iframe></div><div style="font-weight:600;">08 · Compliance Monitoring</div><div class="muted" style="font-size:12px;">Flags · blacklist</div></a>
+    <a class="screen-card" href="screens/09-student-assessment.html"><div class="thumb"><iframe src="screens/09-student-assessment.html"></iframe></div><div style="font-weight:600;">09 · Student Assessment</div><div class="muted" style="font-size:12px;">Metrics + history</div></a>
+    <a class="screen-card" href="screens/10-topic-creation.html"><div class="thumb"><iframe src="screens/10-topic-creation.html"></iframe></div><div style="font-weight:600;">10 · Topic Creation</div><div class="muted" style="font-size:12px;">Lecturer authoring</div></a>
+    <a class="screen-card" href="screens/11-topic-detail.html"><div class="thumb"><iframe src="screens/11-topic-detail.html"></iframe></div><div style="font-weight:600;">11 · Topic Detail</div><div class="muted" style="font-size:12px;">Threaded discussion</div></a>
+  </div>
+</div>
+</body>
+</html>
