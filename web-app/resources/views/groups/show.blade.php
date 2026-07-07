@@ -13,6 +13,7 @@
                        class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
                         Go to Forum
                     </a>
+                    {{-- non-admin can leave --}}
                     @if($group->admin_id !== auth()->id())
                         <form method="POST" action="{{ route('groups.leave', $group->group_id) }}">
                             @csrf
@@ -20,6 +21,18 @@
                                 class="bg-red-100 text-red-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-200"
                                 onclick="return confirm('Are you sure you want to leave this group?')">
                                 Leave group
+                            </button>
+                        </form>
+                    @endif
+                    {{-- admin can delete --}}
+                    @if($group->admin_id === auth()->id())
+                        <form method="POST" action="{{ route('groups.destroy', $group->group_id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
+                                onclick="return confirm('Delete this group? This cannot be undone.')">
+                                Delete Group
                             </button>
                         </form>
                     @endif

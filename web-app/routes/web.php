@@ -82,14 +82,24 @@ Route::middleware(['auth'])->group(function () {
 // Student dashboard
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', function () {
-        return view('student.dashboard');
+        $userGroupIds = \App\Models\GroupMembership::where('user_id', auth()->id())
+            ->where('status', 'active')->pluck('group_id');
+        $topicCount = \App\Models\Topic::whereIn('group_id', $userGroupIds)->count();
+        $postCount = \App\Models\Post::where('author_id', auth()->id())->count();
+        $groupCount = $userGroupIds->count();
+        return view('student.dashboard', compact('topicCount', 'postCount', 'groupCount'));
     })->name('student.dashboard');
 });
 
 // Lecturer dashboard
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer/dashboard', function () {
-        return view('lecturer.dashboard');
+        $quizzes = \App\Models\Quiz::where('lecturer_id', auth()->id())
+            ->latest()->get();
+        $quizCount = $quizzes->count();
+        $groupCount = \App\Models\GroupMembership::where('user_id', auth()->id())->count();
+        $topicCount = \App\Models\Topic::where('creator_id', auth()->id())->count();
+        return view('lecturer.dashboard', compact('quizzes', 'quizCount', 'groupCount', 'topicCount'));
     })->name('lecturer.dashboard');
 });
 
@@ -101,5 +111,7 @@ Route::middleware(['auth', 'role:system_admin'])->group(function () {
     Route::post('/admin/blacklist/{user}', [AdminController::class, 'blacklistMember'])->name('admin.blacklist');
     Route::post('/admin/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist'])->name('admin.liftBlacklist');
 });
+
+Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 
 require __DIR__.'/auth.php';

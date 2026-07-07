@@ -92,4 +92,14 @@ class GroupController extends Controller
         return redirect()->route('groups.index')
             ->with('success', 'You left ' . $group->name . '.');
     }
+
+    public function destroy(Group $group)
+{
+    if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        abort(403);
+    }
+    $group->delete();
+    return redirect()->route('groups.index')
+        ->with('success', 'Group deleted.');
+}
 }
