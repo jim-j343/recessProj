@@ -6,5 +6,7 @@ module com.example.acesdesktop {
     requires java.desktop;
 
     opens forum to javafx.fxml;
+    opens forum.ui to javafx.fxml;
     exports forum;
+    exports forum.ui;
 }

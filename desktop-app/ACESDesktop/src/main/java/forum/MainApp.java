@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -20,11 +21,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * ACES Desktop — UI preview gallery.
+ * ACES Desktop application entry point.
  *
- * Design-phase harness only (no business logic). Launches a single window
- * with a navigator listing every screen; selecting one loads its FXML from
- * /forum/fxml/ into the preview area so all screens can be evaluated in one run.
+ * Normal launch opens the Login screen. The developer-only screen-preview
+ * gallery is shown ONLY in dev mode, enabled by any of:
+ *   - VM option:      -Daces.dev=true
+ *   - program arg:    --dev
+ *   - env variable:   ACES_DEV=1  (or true)
+ * End users never see the gallery.
+ *
+ * (Design phase — no controller/business logic wired yet.)
  */
 public class MainApp extends Application {
 
@@ -52,10 +58,44 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        // --- Navigator (left) ---
-        Label navTitle = new Label("ACES · Screen Preview");
+        try {
+            stage.getIcons().add(new Image(
+                    getClass().getResourceAsStream("/forum/images/aces-logo-256.png")));
+        } catch (Exception ignored) { }
+
+        if (isDeveloperMode()) {
+            startGallery(stage);
+        } else {
+            startApp(stage);
+        }
+    }
+
+    /** True only when the developer explicitly opts in to the preview gallery. */
+    private boolean isDeveloperMode() {
+        if (getParameters() != null && getParameters().getRaw().contains("--dev")) return true;
+        String prop = System.getProperty("aces.dev", "");
+        String env  = System.getenv().getOrDefault("ACES_DEV", "");
+        return prop.equalsIgnoreCase("true") || prop.equals("1")
+            || env.equalsIgnoreCase("true")  || env.equals("1");
+    }
+
+    /** Normal end-user launch: open the Login screen. */
+    private void startApp(Stage stage) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/forum/fxml/Login.fxml"));
+            stage.setScene(new Scene(root));
+            stage.setTitle("ACES");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Developer-only screen-preview gallery. */
+    private void startGallery(Stage stage) {
+        Label navTitle = new Label("ACES · Screen Preview (dev)");
         navTitle.setStyle("-fx-font-size:15px; -fx-font-weight:bold; -fx-padding:0 0 4 0;");
-        Label navHint = new Label("Select a screen to preview");
+        Label navHint = new Label("Developer preview — not shown to users");
         navHint.setStyle("-fx-text-fill:#64748b; -fx-font-size:12px; -fx-padding:0 0 8 0;");
 
         ListView<String> list = new ListView<>(FXCollections.observableArrayList(SCREENS.keySet()));
@@ -68,7 +108,6 @@ public class MainApp extends Application {
         nav.setPrefWidth(260);
         nav.setStyle("-fx-background-color:#ffffff; -fx-border-color:#e2e8f0; -fx-border-width:0 1 0 0;");
 
-        // --- Preview area (right) ---
         preview.setStyle("-fx-background-color:#f8fafc;");
         preview.setAlignment(Pos.TOP_CENTER);
         ScrollPane scroller = new ScrollPane(preview);
@@ -80,12 +119,10 @@ public class MainApp extends Application {
         rootPane.setLeft(nav);
         rootPane.setCenter(scroller);
 
-        Scene scene = new Scene(rootPane, 1500, 900);
-        stage.setTitle("ACES — UI Preview Gallery");
-        stage.setScene(scene);
+        stage.setScene(new Scene(rootPane, 1500, 900));
+        stage.setTitle("ACES — UI Preview Gallery (developer)");
         stage.show();
-
-        list.getSelectionModel().selectFirst();  // open Login by default
+        list.getSelectionModel().selectFirst();
     }
 
     /** Load a screen's FXML into the preview area, showing any error inline. */

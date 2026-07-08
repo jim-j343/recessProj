@@ -2,22 +2,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import forum.ui.RevealPasswordField?>
+<?import forum.ui.IconTextField?>
 
 <!-- ACES · Register / Onboarding  (UI only) -->
 <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-           stylesheets="@../css/aces.css" styleClass="root"
+           stylesheets="@../css/aces.css" styleClass="root,auth" style="-fx-background-color: white;"
            prefWidth="900" prefHeight="700">
     <fx:define><ToggleGroup fx:id="role"/></fx:define>
     <VBox alignment="TOP_CENTER" maxWidth="440" spacing="20">
         <padding><Insets top="40" right="16" bottom="40" left="16"/></padding>
 
         <VBox alignment="CENTER" spacing="6">
-            <Label text="A" styleClass="brand-logo" minWidth="52" minHeight="52" prefWidth="52" prefHeight="52"/>
+            <ImageView fitWidth="52" fitHeight="52" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
             <Label text="Create Account" styleClass="display"/>
             <Label text="Join the ACES platform to get started" styleClass="muted"/>
         </VBox>
 
-        <VBox styleClass="card" spacing="16" maxWidth="440">
+        <VBox styleClass="auth-surface" spacing="16" maxWidth="440">
             <VBox spacing="6">
                 <Label text="Select Role" styleClass="field-label"/>
                 <HBox styleClass="segmented" alignment="CENTER" spacing="0">
@@ -29,22 +32,22 @@
 
             <VBox spacing="6">
                 <Label text="Full Name" styleClass="field-label"/>
-                <TextField fx:id="fullNameField" promptText="Enter your full name"/>
+                <IconTextField fx:id="fullNameField" icon="user" promptText="Enter your full name" maxWidth="Infinity"/>
             </VBox>
 
             <VBox spacing="6">
                 <Label text="Email Address" styleClass="field-label"/>
-                <TextField fx:id="emailField" promptText="your.email@example.com"/>
+                <IconTextField fx:id="emailField" icon="mail" promptText="your.email@example.com" maxWidth="Infinity"/>
             </VBox>
 
             <HBox spacing="16">
                 <VBox spacing="6" HBox.hgrow="ALWAYS">
                     <Label text="Password" styleClass="field-label"/>
-                    <PasswordField fx:id="passwordField" promptText="••••••••"/>
+                    <RevealPasswordField fx:id="passwordField" promptText="Password" maxWidth="Infinity"/>
                 </VBox>
                 <VBox spacing="6" HBox.hgrow="ALWAYS">
                     <Label text="Confirm Password" styleClass="field-label"/>
-                    <PasswordField fx:id="confirmField" promptText="••••••••"/>
+                    <RevealPasswordField fx:id="confirmField" promptText="Confirm password" maxWidth="Infinity"/>
                 </VBox>
             </HBox>
 
