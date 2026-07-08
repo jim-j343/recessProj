@@ -20,7 +20,16 @@ class QuizController extends Controller
             'target'     => ['nullable', 'string', 'max:80'],
         ]);
 
-        // Quiz creation will be implemented when QuizModel is ready
+        \App\Models\Quiz::create([
+            'lecturer_id'     => auth()->id(),
+            'group_id'        => 1,
+            'title'           => $validated['title'],
+            'target_category' => $validated['target'] ?? null,
+            'start_time'      => $validated['start_time'],
+            'duration_minutes'=> $validated['duration'],
+            'is_published'    => false,
+        ]);
+
         return redirect()->route('lecturer.dashboard')
             ->with('success', 'Quiz configuration saved!');
     }

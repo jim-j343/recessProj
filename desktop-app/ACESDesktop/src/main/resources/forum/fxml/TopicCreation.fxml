@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+
+<!-- ACES · Create Learning Topic  (UI only) -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <left>
+        <VBox styleClass="sidebar" spacing="2">
+            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
+                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
+                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Lecturer Workspace" styleClass="brand-sub"/></VBox>
+            </HBox>
+            <Button text="Dashboard"  styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="My Courses"  styleClass="nav-item,active" maxWidth="Infinity"/>
+            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity"/>
+            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
+                <Label text="DK" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <VBox><Label text="Dr. K. Owen" styleClass="label-strong"/><Label text="Lecturer" styleClass="brand-sub"/></VBox>
+            </HBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox>
+            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
+                <Label text="My Courses" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="⛭ Last autosaved at 14:32" styleClass="muted"/>
+            </HBox>
+            <ScrollPane fitToWidth="true" styleClass="content">
+                <VBox spacing="24" maxWidth="820">
+                    <VBox styleClass="card" spacing="16">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Label text="＋" styleClass="brand-logo" minWidth="40" minHeight="40"/>
+                            <VBox><Label text="Create New Learning Topic" styleClass="h-md"/><Label text="Configure your lecture content and AI classification" styleClass="muted"/></VBox>
+                        </HBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Topic Title" styleClass="field-label"/>
+                                <TextField promptText="e.g. Introduction to Wave-Particle Duality"/>
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Category" styleClass="field-label"/>
+                                <ComboBox promptText="Core Curriculum" maxWidth="Infinity"/>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6">
+                            <Label text="Description &amp; Key Objectives" styleClass="field-label"/>
+                            <TextArea promptText="Start typing your lesson description here…" prefRowCount="6" wrapText="true"/>
+                        </VBox>
+
+                        <VBox styleClass="tag-panel" spacing="12">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="✦ AI-SUGGESTED CLASSIFICATION TAGS" styleClass="eyebrow"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Hyperlink text="REGENERATE"/>
+                            </HBox>
+                            <FlowPane hgap="8" vgap="8">
+                                <Label text="Quantum Mechanics ✕" styleClass="chip"/>
+                                <Label text="Theoretical Physics ✕" styleClass="chip"/>
+                                <Label text="Undergraduate ✕" styleClass="chip"/>
+                                <Label text="Spring 2026 ✕" styleClass="chip"/>
+                                <Label text="＋ Custom Tag" styleClass="chip,chip-dashed"/>
+                            </FlowPane>
+                        </VBox>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="☁ Draft synced to local cache" styleClass="muted"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <HBox spacing="8">
+                                <Button text="Save Draft" styleClass="btn,btn-secondary"/>
+                                <Button text="✦ Publish Topic" styleClass="btn,btn-accent"/>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
