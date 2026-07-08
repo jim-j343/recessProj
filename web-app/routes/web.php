@@ -4,8 +4,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,7 +24,6 @@ Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
         return redirect()->route('student.dashboard');
     }
 
-    // Secondary structural fallback layout if no role matches
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -67,33 +67,53 @@ Route::middleware(['auth'])->group(function () {
     })->name('participation.grade');
 });
 
+// Group routes — IMPORTANT: /groups/create must come before /groups/{group}
+Route::middleware(['auth'])->group(function () {
+    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
+    Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+});
+
 // ==========================================
 // ROLE-BASED DASHBOARD ROUTE GROUPS
 // ==========================================
 
-// Student-Specific Dashboards (Recess Brief Features)
+// Student dashboard
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', function () {
-        return view('student.dashboard');
+        $userGroupIds = \App\Models\GroupMembership::where('user_id', auth()->id())
+            ->where('status', 'active')->pluck('group_id');
+        $topicCount = \App\Models\Topic::whereIn('group_id', $userGroupIds)->count();
+        $postCount = \App\Models\Post::where('author_id', auth()->id())->count();
+        $groupCount = $userGroupIds->count();
+        return view('student.dashboard', compact('topicCount', 'postCount', 'groupCount'));
     })->name('student.dashboard');
 });
 
-// Lecturer-Specific Dashboards (Recess Brief Features)
+// Lecturer dashboard
 Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer/dashboard', function () {
-        return view('lecturer.dashboard');
+        $quizzes = \App\Models\Quiz::where('lecturer_id', auth()->id())
+            ->latest()->get();
+        $quizCount = $quizzes->count();
+        $groupCount = \App\Models\GroupMembership::where('user_id', auth()->id())->count();
+        $topicCount = \App\Models\Topic::where('creator_id', auth()->id())->count();
+        return view('lecturer.dashboard', compact('quizzes', 'quizCount', 'groupCount', 'topicCount'));
     })->name('lecturer.dashboard');
 });
 
-// System Administrator Routes (Unified & Protected)
+// Admin routes — all protected by role:system_admin
 Route::middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/members', function () {
-        return view('admin.members');
-    })->name('admin.members');
-    Route::get('/admin/analytics', function () {
-        return view('admin.analytics');
-    })->name('admin.analytics');
+    Route::get('/admin/members', [AdminController::class, 'members'])->name('admin.members');
+    Route::get('/admin/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
+    Route::post('/admin/blacklist/{user}', [AdminController::class, 'blacklistMember'])->name('admin.blacklist');
+    Route::post('/admin/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist'])->name('admin.liftBlacklist');
 });
+
+Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 
 require __DIR__.'/auth.php';

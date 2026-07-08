@@ -12,8 +12,15 @@ class TopicController extends Controller
     // Show all topics
     public function index()
     {
+        // Get the groups the current user belongs to
+        $userGroupIds = \App\Models\GroupMembership::where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->pluck('group_id');
+
+        // Show only topics from the user's groups
         $topics = Topic::with('creator')
             ->withCount('posts')
+            ->whereIn('group_id', $userGroupIds)
             ->latest()
             ->get();
 
@@ -23,7 +30,13 @@ class TopicController extends Controller
     // Show form to create a new topic
     public function create()
     {
-        return view('forum.create');
+        $groups = \App\Models\GroupMembership::where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->with('group')
+            ->get()
+            ->pluck('group');
+
+        return view('forum.create', compact('groups'));
     }
 
     // Save new topic to database

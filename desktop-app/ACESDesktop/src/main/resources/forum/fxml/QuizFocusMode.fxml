@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- ACES · Quiz Focus / Proctored Takeover Mode  (UI only) -->
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+           stylesheets="@../css/aces.css" styleClass="root,focus-bg"
+           prefWidth="1000" prefHeight="720">
+    <VBox alignment="TOP_RIGHT">
+        <padding><Insets top="20" right="32"/></padding>
+        <Label text="⏱ 24:57" styleClass="timer-danger"/>
+        <Label text="TIME REMAINING" styleClass="eyebrow"/>
+    </VBox>
+
+    <VBox styleClass="card" maxWidth="640" maxHeight="480" spacing="20">
+        <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
+        <HBox alignment="CENTER_LEFT">
+            <VBox><Label text="Advanced Web Systems" styleClass="h-sm"/><Label text="Question 12 of 30 · Multiple Choice" styleClass="muted"/></VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="🔒 LOCKED" styleClass="badge,badge-neutral"/>
+        </HBox>
+
+        <Label text="What is the primary benefit of using a Virtual DOM in modern web frameworks?" styleClass="h-md" wrapText="true"/>
+
+        <fx:define><ToggleGroup fx:id="answer"/></fx:define>
+        <VBox spacing="12">
+            <RadioButton text="Faster initial render" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+            <RadioButton text="Efficient updates by minimizing direct DOM manipulation" toggleGroup="$answer" selected="true" styleClass="answer-option,selected" maxWidth="Infinity"/>
+            <RadioButton text="Automatic SEO optimization" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+            <RadioButton text="Native browser support" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+        </VBox>
+
+        <Separator styleClass="divider"/>
+        <HBox alignment="CENTER_LEFT">
+            <Button text="🚩 Review Later" styleClass="btn,btn-ghost"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="8">
+                <Button text="Previous" styleClass="btn,btn-secondary"/>
+                <Button text="Next Question →" styleClass="btn,btn-primary"/>
+            </HBox>
+        </HBox>
+    </VBox>
+
+    <VBox alignment="BOTTOM_CENTER">
+        <padding><Insets bottom="16"/></padding>
+        <Label text="🛡 Proctoring Active · Screen Recording &amp; Tab Locking Enabled" styleClass="muted"/>
+    </VBox>
+</StackPane>
