@@ -2,6 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
 
 <!-- ACES · Compliance Monitoring  (UI only) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -10,7 +11,7 @@
     <left>
         <VBox styleClass="sidebar" spacing="2">
             <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <Label text="A" styleClass="brand-logo" minWidth="34" minHeight="34"/>
+                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
                 <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Admin Console" styleClass="brand-sub"/></VBox>
             </HBox>
             <Label text="OVERVIEW" styleClass="nav-section"/>
