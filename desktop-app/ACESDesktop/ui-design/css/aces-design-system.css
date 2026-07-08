@@ -1,31 +1,27 @@
 /* ============================================================
    ACES — Precision Logic Design System
    Unified UI stylesheet for all platform mockups.
-   Aesthetic: Minimalist Corporate Tech / "Quiet Premium".
+   Serif display + sans UI. Pill (Spotify-style) buttons.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap');
 
 :root {
-  /* --- Ground & surfaces --- */
-  --bg:              #f8fafc;   /* ground plane */
-  --surface:         #ffffff;   /* cards / containers */
-  --surface-2:       #f1f5f9;   /* recessed / chips / disabled */
+  --bg:              #f8fafc;
+  --surface:         #ffffff;
+  --surface-2:       #f1f5f9;
   --surface-3:       #f8fafc;
 
-  /* --- Text --- */
-  --ink:             #0f172a;   /* primary text / primary buttons */
-  --ink-2:           #334155;   /* secondary text */
-  --ink-3:           #475569;   /* tertiary */
-  --muted:           #64748b;   /* captions */
-  --muted-2:         #94a3b8;   /* disabled text / placeholder */
+  --ink:             #0f172a;
+  --ink-2:           #334155;
+  --ink-3:           #475569;
+  --muted:           #64748b;
+  --muted-2:         #94a3b8;
 
-  /* --- Lines --- */
   --border:          #e2e8f0;
   --border-strong:   #cbd5e1;
 
-  /* --- Accents --- */
-  --accent:          #2563eb;   /* interactive / focus only */
+  --accent:          #2563eb;
   --accent-soft:     rgba(37, 99, 235, 0.12);
   --success:         #16a34a;
   --success-soft:    #dcfce7;
@@ -34,13 +30,15 @@
   --danger:          #dc2626;
   --danger-soft:     #fee2e2;
 
-  /* --- Shape --- */
   --r-sm: 4px;
   --r-md: 6px;
   --r-lg: 8px;
   --r-full: 9999px;
 
-  /* --- Spacing (8px base) --- */
+  /* Type families: serif display + sans UI */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, Cambria, 'Times New Roman', serif;
+
   --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s5: 40px;
 
   --shadow-overlay: 0 12px 32px rgba(15, 23, 42, 0.12);
@@ -52,7 +50,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--ink);
   font-size: 14px;
@@ -61,9 +59,14 @@ html, body {
 }
 
 /* ---------- Typography ---------- */
-.display   { font-size: 36px; font-weight: 700; line-height: 44px; letter-spacing: -0.02em; }
-.h-lg      { font-size: 28px; font-weight: 600; line-height: 36px; letter-spacing: -0.01em; }
-.h-md      { font-size: 20px; font-weight: 600; line-height: 28px; }
+/* Headings use the serif display face; body/UI stays sans. */
+.display, .h-lg, .h-md, .h-sm,
+.card-head h3, .page-head h1, .metric .v {
+  font-family: var(--font-serif);
+}
+.display   { font-size: 36px; font-weight: 600; line-height: 44px; letter-spacing: -0.01em; }
+.h-lg      { font-size: 28px; font-weight: 600; line-height: 36px; letter-spacing: -0.005em; }
+.h-md      { font-size: 21px; font-weight: 600; line-height: 28px; }
 .h-sm      { font-size: 16px; font-weight: 600; line-height: 24px; }
 .body-lg   { font-size: 16px; font-weight: 400; line-height: 24px; }
 .body      { font-size: 14px; font-weight: 400; line-height: 20px; }
@@ -130,15 +133,17 @@ a:hover { text-decoration: underline; }
 .searchbox {
   display: flex; align-items: center; gap: 8px;
   background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--r-md); padding: 8px 12px; width: 320px; color: var(--muted);
+  border-radius: var(--r-full); padding: 8px 14px; width: 320px; color: var(--muted);
 }
 .searchbox input { border: 0; background: transparent; outline: none; font: inherit; width: 100%; color: var(--ink); }
 .icon-btn {
-  width: 38px; height: 38px; border-radius: var(--r-md);
+  width: 38px; height: 38px; border-radius: var(--r-full);
   border: 1px solid var(--border); background: var(--surface);
   display: grid; place-items: center; cursor: pointer; color: var(--ink-3); position: relative;
+  transition: transform .1s ease, background .15s ease;
 }
 .icon-btn:hover { background: var(--surface-2); }
+.icon-btn:active { transform: scale(0.94); }
 .icon-btn .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); border: 1.5px solid #fff; }
 
 .content { padding: var(--s4); flex: 1; }
@@ -169,37 +174,40 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Stat / metric ---------- */
 .metric .k { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.metric .v { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 0 2px; }
+.metric .v { font-size: 30px; font-weight: 600; letter-spacing: -0.01em; margin: 6px 0 2px; }
 .metric .d { font-size: 12px; color: var(--muted); }
 .trend-up { color: var(--success); font-weight: 600; }
 .trend-down { color: var(--danger); font-weight: 600; }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons (pill / Spotify-style) ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 16px; border-radius: var(--r-sm); font: inherit; font-weight: 600; font-size: 14px;
-  border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  padding: 11px 24px; border-radius: var(--r-full); font: inherit; font-weight: 700; font-size: 14px;
+  letter-spacing: 0.01em; border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: transform .1s ease, background .15s ease, box-shadow .15s ease, filter .15s ease;
 }
 .btn svg { width: 16px; height: 16px; }
+.btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--ink); color: #fff; }
-.btn-primary:hover { background: #1e293b; }
-.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border); }
-.btn-secondary:hover { background: var(--surface-2); }
+.btn-primary:hover { background: #000; transform: scale(1.03); box-shadow: 0 4px 14px rgba(15,23,42,0.18); }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--surface); border-color: var(--ink); transform: scale(1.03); }
 .btn-accent { background: var(--accent); color: #fff; }
-.btn-accent:hover { background: #1d4ed8; }
+.btn-accent:hover { background: #1d4ed8; transform: scale(1.03); box-shadow: 0 4px 14px rgba(37,99,235,0.28); }
 .btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { filter: brightness(1.05); transform: scale(1.03); }
 .btn-ghost { background: transparent; color: var(--ink-2); }
 .btn-ghost:hover { background: var(--surface-2); }
-.btn-sm { padding: 7px 12px; font-size: 13px; }
+.btn-sm { padding: 8px 18px; font-size: 13px; }
 .btn-block { width: 100%; }
-.btn:disabled, .btn.disabled { background: var(--surface-2); color: var(--muted-2); border-color: transparent; cursor: not-allowed; }
+.btn:disabled, .btn.disabled { background: var(--surface-2); color: var(--muted-2); border-color: transparent; cursor: not-allowed; transform: none; box-shadow: none; }
 
 /* ---------- Inputs ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s2); }
 .field > label { font-size: 12px; font-weight: 500; color: var(--ink-2); }
 .input, .select, textarea.input {
-  width: 100%; padding: 10px 12px; font: inherit; font-size: 14px;
-  border: 1px solid var(--border); border-radius: var(--r-sm);
+  width: 100%; padding: 10px 14px; font: inherit; font-size: 14px;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
   background: var(--surface); color: var(--ink); outline: none;
 }
 .input::placeholder { color: var(--muted-2); }
@@ -207,20 +215,20 @@ a:hover { text-decoration: underline; }
   border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .input-group { position: relative; display: flex; align-items: center; }
-.input-group .lead { position: absolute; left: 12px; color: var(--muted-2); display: grid; place-items: center; }
+.input-group .lead { position: absolute; left: 14px; color: var(--muted-2); display: grid; place-items: center; }
 .input-group .trail { position: absolute; right: 12px; color: var(--muted-2); cursor: pointer; }
-.input-group .input { padding-left: 38px; }
+.input-group .input { padding-left: 40px; }
 
 /* ---------- Chips / tags / badges ---------- */
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--surface-2); color: var(--ink-3);
-  padding: 5px 10px; border-radius: var(--r-full); font-size: 12px; font-weight: 500;
+  padding: 5px 12px; border-radius: var(--r-full); font-size: 12px; font-weight: 500;
 }
 .chip .x { color: var(--muted-2); cursor: pointer; }
 .badge {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 9px; border-radius: var(--r-full); font-size: 11.5px; font-weight: 600;
+  padding: 3px 10px; border-radius: var(--r-full); font-size: 11.5px; font-weight: 600;
 }
 .badge-neutral { background: var(--surface-2); color: var(--ink-3); }
 .badge-success { background: var(--success-soft); color: var(--success); }
@@ -229,8 +237,8 @@ a:hover { text-decoration: underline; }
 .badge-accent  { background: var(--accent-soft); color: var(--accent); }
 
 /* ---------- Segmented control (tabs) ---------- */
-.segmented { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); padding: 3px; gap: 2px; }
-.segmented button { border: 0; background: transparent; padding: 7px 16px; border-radius: var(--r-sm); font: inherit; font-weight: 500; font-size: 13px; color: var(--ink-3); cursor: pointer; }
+.segmented { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-full); padding: 3px; gap: 2px; }
+.segmented button { border: 0; background: transparent; padding: 7px 18px; border-radius: var(--r-full); font: inherit; font-weight: 500; font-size: 13px; color: var(--ink-3); cursor: pointer; }
 .segmented button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(15,23,42,0.06); font-weight: 600; }
 
 .tabs { display: flex; gap: var(--s3); border-bottom: 1px solid var(--border); }
@@ -264,3 +272,47 @@ a:hover { text-decoration: underline; }
 .bar-labels span { flex: 1; text-align: center; font-size: 11px; color: var(--muted); }
 
 .mockup-frame { min-height: 100vh; }
+
+/* ---------- Checkboxes (rounded box, ink fill, sharp tick) ---------- */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  margin: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+input[type="checkbox"]:hover { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(15,23,42,0.10); }
+input[type="checkbox"]:checked { background: var(--ink); border-color: var(--ink); }
+input[type="checkbox"]:checked:hover { background: #1e293b; }
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute; left: 5.5px; top: 2px;
+  width: 4px; height: 8px;
+  border: solid #fff; border-width: 0 2px 2px 0;
+  border-radius: 0;                 /* sharp, cornered tick */
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(15,23,42,0.14); }
+input[type="checkbox"]:disabled { background: var(--surface-2); border-color: var(--border); cursor: not-allowed; }
+input[type="checkbox"]:disabled:checked { background: var(--muted-2); border-color: var(--muted-2); }
+
+/* ---------- Brand mark (ACES chevron logo) ---------- */
+.brand-mark { display:inline-block; width:34px; height:34px; flex-shrink:0;
+  background:no-repeat center/contain; background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cpath%20d='M9%2047%20L32%2015%20L55%2047'%20fill='none'%20stroke='%23b6b9c2'%20stroke-width='7.5'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M19%2047%20L32%2029%20L45%2047'%20fill='none'%20stroke='%230f172a'%20stroke-width='7.5'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+/* ---------- Auth screens: white background, borderless form ---------- */
+.auth-wrap { background: #ffffff; }
+.auth-card .card { border: none; background: transparent; padding: 0; }
+
+/* ---------- Auth screens: sans-serif headings (match reference) ---------- */
+.auth-card .display, .auth-card .h-lg, .auth-wrap .display, .auth-wrap .h-lg {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
