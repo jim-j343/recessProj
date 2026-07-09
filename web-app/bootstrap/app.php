@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'not.blacklisted' => \App\Http\Middleware\EnsureUserIsNotBlacklisted::class,
         ]);
+        $middleware->appendToGroup('web', \App\Http\Middleware\UpdateLastActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
