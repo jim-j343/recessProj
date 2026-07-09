@@ -37,7 +37,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->system_role === 'admin')
+                    @if(auth()->user()->system_role === 'system_admin')
                         <x-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                             Members
                         </x-nav-link>
@@ -124,7 +124,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->system_role === 'admin')
+            @if(auth()->user()->system_role === 'system_admin')
                 <x-responsive-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                     👥 Members
                 </x-responsive-nav-link>

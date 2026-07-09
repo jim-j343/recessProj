@@ -2,77 +2,128 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
 use App\Models\GroupMembership;
 use App\Models\ParticipationScore;
+use App\Models\Post;
+use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ParticipationController extends Controller
 {
-    // Lecturer: pick a group, then grade its active student members
+    // Map letter grades to numeric scores stored in participation_scores
+    private const GRADE_SCORES = [
+        'A' => 90, 'B' => 75, 'C' => 60, 'D' => 45, 'F' => 30,
+    ];
+
+    // Lecturer: grading table with real students and real activity
     public function grade(Request $request)
     {
-        // Groups this lecturer actually belongs to (same pattern as QuizController::create)
-        $groups = GroupMembership::where('user_id', Auth::id())
+        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
             ->where('status', 'active')
-            ->with('group')
-            ->get()
-            ->pluck('group');
+            ->pluck('group_id');
 
-        $selectedGroupId = $request->query('group_id') ?? $groups->first()?->group_id;
-        $selectedGroup = $groups->firstWhere('group_id', (int) $selectedGroupId);
+        // Topics in the lecturer's groups (for the filter dropdown)
+        $topics = Topic::whereIn('group_id', $lecturerGroupIds)
+            ->orderBy('title')->get();
 
-        $students = collect();
-        if ($selectedGroup) {
-            $students = GroupMembership::where('group_id', $selectedGroup->group_id)
-                ->where('status', 'active')
-                ->with(['user' => fn ($q) => $q->where('system_role', 'student')])
-                ->get()
-                ->pluck('user')
-                ->filter()
-                ->values();
+        $topicFilter = $request->query('topic');
+        $search      = $request->query('search');
+
+        // Students who share a group with the lecturer
+        $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
+            ->where('status', 'active')
+            ->pluck('user_id');
+
+        $studentsQuery = User::whereIn('user_id', $studentIds)
+            ->where('system_role', 'student');
+
+        if ($search) {
+            $studentsQuery->where('username', 'like', "%{$search}%");
         }
 
-        return view('participation.grade', compact('groups', 'selectedGroup', 'students'));
+        $students = $studentsQuery->orderBy('username')->get();
+
+        // Build per-student activity rows
+        $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter) {
+            $postsQuery = Post::where('author_id', $student->user_id)
+                ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
+                    $q->whereIn('group_id', $lecturerGroupIds);
+                    if ($topicFilter) {
+                        $q->where('topic_id', $topicFilter);
+                    }
+                });
+
+            $postCount  = (clone $postsQuery)->count();
+            $replyCount = (clone $postsQuery)->whereNotNull('parent_post_id')->count();
+
+            // Most recent topic they posted in (for display)
+            $latestPost = (clone $postsQuery)->with('topic')->latest('created_at')->first();
+
+            $quality = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
+
+            // Latest saved score, if any
+            $existing = ParticipationScore::where('user_id', $student->user_id)
+                ->latest('created_at')->first();
+
+            return (object) [
+                'student'     => $student,
+                'postCount'   => $postCount,
+                'replyCount'  => $replyCount,
+                'latestTopic' => $latestPost?->topic?->title,
+                'quality'     => $quality,
+                'existing'    => $existing,
+            ];
+        });
+
+        // Hide students with zero activity when filtering by a specific topic
+        if ($topicFilter) {
+            $rows = $rows->filter(fn ($r) => $r->postCount > 0)->values();
+        }
+
+        return view('participation.grade', compact('rows', 'topics', 'topicFilter', 'search'));
     }
 
-    // Lecturer: persist a batch of participation scores for one group/criteria
-    public function save(Request $request)
+    // Lecturer: save all grades at once
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            'group_id'        => ['required', 'exists:groups,group_id'],
-            'criteria'        => ['required', 'string', 'max:120'],
-            'scores'          => ['required', 'array'],
-            'scores.*'        => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'grades'             => ['required', 'array'],
+            'grades.*.grade'     => ['nullable', 'in:A,B,C,D,F'],
+            'grades.*.remark'    => ['nullable', 'string', 'max:255'],
         ]);
 
-        $awarded = 0;
+        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->pluck('group_id');
 
-        foreach ($validated['scores'] as $userId => $score) {
-            if ($score === null || $score === '') {
+        $saved = 0;
+
+        foreach ($validated['grades'] as $userId => $data) {
+            if (empty($data['grade'])) {
+                continue; // skip rows the lecturer left ungraded
+            }
+
+            // Score is stored against the group both lecturer and student share
+            $groupId = GroupMembership::where('user_id', $userId)
+                ->whereIn('group_id', $lecturerGroupIds)
+                ->value('group_id');
+
+            if (!$groupId) {
                 continue;
             }
 
             ParticipationScore::create([
                 'user_id'    => $userId,
-                'group_id'   => $validated['group_id'],
-                'criteria'   => $validated['criteria'],
-                'score'      => $score,
+                'group_id'   => $groupId,
+                'criteria'   => $data['remark'] ?: 'Forum participation — grade ' . $data['grade'],
+                'score'      => self::GRADE_SCORES[$data['grade']],
                 'awarded_by' => Auth::id(),
             ]);
-
-            ActivityLog::create([
-                'user_id'     => $userId,
-                'group_id'    => $validated['group_id'],
-                'action_type' => 'participation_graded',
-                'meta'        => ['criteria' => $validated['criteria'], 'score' => $score],
-                'logged_at'   => now(),
-            ]);
-
-            $awarded++;
+            $saved++;
         }
 
-        return back()->with('success', "Saved participation scores for {$awarded} student(s).");
+        return back()->with('success', "Saved grades for {$saved} student(s).");
     }
 }

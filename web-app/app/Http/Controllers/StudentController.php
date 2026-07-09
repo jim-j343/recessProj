@@ -102,6 +102,12 @@ class StudentController extends Controller
         $assessmentInputs = collect([$averageGrade, $participationAvg])->filter(fn ($v) => $v !== null);
         $overallScore = $assessmentInputs->count() ? (int) round($assessmentInputs->avg()) : null;
 
+        // ---- Latest topic in the student's groups (replaces hardcoded card) ----
+        $latestTopic = Topic::whereIn('group_id', $groupIds)
+            ->with(['posts' => fn ($q) => $q->with('author')->latest('created_at')->take(3)])
+            ->latest('created_at')
+            ->first();
+
         return view('student.dashboard', compact(
             'topicCount',
             'postCount',
@@ -117,7 +123,8 @@ class StudentController extends Controller
             'participationAvg',
             'latestWarning',
             'recentActivity',
-            'overallScore'
+            'overallScore',
+            'latestTopic'
         ));
     }
 }
