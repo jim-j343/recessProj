@@ -1,5 +1,10 @@
 package forum;
 
+import forum.app.SceneManager;
+import forum.database.SQLiteConnection;
+import forum.database.TopicDao;
+import forum.database.UserDao;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -23,18 +28,12 @@ import java.util.Map;
 /**
  * ACES Desktop application entry point.
  *
- * Normal launch opens the Login screen. The developer-only screen-preview
- * gallery is shown ONLY in dev mode, enabled by any of:
- *   - VM option:      -Daces.dev=true
- *   - program arg:    --dev
- *   - env variable:   ACES_DEV=1  (or true)
- * End users never see the gallery.
- *
- * (Design phase — no controller/business logic wired yet.)
+ * Normal launch initialises the local cache and opens the Login screen.
+ * The developer-only screen-preview gallery is shown ONLY in dev mode, via:
+ *   -Daces.dev=true  |  program arg --dev  |  env ACES_DEV=1
  */
 public class MainApp extends Application {
 
-    /** Display name -> FXML base name (file in /forum/fxml/). Order = list order. */
     private static final Map<String, String> SCREENS = new LinkedHashMap<>();
     static {
         SCREENS.put("01 · Login",                  "Login");
@@ -63,32 +62,30 @@ public class MainApp extends Application {
                     getClass().getResourceAsStream("/forum/images/aces-logo-256.png")));
         } catch (Exception ignored) { }
 
+        // Initialise the local SQLite cache and seed demo accounts.
+        try {
+            SQLiteConnection.initSchema();
+            new UserDao().seedDemoUsers();
+            new TopicDao().seedDemoIfEmpty();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        SceneManager.init(stage);
+
         if (isDeveloperMode()) {
             startGallery(stage);
         } else {
-            startApp(stage);
+            SceneManager.show("Login", "ACES");
         }
     }
 
-    /** True only when the developer explicitly opts in to the preview gallery. */
     private boolean isDeveloperMode() {
         if (getParameters() != null && getParameters().getRaw().contains("--dev")) return true;
         String prop = System.getProperty("aces.dev", "");
         String env  = System.getenv().getOrDefault("ACES_DEV", "");
         return prop.equalsIgnoreCase("true") || prop.equals("1")
             || env.equalsIgnoreCase("true")  || env.equals("1");
-    }
-
-    /** Normal end-user launch: open the Login screen. */
-    private void startApp(Stage stage) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/forum/fxml/Login.fxml"));
-            stage.setScene(new Scene(root));
-            stage.setTitle("ACES");
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /** Developer-only screen-preview gallery. */
@@ -125,7 +122,6 @@ public class MainApp extends Application {
         list.getSelectionModel().selectFirst();
     }
 
-    /** Load a screen's FXML into the preview area, showing any error inline. */
     private void show(String fxml) {
         preview.getChildren().clear();
         try {
