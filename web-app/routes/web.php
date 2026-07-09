@@ -9,7 +9,6 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ParticipationController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ParticipationController;
 
 Route::get('/', function () {
     return view('welcome');
