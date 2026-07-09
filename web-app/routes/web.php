@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ParticipationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ParticipationController;
 

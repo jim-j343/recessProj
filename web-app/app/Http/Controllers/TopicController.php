@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Topic;
 use App\Models\Post;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,6 +64,15 @@ class TopicController extends Controller
             'content'   => $validated['content'],
         ]);
 
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $validated['group_id'],
+            'action_type' => 'post',
+            'meta'        => ['topic_id' => $topic->topic_id],
+            'logged_at'   => now(),
+        ]);
+        Auth::user()->update(['last_active_at' => now()]);
+
         return redirect()->route('topics.show', $topic->topic_id)
             ->with('success', 'Topic created successfully!');
     }
@@ -92,6 +102,15 @@ class TopicController extends Controller
             'parent_post_id'  => $validated['parent_post_id'] ?? null,
             'content'         => $validated['content'],
         ]);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $topic->group_id,
+            'action_type' => 'reply',
+            'meta'        => ['topic_id' => $topic->topic_id],
+            'logged_at'   => now(),
+        ]);
+        Auth::user()->update(['last_active_at' => now()]);
 
         return redirect()->route('topics.show', $topic->topic_id)
             ->with('success', 'Reply posted!');

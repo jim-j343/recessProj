@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Topic;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,6 +24,16 @@ class PostController extends Controller
             'parent_post_id' => $validated['parent_post_id'] ?? null,
             'content'        => $validated['content'],
         ]);
+
+        $topic = Topic::find($topicId);
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $topic?->group_id,
+            'action_type' => 'reply',
+            'meta'        => ['topic_id' => (int) $topicId],
+            'logged_at'   => now(),
+        ]);
+        Auth::user()->update(['last_active_at' => now()]);
 
         return redirect()->route('topics.show', $topicId)
             ->with('success', 'Reply posted!');
