@@ -6,6 +6,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -81,14 +82,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Student dashboard
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/student/dashboard', function () {
-        $userGroupIds = \App\Models\GroupMembership::where('user_id', auth()->id())
-            ->where('status', 'active')->pluck('group_id');
-        $topicCount = \App\Models\Topic::whereIn('group_id', $userGroupIds)->count();
-        $postCount = \App\Models\Post::where('author_id', auth()->id())->count();
-        $groupCount = $userGroupIds->count();
-        return view('student.dashboard', compact('topicCount', 'postCount', 'groupCount'));
-    })->name('student.dashboard');
+    Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
 });
 
 // Lecturer dashboard

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('group_id');
             $table->text('reason')->nullable();
             $table->timestamp('blacklisted_at')->useCurrent();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             // admin who lifted early — nullable if auto-expired
             $table->unsignedBigInteger('lifted_by')->nullable();
 
