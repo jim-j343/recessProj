@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Forum routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/forum', [TopicController::class, 'index'])->name('forum.index');
     Route::get('/topics/create', [TopicController::class, 'create'])->name('topics.create');
     Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
@@ -51,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Quiz routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
     Route::post('/quiz/store', [QuizController::class, 'store'])->name('quiz.store');
     Route::get('/quiz/{id}', [QuizController::class, 'show'])->name('quiz.show');
@@ -64,27 +64,32 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/participation', function () {
         return view('participation.index');
     })->name('participation.index');
-    Route::get('/participation/grade', [ParticipationController::class, 'grade'])->name('participation.grade');
-    Route::post('/participation/grade/save', [ParticipationController::class, 'save'])->name('participation.grade.save');
 });
 
-// Group routes — IMPORTANT: /groups/create must come before /groups/{group}
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/participation/grade', [ParticipationController::class, 'grade'])->name('participation.grade');
+    Route::post('/participation/grade', [ParticipationController::class, 'store'])->name('participation.store');
+});
+
+// Group routes — /groups/create must come before /groups/{group}
+Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 
 // ==========================================
 // ROLE-BASED DASHBOARD ROUTE GROUPS
 // ==========================================
 
-// Student dashboard
+// Student dashboard — logic lives in StudentController
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/student/dashboard', [StudentController::class, 'dashboard'])
+        ->name('student.dashboard');
 });
 
 // Lecturer dashboard
@@ -92,7 +97,7 @@ Route::middleware(['auth', 'role:lecturer'])->group(function () {
     Route::get('/lecturer/dashboard', function () {
         $quizzes = \App\Models\Quiz::where('lecturer_id', auth()->id())
             ->latest()->get();
-        $quizCount = $quizzes->count();
+        $quizCount  = $quizzes->count();
         $groupCount = \App\Models\GroupMembership::where('user_id', auth()->id())->count();
         $topicCount = \App\Models\Topic::where('creator_id', auth()->id())->count();
         return view('lecturer.dashboard', compact('quizzes', 'quizCount', 'groupCount', 'topicCount'));
@@ -107,7 +112,5 @@ Route::middleware(['auth', 'role:system_admin'])->group(function () {
     Route::post('/admin/blacklist/{user}', [AdminController::class, 'blacklistMember'])->name('admin.blacklist');
     Route::post('/admin/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist'])->name('admin.liftBlacklist');
 });
-
-Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 
 require __DIR__.'/auth.php';

@@ -25,8 +25,8 @@
                 <a href="#" class="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">
                     <x-icon name="quiz" class="w-4 h-4" /> My Quizzes
                 </a>
-                <a href="{{ route('participation.index') }}" class="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">
-                    <x-icon name="chart-bar" class="w-4 h-4" /> My Progress
+                <a href="{{ route('forum.index') }}" class="text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">
+                    <x-icon name="quiz" class="w-4 h-4" /> My Quizzes
                 </a>
             </nav>
 
@@ -209,23 +209,38 @@
             </div>
 
             <!-- TOPIC ISOLATION AND PDF EXPORT (Recess Requirement #6) -->
+            @if($latestTopic ?? null)
             <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900">Topic: Linear Data Chains</h3>
-                        <p class="text-xs text-gray-400">Viewing isolated chats for this topic only</p>
+                        <h3 class="text-lg font-bold text-gray-900">Topic: {{ $latestTopic->title }}</h3>
+                        <p class="text-xs text-gray-400">Latest discussion in your groups — isolated view</p>
                     </div>
-                    <button class="bg-gray-900 text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wide">
+                    <a href="{{ route('topics.pdf', $latestTopic->topic_id) }}"
+                       class="bg-gray-900 text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wide hover:bg-gray-700">
                         Export Thread to PDF
-                    </button>
+                    </a>
                 </div>
                 <div class="space-y-4 border-t border-gray-100 pt-4">
-                    <div class="bg-gray-50 p-3 rounded">
-                        <span class="font-semibold text-sm block">Tony Stark:</span>
-                        <p class="text-sm text-gray-600">Has anyone optimized the offline synchronization task?</p>
-                    </div>
+                    @forelse($latestTopic->posts as $post)
+                        <div class="bg-gray-50 p-3 rounded">
+                            <span class="font-semibold text-sm block">{{ $post->author->username ?? 'Unknown' }}:</span>
+                            <p class="text-sm text-gray-600">{{ Str::limit($post->content, 180) }}</p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400">No posts in this topic yet.</p>
+                    @endforelse
+                    <a href="{{ route('topics.show', $latestTopic->topic_id) }}"
+                       class="inline-block text-sm text-indigo-600 font-medium hover:underline">
+                        View full discussion →
+                    </a>
                 </div>
             </div>
+            @else
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 text-center text-gray-400 text-sm">
+                No discussions in your groups yet — <a href="{{ route('groups.index') }}" class="text-indigo-600 underline">join a group</a> to get started.
+            </div>
+            @endif
         </div>
 
         <!-- RIGHT SIDEBAR (Recess Requirement #11 & #12) -->
