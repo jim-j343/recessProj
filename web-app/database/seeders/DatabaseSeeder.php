@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             GroupSeeder::class,
             TopicSeeder::class,
             PostSeeder::class,
+            ModerationSeeder::class,
         ]);
     }
 }

@@ -64,4 +64,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class, 'author_id', 'user_id');
     }
+
+    public function warnings()
+    {
+        return $this->hasMany(Warning::class, 'user_id', 'user_id');
+    }
+
+    public function blacklists()
+    {
+        return $this->hasMany(Blacklist::class, 'user_id', 'user_id');
+    }
 }
