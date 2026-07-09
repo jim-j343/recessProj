@@ -74,11 +74,34 @@ class QuizController extends Controller
     }
 
     // Student: show quiz to attempt
+    // Student: show quiz to attempt
     public function show($id)
     {
         $quiz = Quiz::with(['questions.answers'])->findOrFail($id);
 
-        // Check if student already submitted
+        // Guard: must be published
+        abort_unless($quiz->is_published, 403, 'This quiz is not available.');
+
+        // Guard: user must belong to the quiz's group
+        $isMember = GroupMembership::where('user_id', Auth::id())
+            ->where('group_id', $quiz->group_id)
+            ->where('status', 'active')
+            ->exists();
+        abort_unless($isMember, 403, 'You are not in this quiz\'s group.');
+
+        // Guard: quiz time window
+        $now    = now();
+        $endsAt = $quiz->start_time->copy()->addMinutes($quiz->duration_minutes);
+
+        if ($now->lt($quiz->start_time)) {
+            return redirect()->route('dashboard')
+                ->with('info', 'This quiz has not started yet.');
+        }
+        if ($now->gt($endsAt)) {
+            return redirect()->route('dashboard')
+                ->with('info', 'This quiz has closed.');
+        }
+
         $submission = Submission::where('quiz_id', $id)
             ->where('user_id', Auth::id())
             ->first();
@@ -88,7 +111,6 @@ class QuizController extends Controller
                 ->with('info', 'You have already submitted this quiz.');
         }
 
-        // Create submission record when student opens quiz
         if (!$submission) {
             $submission = Submission::create([
                 'quiz_id'    => $id,
@@ -97,11 +119,18 @@ class QuizController extends Controller
             ]);
         }
 
-        $timeLeft = $quiz->duration_minutes * 60;
+        // Timer counts from FIRST open (survives refresh),
+        // and never extends past the quiz's own closing time
+        $elapsed  = $submission->started_at->diffInSeconds(now());
+        $timeLeft = max(0, min(
+            ($quiz->duration_minutes * 60) - $elapsed,
+            $now->diffInSeconds($endsAt, false)
+        ));
 
         return view('quiz.show', compact('quiz', 'submission', 'timeLeft'));
     }
 
+    // Student: submit quiz answers
     // Student: submit quiz answers
     public function submit(Request $request, $id)
     {
@@ -113,6 +142,19 @@ class QuizController extends Controller
 
         if ($submission->submitted_at) {
             return redirect()->route('quiz.results', $id);
+        }
+
+        // Reject submissions more than 2 minutes past the quiz close
+        // (small grace window for the auto-submit to arrive)
+        $endsAt = $quiz->start_time->copy()->addMinutes($quiz->duration_minutes);
+        if (now()->gt($endsAt->copy()->addMinutes(2))) {
+            $submission->update([
+                'submitted_at'   => now(),
+                'score'          => 0,
+                'auto_submitted' => true,
+            ]);
+            return redirect()->route('quiz.results', $id)
+                ->with('error', 'Time expired — quiz was closed before submission.');
         }
 
         $totalScore = 0;
