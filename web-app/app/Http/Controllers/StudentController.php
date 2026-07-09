@@ -35,6 +35,10 @@ class StudentController extends Controller
             ->orderByDesc('start_time')
             ->get();
 
+        // Note: QuizController::show() creates a Submission row the moment a
+        // student *opens* a quiz, before they've answered anything — so "has a
+        // submission" is not the same as "finished it". Only submitted_at being
+        // set means the attempt is actually complete.
         $submissions = Submission::where('user_id', $user->user_id)
             ->whereIn('quiz_id', $quizzes->pluck('quiz_id'))
             ->get()
@@ -45,8 +49,9 @@ class StudentController extends Controller
         $upcomingQuiz = null;
 
         foreach ($quizzes as $quiz) {
-            $alreadySubmitted = $submissions->has($quiz->quiz_id);
-            if ($alreadySubmitted) {
+            $submission = $submissions->get($quiz->quiz_id);
+            $alreadyCompleted = $submission && $submission->submitted_at !== null;
+            if ($alreadyCompleted) {
                 continue;
             }
 
@@ -69,7 +74,7 @@ class StudentController extends Controller
             ->values();
 
         $averageGrade = $gradedSubmissions->count() ? round($gradedSubmissions->avg('score'), 1) : null;
-        $quizzesCompleted = $submissions->count();
+        $quizzesCompleted = $submissions->filter(fn ($s) => $s->submitted_at !== null)->count();
         $quizzesTotal = $quizzes->count();
         $quizProgress = $quizzesTotal > 0 ? (int) round(($quizzesCompleted / $quizzesTotal) * 100) : 0;
 

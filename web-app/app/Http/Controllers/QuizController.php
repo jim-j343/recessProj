@@ -8,6 +8,7 @@ use App\Models\Answer;
 use App\Models\Submission;
 use App\Models\SubmissionAnswer;
 use App\Models\GroupMembership;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -144,6 +145,15 @@ class QuizController extends Controller
             'score'          => $totalScore,
             'auto_submitted' => $request->has('auto_submit'),
         ]);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $quiz->group_id,
+            'action_type' => 'quiz_attempt',
+            'meta'        => ['quiz_id' => $quiz->quiz_id, 'score' => $totalScore],
+            'logged_at'   => now(),
+        ]);
+        Auth::user()->update(['last_active_at' => now()]);
 
         return redirect()->route('quiz.results', $id)
             ->with('success', 'Quiz submitted successfully!');
