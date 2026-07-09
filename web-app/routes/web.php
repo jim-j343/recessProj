@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ParticipationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -63,9 +64,8 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/participation', function () {
         return view('participation.index');
     })->name('participation.index');
-    Route::get('/participation/grade', function () {
-        return view('participation.grade');
-    })->name('participation.grade');
+    Route::get('/participation/grade', [ParticipationController::class, 'grade'])->name('participation.grade');
+    Route::post('/participation/grade/save', [ParticipationController::class, 'save'])->name('participation.grade.save');
 });
 
 // Group routes — /groups/create must come before /groups/{group}
