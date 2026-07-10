@@ -13,21 +13,38 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // Main admin dashboard — high level overview stats
+   // Main admin dashboard — high level overview stats
     public function dashboard()
     {
+        $totalMembers = User::count();
+
+        // Users active since midnight today
+        $activeToday = User::where('last_active_at', '>=', now()->startOfDay())->count();
+
+        // Users with at least one unheeded warning
+        $warned = User::whereHas('warnings', fn ($q) => $q->where('is_heeded', false))->count();
+
+        $blacklisted  = User::where('status', 'blacklisted')->count();
+        $flaggedPosts = Post::where('is_flagged', true)->count();
+
+        // Older stats array kept for backward compatibility with any
+        // part of the view still using $stats['...']
         $stats = [
-            'total_users'   => User::count(),
+            'total_users'   => $totalMembers,
             'active_users'  => User::where('status', 'active')->count(),
-            'blacklisted'   => User::where('status', 'blacklisted')->count(),
+            'blacklisted'   => $blacklisted,
             'total_topics'  => Topic::count(),
             'total_posts'   => Post::count(),
-            'flagged_posts' => Post::where('is_flagged', true)->count(),
+            'flagged_posts' => $flaggedPosts,
         ];
 
         $members = User::withCount('posts')->orderBy('username')->paginate(20);
 
-        return view('admin.dashboard', compact('stats', 'members'));
+        return view('admin.dashboard', compact(
+            'totalMembers', 'activeToday', 'warned',
+            'blacklisted', 'flaggedPosts',
+            'stats', 'members'
+        ));
     }
 
     // List members with real filters and search (requirements 4 & 7)
@@ -89,7 +106,7 @@ class AdminController extends Controller
                 'group_id'       => $groupId,
                 'reason'         => $validated['reason'],
                 'blacklisted_at' => now(),
-                'expires_at'     => now()->addDays($validated['days']),
+                'expires_at' => now()->addDays($request->integer('days')),
             ]);
         }
 
