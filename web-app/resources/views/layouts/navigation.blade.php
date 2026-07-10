@@ -37,7 +37,7 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->system_role === 'admin')
+                    @if(auth()->user()->system_role === 'system_admin')
                         <x-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                             Members
                         </x-nav-link>
@@ -52,7 +52,8 @@
             <div class="hidden lg:flex lg:items-center lg:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                        <button class="inline-flex items-center gap-2 px-2 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <x-avatar :name="Auth::user()->username" size="w-8 h-8" />
                             <div>{{ Auth::user()->username }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -63,12 +64,20 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.edit')">
+                            <span class="inline-flex items-center gap-2">
+                                <x-icon name="badge-check" class="w-4 h-4 text-gray-400" />
+                                Profile
+                            </span>
+                        </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();">
-                                Log Out
+                                <span class="inline-flex items-center gap-2">
+                                    <x-icon name="logout" class="w-4 h-4 text-gray-400" />
+                                    Log Out
+                                </span>
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -115,7 +124,7 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->system_role === 'admin')
+            @if(auth()->user()->system_role === 'system_admin')
                 <x-responsive-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                     👥 Members
                 </x-responsive-nav-link>
@@ -127,20 +136,29 @@
 
         {{-- MOBILE: Profile --}}
         <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->username }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            <div class="px-4 flex items-center gap-3">
+                <x-avatar :name="Auth::user()->username" size="w-10 h-10" />
+                <div>
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->username }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    Profile
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="badge-check" class="w-4 h-4 text-gray-400" />
+                        Profile
+                    </span>
                 </x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
                         onclick="event.preventDefault(); this.closest('form').submit();">
-                        Log Out
+                        <span class="inline-flex items-center gap-2">
+                            <x-icon name="logout" class="w-4 h-4 text-gray-400" />
+                            Log Out
+                        </span>
                     </x-responsive-nav-link>
                 </form>
             </div>

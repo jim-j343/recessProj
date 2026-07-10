@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('group_id');
             $table->tinyInteger('warning_number'); // 1 or 2
             $table->timestamp('issued_at')->useCurrent();
-            $table->timestamp('deadline');
+            $table->timestamp('deadline')->nullable();
             $table->boolean('is_heeded')->default(false);
 
             $table->foreign('user_id')
