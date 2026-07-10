@@ -44,6 +44,8 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
     Route::get('/topics/{topic}/export-pdf', [TopicController::class, 'exportPdf'])->name('topics.pdf');
     Route::post('/topics/{topic}/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::put('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
