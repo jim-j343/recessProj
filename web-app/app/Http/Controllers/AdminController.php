@@ -2,39 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Topic;
-use App\Models\Post;
+use App\Models\Blacklist;
 use App\Models\Group;
+use App\Models\GroupMembership;
+use App\Models\Post;
+use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // Main admin dashboard — high level overview stats
+   // Main admin dashboard — high level overview stats
     public function dashboard()
-{
-    // 1. Fetch data using the exact variable names expected by your view
-    $totalMembers = \App\Models\User::count();
-    $activeToday  = \App\Models\User::where('status', 'active')->count();
-    $warned       = \App\Models\User::where('status', 'warned_once')->count(); // or 'warned' depending on your seed data
-    $blacklisted  = \App\Models\User::where('status', 'blacklisted')->count();
+    {
+        $totalMembers = User::count();
 
-    // Fetch the members collection for the table at the bottom
-    $members = \App\Models\User::withCount('posts')->orderBy('username')->paginate(20);
+        // Users active since midnight today
+        $activeToday = User::where('last_active_at', '>=', now()->startOfDay())->count();
 
-    // 2. Pass them all using compact()
-    return view('admin.dashboard', compact(
-        'totalMembers',
-        'activeToday',
-        'warned',
-        'blacklisted',
-        'members'
-    ));
-}
+        // Users with at least one unheeded warning
+        $warned = User::whereHas('warnings', fn ($q) => $q->where('is_heeded', false))->count();
 
-    // List all members for admin management (requirement 7)
-     public function members(Request $request)
+        $blacklisted  = User::where('status', 'blacklisted')->count();
+        $flaggedPosts = Post::where('is_flagged', true)->count();
+
+        // Older stats array kept for backward compatibility with any
+        // part of the view still using $stats['...']
+        $stats = [
+            'total_users'   => $totalMembers,
+            'active_users'  => User::where('status', 'active')->count(),
+            'blacklisted'   => $blacklisted,
+            'total_topics'  => Topic::count(),
+            'total_posts'   => Post::count(),
+            'flagged_posts' => $flaggedPosts,
+        ];
+
+        $members = User::withCount('posts')->orderBy('username')->paginate(20);
+
+        return view('admin.dashboard', compact(
+            'totalMembers', 'activeToday', 'warned',
+            'blacklisted', 'flaggedPosts',
+            'stats', 'members'
+        ));
+    }
+
+    // List members with real filters and search (requirements 4 & 7)
+    public function members(Request $request)
     {
         $filter = $request->query('filter', 'all');
         $search = $request->query('search');
@@ -65,7 +79,7 @@ class AdminController extends Controller
         return view('admin.members', compact('members', 'filter', 'search'));
     }
 
-    // View per-group statistics (requirement 7)
+    // Per-group statistics (requirement 7)
     public function analytics()
     {
         $groups = Group::withCount(['topics', 'memberships'])->get();
@@ -73,7 +87,7 @@ class AdminController extends Controller
         return view('admin.analytics', compact('groups'));
     }
 
-    // Manually blacklist a member
+    // Manually blacklist a member — records a real blacklist row
     public function blacklistMember(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -87,19 +101,19 @@ class AdminController extends Controller
         $groupId = GroupMembership::where('user_id', $user->user_id)->value('group_id');
 
         if ($groupId) {
-           Blacklist::create([
+            Blacklist::create([
                 'user_id'        => $user->user_id,
                 'group_id'       => $groupId,
                 'reason'         => $validated['reason'],
                 'blacklisted_at' => now(),
-                'expires_at'     => now()->addDays($validated['days']),
+                'expires_at' => now()->addDays($request->integer('days')),
             ]);
         }
 
         return back()->with('success', "{$user->username} has been blacklisted for {$validated['days']} days.");
     }
 
-    // Manually lift a blacklist
+    // Lift a blacklist early
     public function liftBlacklist(User $user)
     {
         $user->update(['status' => 'active']);

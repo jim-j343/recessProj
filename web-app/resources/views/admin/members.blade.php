@@ -85,6 +85,19 @@
                                         </button>
                                     </form>
                                 </div>
+                                @elseif($member->status === 'blacklisted')
+                                    <div class="flex items-center justify-between bg-red-50 border border-red-100 rounded-lg p-4 mb-4">
+                                        <div>
+                                            <p class="text-xs font-bold text-red-700 uppercase tracking-wide">Blacklisted</p>
+                                            <p class="text-xs text-red-600 mt-1">No active restriction record found for this member.</p>
+                                        </div>
+                                        <form method="POST" action="{{ route('admin.liftBlacklist', $member->user_id) }}">
+                                            @csrf
+                                            <button class="bg-white border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100">
+                                                Lift Blacklist
+                                            </button>
+                                        </form>
+                                    </div>
                             @endif
 
                             @if($member->warnings->count())
