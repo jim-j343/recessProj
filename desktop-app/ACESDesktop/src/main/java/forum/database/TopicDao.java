@@ -1,5 +1,6 @@
 package forum.database;
 
+import forum.api.dto.TopicDto;
 import forum.models.Topic;
 
 import java.sql.Connection;
@@ -78,6 +79,87 @@ public class TopicDao {
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Insert or update a topic pulled from the server. Server rows are keyed
+     * locally by their server id (so cached posts line up), matched on
+     * {@code server_id} to avoid duplicating a row that was pushed from here.
+     */
+    public void upsertFromServer(TopicDto dto) {
+        String update = "UPDATE topics SET group_id = ?, creator_id = ?, title = ?, "
+                + "category = ?, created_at = COALESCE(?, created_at), server_id = ? WHERE server_id = ?";
+        try (Connection c = SQLiteConnection.get()) {
+            int rows;
+            try (PreparedStatement ps = c.prepareStatement(update)) {
+                ps.setLong(1, dto.group_id);
+                ps.setLong(2, dto.creator_id);
+                ps.setString(3, dto.title);
+                ps.setString(4, dto.category);
+                ps.setString(5, dto.created_at);
+                ps.setLong(6, dto.topic_id);
+                ps.setLong(7, dto.topic_id);
+                rows = ps.executeUpdate();
+            }
+            if (rows == 0) {
+                String insert = "INSERT OR REPLACE INTO topics"
+                        + "(topic_id, group_id, creator_id, title, category, is_flagged, server_id, created_at) "
+                        + "VALUES(?,?,?,?,?,0,?,?)";
+                try (PreparedStatement pi = c.prepareStatement(insert)) {
+                    pi.setLong(1, dto.topic_id);
+                    pi.setLong(2, dto.group_id);
+                    pi.setLong(3, dto.creator_id);
+                    pi.setString(4, dto.title);
+                    pi.setString(5, dto.category);
+                    pi.setLong(6, dto.topic_id);
+                    pi.setString(7, dto.created_at);
+                    pi.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** The server id recorded for a local topic (0 if not yet synced). */
+    public long serverIdFor(long topicId) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("SELECT server_id FROM topics WHERE topic_id = ?")) {
+            ps.setLong(1, topicId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) { long v = rs.getLong(1); return rs.wasNull() ? 0 : v; }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /** Content of the topic's first post (used as the body when pushing a new topic). */
+    public String firstPostContent(long topicId) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement(
+                     "SELECT content FROM posts WHERE topic_id = ? ORDER BY post_id ASC LIMIT 1")) {
+            ps.setLong(1, topicId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /** Records the server id after a locally-created topic is pushed. */
+    public void setServerId(long topicId, long serverId) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("UPDATE topics SET server_id = ? WHERE topic_id = ?")) {
+            ps.setLong(1, serverId);
+            ps.setLong(2, topicId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Student Dashboard — mirrors web student/dashboard.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link,active"/>
+                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="My Progress" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Alex Rivers"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Welcome back, Alex Rivers 👋" styleClass="page-title"/>
+                    <Label text="Here's where your progress, grades, and quizzes stand today." styleClass="subtle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Go to Forum" styleClass="btn,btn-primary"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Quiz notice -->
+                    <HBox styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12">
+                        <Label text="✓" style="-fx-text-fill:#4b5563; -fx-font-size:18px;"/>
+                        <VBox>
+                            <Label text="No Quizzes Pending" styleClass="label-strong"/>
+                            <Label text="You're all caught up — nothing scheduled for your groups right now." styleClass="subtle"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Progress -->
+                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT" styleClass="eyebrow"/>
+                    <HBox spacing="16">
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="OVERALL ASSESSMENT" styleClass="eyebrow"/>
+                            <Label text="87%" styleClass="metric-value"/>
+                            <Label text="Blend of quiz grades &amp; participation" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="QUIZ PROGRESS" styleClass="eyebrow"/>
+                            <Label text="6/8" styleClass="metric-value"/>
+                            <ProgressBar progress="0.75" maxWidth="Infinity"/>
+                            <Label text="75% of published quizzes completed" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
+                            <Label text="4.2" styleClass="metric-value"/>
+                            <Label text="128 total pts across all criteria" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
+                            <Label text="Good Standing" styleClass="badge,badge-success"/>
+                            <Label text="No active warnings on your account" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Grades -->
+                    <VBox styleClass="card" spacing="0">
+                        <HBox alignment="CENTER_LEFT">
+                            <padding><Insets bottom="12"/></padding>
+                            <VBox>
+                                <Label text="Grades" styleClass="card-title"/>
+                                <Label text="Your most recent quiz results" styleClass="subtle"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="Average: 88%" styleClass="badge,badge-neutral"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <padding><Insets top="12" bottom="12"/></padding>
+                            <VBox HBox.hgrow="ALWAYS"><Label text="Advanced React Patterns" styleClass="label-strong"/><Label text="Submitted 14 Oct 2024, 14:30" styleClass="subtle"/></VBox>
+                            <Label text="92%" styleClass="label-strong"/>
+                        </HBox>
+                        <Region styleClass="divider" prefHeight="1"/>
+                        <HBox alignment="CENTER_LEFT">
+                            <padding><Insets top="12" bottom="12"/></padding>
+                            <VBox HBox.hgrow="ALWAYS"><Label text="Data Structures II" styleClass="label-strong"/><Label text="Submitted 08 Oct 2024, 09:15" styleClass="subtle"/></VBox>
+                            <Label text="85%" styleClass="label-strong"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

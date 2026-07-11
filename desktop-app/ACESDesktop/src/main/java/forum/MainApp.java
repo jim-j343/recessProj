@@ -47,6 +47,18 @@ public class MainApp extends Application {
         SCREENS.put("09 · Student Assessment",     "StudentAssessment");
         SCREENS.put("10 · Topic Creation",         "TopicCreation");
         SCREENS.put("11 · Topic Detail",           "TopicDetail");
+        SCREENS.put("12 · Student Dashboard",      "StudentDashboard");
+        SCREENS.put("13 · Lecturer Dashboard",     "LecturerDashboard");
+        SCREENS.put("14 · Admin Dashboard",        "AdminDashboard");
+        SCREENS.put("15 · Groups",                 "GroupsIndex");
+        SCREENS.put("16 · Create Group",           "GroupCreate");
+        SCREENS.put("17 · Group Detail",           "GroupShow");
+        SCREENS.put("18 · Quiz Results",           "QuizResults");
+        SCREENS.put("19 · Profile",                "ProfileEdit");
+        SCREENS.put("20 · Forgot Password",        "ForgotPassword");
+        SCREENS.put("21 · Reset Password",         "ResetPassword");
+        SCREENS.put("22 · Confirm Password",       "ConfirmPassword");
+        SCREENS.put("23 · Verify Email",           "VerifyEmail");
     }
 
     private final StackPane preview = new StackPane();

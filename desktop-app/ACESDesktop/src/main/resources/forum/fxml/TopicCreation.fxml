@@ -2,61 +2,65 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES - Create Learning Topic  (wired to local cache) -->
+<!-- Create New Topic — mirrors web forum/create.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.TopicCreationController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Academic Portal" styleClass="brand-sub"/></VBox>
-            </HBox>
-            <Button text="Dashboard"  styleClass="nav-item" maxWidth="Infinity" onAction="#onCancel"/>
-            <Button text="My Courses"  styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity" onAction="#onCancel"/>
-            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
-        </VBox>
-    </left>
-    <center>
+    <top>
         <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="12">
-                <Hyperlink text="← Back" onAction="#onCancel"/>
-                <Label text="New Topic" styleClass="page-title"/>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onCancel"/>
+                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="New Topic" styleClass="nav-link,active"/>
+                <Label text="Quiz Center" styleClass="nav-link"/>
+                <Label text="Grading" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Dr. K. Owen"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
             </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24" maxWidth="820">
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Create New Topic" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Back to Forum" styleClass="btn,btn-secondary" onAction="#onCancel"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox maxWidth="896">
                     <VBox styleClass="card" spacing="16">
-                        <Label text="Create New Learning Topic" styleClass="h-md"/>
-                        <HBox spacing="16">
-                            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label text="Topic Title" styleClass="field-label"/>
-                                <TextField fx:id="titleField" promptText="e.g. Introduction to Wave-Particle Duality"/>
-                            </VBox>
-                            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label text="Category" styleClass="field-label"/>
-                                <ComboBox fx:id="categoryCombo" promptText="Core Curriculum" maxWidth="Infinity"/>
-                            </VBox>
-                        </HBox>
                         <VBox spacing="6">
-                            <Label text="Description &amp; Key Objectives" styleClass="field-label"/>
-                            <TextArea fx:id="descriptionArea" promptText="Start typing your lesson description here…" prefRowCount="6" wrapText="true"/>
+                            <Label text="Topic Title" styleClass="field-label"/>
+                            <TextField fx:id="titleField" promptText="Enter a clear, descriptive title..."/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Category (optional)" styleClass="field-label"/>
+                            <ComboBox fx:id="categoryCombo" promptText="-- Select a category --" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Group *" styleClass="field-label"/>
+                            <ComboBox promptText="-- Select a group --" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Description" styleClass="field-label"/>
+                            <TextArea fx:id="descriptionArea" promptText="Describe your topic in detail..." prefRowCount="8" wrapText="true"/>
                         </VBox>
                         <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;"/>
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="☁ Saved to local cache · queued for sync" styleClass="muted"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <HBox spacing="8">
-                                <Button text="Cancel" styleClass="btn,btn-secondary" onAction="#onCancel"/>
-                                <Button text="✦ Publish Topic" styleClass="btn,btn-accent" onAction="#onPublish"/>
-                            </HBox>
+                        <HBox alignment="CENTER_RIGHT" spacing="16">
+                            <Hyperlink text="Cancel" onAction="#onCancel" styleClass="muted"/>
+                            <Button text="Post Topic" styleClass="btn,btn-primary" onAction="#onPublish"/>
                         </HBox>
                     </VBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

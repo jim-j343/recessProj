@@ -2,73 +2,54 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES - Forum Dashboard  (wired to local cache) -->
+<!-- Discussion Forum — mirrors web forum/index.blade.php (top-nav layout) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.ForumDashboardController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Academic Portal" styleClass="brand-sub"/></VBox>
+    <top>
+        <VBox>
+            <!-- NAV BAR -->
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link,active"/>
+                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="My Progress" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
+                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label fx:id="userNameLabel" text="Signed in"/>
+                    <Label fx:id="userMetaLabel" text="Student" visible="false" managed="false"/>
+                    <Label text="Log out ▾" styleClass="subtle"/>
+                </HBox>
             </HBox>
-            <Button text="Dashboard"     styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="Discussions"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="My Courses"     styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center"    styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Participation"  styleClass="nav-item" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <padding><Insets top="12"/></padding>
-                <Label text="AR" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox>
-                    <Label fx:id="userNameLabel" text="Signed in" styleClass="label-strong"/>
-                    <Label fx:id="userMetaLabel" text="Student" styleClass="brand-sub"/>
-                </VBox>
+            <!-- HEADER BAND -->
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Discussion Forum" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ New Topic" styleClass="btn,btn-primary" onAction="#onNewThread"/>
             </HBox>
         </VBox>
-    </left>
+    </top>
 
     <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
-                <Label text="Dashboard" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <TextField promptText="Search topics…" prefWidth="320"/>
-            </HBox>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="1152">
+                    <!-- Search bar card -->
+                    <VBox styleClass="card">
+                        <TextField promptText="Search topics..." maxWidth="Infinity"/>
+                    </VBox>
 
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24" maxWidth="1200">
-                    <Label text="✦ RECENT DISCUSSIONS" styleClass="eyebrow"/>
-                    <HBox spacing="24">
-                        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
-                            <HBox alignment="CENTER_LEFT" spacing="16">
-                                <Label text="Recent Discussions" styleClass="card-title"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Button text="＋ New Thread" styleClass="btn,btn-primary" onAction="#onNewThread"/>
-                            </HBox>
-                            <Region styleClass="divider" prefHeight="1"><VBox.margin><Insets top="16" bottom="8"/></VBox.margin></Region>
-                            <VBox fx:id="discussionList" spacing="0"/>
-                        </VBox>
-
-                        <VBox spacing="24" prefWidth="320" minWidth="320">
-                            <VBox styleClass="card" spacing="12">
-                                <Label text="Your Statistics" styleClass="card-title"/>
-                                <HBox spacing="16">
-                                    <VBox HBox.hgrow="ALWAYS"><Label text="MARKS EARNED" styleClass="eyebrow"/><Label text="124" styleClass="metric-value"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS"><Label text="CONTRIBUTIONS" styleClass="eyebrow"/><Label text="8" styleClass="metric-value"/></VBox>
-                                </HBox>
-                                <Label text="Progress to Expert Tier — 82%" styleClass="muted"/>
-                                <ProgressBar progress="0.82" maxWidth="Infinity"/>
-                            </VBox>
-                        </VBox>
-                    </HBox>
+                    <!-- Topic list (rows injected by controller) -->
+                    <VBox styleClass="card" spacing="0">
+                        <Label text="Recent Discussions" styleClass="card-title"/>
+                        <Region styleClass="divider" prefHeight="1"><VBox.margin><Insets top="14" bottom="6"/></VBox.margin></Region>
+                        <VBox fx:id="discussionList" spacing="0"/>
+                    </VBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>
