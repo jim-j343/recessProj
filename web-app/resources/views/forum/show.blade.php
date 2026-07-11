@@ -7,6 +7,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <div style="background:red;color:white;padding:20px;font-size:30px;">
+    TESTING SHOW.BLADE.PHP
+</div>
 
     {{-- TOP BAR --}}
     <header class="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center sticky top-0 z-10">
@@ -22,20 +25,59 @@
 
         {{-- SDD: Export to PDF + Forward to Social Media --}}
         <div class="flex items-center gap-2 shrink-0 ml-4">
-            {{-- [Export to PDF] Button (SDD requirement) --}}
-            <a href="{{ route('topics.pdf', $topic->topic_id ?? 1) }}"
-                class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
+
+    {{-- Export PDF --}}
+    <a href="{{ route('topics.pdf', $topic) }}"
+        class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
+               px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+        ↓ Export PDF
+    </a>
+
+    {{-- Share --}}
+    <button onclick="document.getElementById('share-modal').classList.remove('hidden')"
+        class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
+               px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+        ↗ Share
+    </button>
+    <div style="background:red;color:white;padding:10px;">
+    THIS SHOULD ALWAYS APPEAR
+     </div>
+
+    {{-- Edit/Delete (Owner or Admin only) --}}
+    @if(true)
+
+        <a href="{{ route('topics.edit', $topic) }}"
+           class="flex items-center gap-1.5 border border-blue-200 text-blue-700 hover:bg-blue-50
+                  px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+            ✏ Edit
+        </a>
+
+        <form method="POST"
+              action="{{ route('topics.destroy', $topic) }}"
+              onsubmit="return confirm('Delete this topic?')"
+              class="inline">
+
+            @csrf
+            @method('DELETE')
+
+            <button type="submit"
+                class="flex items-center gap-1.5 border border-red-200 text-red-700 hover:bg-red-50
                        px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-                ↓ Export PDF
-            </a>
-            {{-- [Share] Button --}}
-            <button onclick="document.getElementById('share-modal').classList.remove('hidden')"
-                class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
-                       px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-                ↗ Share
+                🗑 Delete
             </button>
+
+        </form>
+
+    @endif
+
+</div>
         </div>
     </header>
+        <div class="bg-yellow-100 p-3 rounded text-sm mb-4">
+            Logged in ID: {{ auth()->id() }} <br>
+            Topic creator ID: {{ $topic->creator_id }} <br>
+            Role: {{ auth()->user()->system_role }}
+        </div>  
 
     {{-- SHARE MODAL (Forward to Social Media) --}}
     <div id="share-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
@@ -84,7 +126,7 @@
             </div>
             <div class="bg-white border border-gray-200 rounded-lg p-5">
                 <p class="text-gray-700 text-sm leading-relaxed">
-                    {{ $topic->description ?? 'With Vite, Esbuild, and Turbopack offering near-instant cold starts and lightning-fast HMR, why is the industry still so tied to Webpack?' }}
+                    {{ $firstPost->content ?? 'No description available.' }}
                 </p>
             </div>
         </div>
