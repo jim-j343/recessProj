@@ -82,22 +82,35 @@ use Illuminate\Support\Str;
                 <button onclick="document.getElementById('share-modal').classList.add('hidden')"
                     class="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}
-                https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->fullUrl()) }}
-                https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}
-                <a href="https://wa.me/?text={{ urlencode(request()->fullUrl()) }}"
-                     target="_blank"
-                     class="...">
+            <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}"
+   target="_blank"
+   class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+    𝕏 Twitter / X
+</a>
 
-                      WhatsApp
+<a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->fullUrl()) }}"
+   target="_blank"
+   class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+    in LinkedIn
+</a>
 
-                </a>
-                <button onclick="navigator.clipboard.writeText(window.location.href); this.textContent='✓ Copied!'"
-                    class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                    🔗 Copy link
-                </button>
-            </div>
+<a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}"
+   target="_blank"
+   class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+    f Facebook
+</a>
+
+<a href="https://wa.me/?text={{ urlencode($topic->title.' '.request()->fullUrl()) }}"
+   target="_blank"
+   class="flex items-center justify-center gap-2 border border-green-300 rounded-lg py-2.5 text-sm font-semibold text-green-700 hover:bg-green-50">
+    💬 WhatsApp
+</a>
+
+<button
+    onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!');"
+    class="col-span-2 flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+    🔗 Copy Link
+</button>
         </div>
     </div>
 
