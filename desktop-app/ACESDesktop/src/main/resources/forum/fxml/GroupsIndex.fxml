@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Discussion Groups — mirrors web groups/index.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link"/>
+                <Label text="Groups" styleClass="nav-link,active"/>
+                <Label text="Analytics" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Dr. Sarah Jenkins"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Discussion Groups" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ New Group" styleClass="btn,btn-primary"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <FlowPane hgap="24" vgap="24" prefWrapLength="1120" maxWidth="1120">
+                    <VBox styleClass="card" spacing="12" prefWidth="352">
+                        <HBox alignment="TOP_LEFT"><Label text="Computer Science Year 2" styleClass="h-sm" wrapText="true"/><Region HBox.hgrow="ALWAYS"/><Label text="42 members" styleClass="chip"/></HBox>
+                        <Label text="Core CS discussions, coursework and revision for second-year students." styleClass="muted" wrapText="true"/>
+                        <HBox><Label text="18 topics" styleClass="subtle"/><Region HBox.hgrow="ALWAYS"/><Label text="Admin: Dr. K. Owen" styleClass="subtle"/></HBox>
+                        <HBox spacing="8">
+                            <Label text="View" styleClass="btn,btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Label text="✓ Joined" styleClass="badge,badge-success" maxWidth="Infinity" HBox.hgrow="ALWAYS" alignment="CENTER"/>
+                        </HBox>
+                    </VBox>
+                    <VBox styleClass="card" spacing="12" prefWidth="352">
+                        <HBox alignment="TOP_LEFT"><Label text="Macroeconomics" styleClass="h-sm" wrapText="true"/><Region HBox.hgrow="ALWAYS"/><Label text="30 members" styleClass="chip"/></HBox>
+                        <Label text="Discussion group for the Macroeconomics module and tutorials." styleClass="muted" wrapText="true"/>
+                        <HBox><Label text="11 topics" styleClass="subtle"/><Region HBox.hgrow="ALWAYS"/><Label text="Admin: Prof. L. Vane" styleClass="subtle"/></HBox>
+                        <HBox spacing="8">
+                            <Label text="View" styleClass="btn,btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Label text="Join" styleClass="btn,btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS" alignment="CENTER"/>
+                        </HBox>
+                    </VBox>
+                    <VBox styleClass="card" spacing="12" prefWidth="352">
+                        <HBox alignment="TOP_LEFT"><Label text="Advanced Calculus II" styleClass="h-sm" wrapText="true"/><Region HBox.hgrow="ALWAYS"/><Label text="27 members" styleClass="chip"/></HBox>
+                        <Label text="Problem sets, proofs and exam prep for Advanced Calculus II." styleClass="muted" wrapText="true"/>
+                        <HBox><Label text="22 topics" styleClass="subtle"/><Region HBox.hgrow="ALWAYS"/><Label text="Admin: Dr. S. Jenkins" styleClass="subtle"/></HBox>
+                        <HBox spacing="8">
+                            <Label text="View" styleClass="btn,btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Label text="Join" styleClass="btn,btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS" alignment="CENTER"/>
+                        </HBox>
+                    </VBox>
+                </FlowPane>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

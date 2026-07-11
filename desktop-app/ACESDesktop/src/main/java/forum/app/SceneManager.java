@@ -47,10 +47,10 @@ public final class SceneManager {
     /** Route a freshly authenticated user to their role's home screen. */
     public static void showHomeFor(forum.models.Role role) {
         switch (role) {
-            case LECTURER     -> show("QuizManagement", "ACES — Lecturer");
-            case SYSTEM_ADMIN -> show("AdminAnalytics", "ACES — Admin");
-            case STUDENT      -> show("ForumDashboard", "ACES — Student");
-            default           -> show("ForumDashboard", "ACES");
+            case LECTURER     -> show("LecturerDashboard", "Smart Discussion Forum — Lecturer");
+            case SYSTEM_ADMIN -> show("AdminDashboard", "Smart Discussion Forum — Admin");
+            case STUDENT      -> show("StudentDashboard", "Smart Discussion Forum — Student");
+            default           -> show("StudentDashboard", "Smart Discussion Forum");
         }
     }
 }

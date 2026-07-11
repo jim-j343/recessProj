@@ -120,6 +120,7 @@
       <excludeFolder url="file://$MODULE_DIR$/web-app/vendor/tijsverkoyen/css-to-inline-styles" />
       <excludeFolder url="file://$MODULE_DIR$/web-app/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/web-app/vendor/voku/portable-ascii" />
+      <excludeFolder url="file://$MODULE_DIR$/web-app/vendor/laravel/sanctum" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

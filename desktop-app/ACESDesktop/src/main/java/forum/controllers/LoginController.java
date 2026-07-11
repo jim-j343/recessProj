@@ -34,9 +34,9 @@ public class LoginController {
     private void onSignIn() {
         clearError();
         try {
-            User user = authService.login(email(), password(), selectedRole());
-            Session.begin(user, null);              // token added once the API exists
-            SceneManager.showHomeFor(user.getRole());
+            AuthService.Result result = authService.login(email(), password(), selectedRole());
+            Session.begin(result.user(), result.token());
+            SceneManager.showHomeFor(result.user().getRole());
         } catch (AuthService.AuthException e) {
             showError(e.getMessage());
         }

@@ -1,7 +1,9 @@
 package forum.database;
 
+import forum.api.dto.UserDto;
 import forum.models.Role;
 import forum.models.User;
+import forum.util.PasswordHash;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,7 +35,12 @@ public class UserDao {
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email == null ? "" : email.trim().toLowerCase());
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getString(1).equals(password);
+                if (rs.next()) {
+                    String stored = rs.getString(1);
+                    if (stored == null) return false;
+                    // match a local hash, or a legacy plaintext row (backward compat)
+                    return stored.equals(PasswordHash.of(password)) || stored.equals(password);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,7 +54,7 @@ public class UserDao {
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, email.trim().toLowerCase());
-            ps.setString(3, password);          // TODO: hash before storing
+            ps.setString(3, PasswordHash.of(password));
             ps.setString(4, role.db());
             ps.executeUpdate();
             long id = 0;
@@ -59,6 +66,47 @@ public class UserDao {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Cache a user returned by the server into the local SQLite store.
+     * Keeps the row keyed by email; records the authoritative server id in
+     * {@code server_id} and stores the just-used password so the account can
+     * still be validated later while offline. Returns a {@link User} whose id
+     * is the SERVER id (what the sync API expects for authored content).
+     */
+    public User upsertFromServer(UserDto dto, String password) {
+        String email = dto.email == null ? "" : dto.email.trim().toLowerCase();
+        String update = "UPDATE users SET username = ?, system_role = ?, status = ?, "
+                + "server_id = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?";
+        try (Connection c = SQLiteConnection.get()) {
+            int rows;
+            try (PreparedStatement ps = c.prepareStatement(update)) {
+                ps.setString(1, dto.username);
+                ps.setString(2, dto.system_role);
+                ps.setString(3, dto.status);
+                ps.setLong(4, dto.user_id);
+                ps.setString(5, PasswordHash.of(password));
+                ps.setString(6, email);
+                rows = ps.executeUpdate();
+            }
+            if (rows == 0) {
+                String insert = "INSERT INTO users(username, email, password_hash, system_role, status, server_id) "
+                        + "VALUES(?,?,?,?,?,?)";
+                try (PreparedStatement pi = c.prepareStatement(insert)) {
+                    pi.setString(1, dto.username);
+                    pi.setString(2, email);
+                    pi.setString(3, PasswordHash.of(password));
+                    pi.setString(4, dto.system_role);
+                    pi.setString(5, dto.status);
+                    pi.setLong(6, dto.user_id);
+                    pi.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new User(dto.user_id, dto.username, dto.email, Role.fromDb(dto.system_role), dto.status);
     }
 
     /** Seeds a demo account per role the first time the app runs (password: "password"). */
