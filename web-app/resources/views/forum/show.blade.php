@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Str;
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +10,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div style="background:red;color:white;padding:20px;font-size:30px;">
-    TESTING SHOW.BLADE.PHP
-</div>
 
     {{-- TOP BAR --}}
     <header class="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center sticky top-0 z-10">
@@ -39,13 +39,10 @@
                px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
         ↗ Share
     </button>
-    <div style="background:red;color:white;padding:10px;">
-    THIS SHOULD ALWAYS APPEAR
-     </div>
+    
 
     {{-- Edit/Delete (Owner or Admin only) --}}
-    @if(true)
-
+   @if(true)
         <a href="{{ route('topics.edit', $topic) }}"
            class="flex items-center gap-1.5 border border-blue-200 text-blue-700 hover:bg-blue-50
                   px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
@@ -69,8 +66,6 @@
         </form>
 
     @endif
-
-</div>
         </div>
     </header>
         <div class="bg-yellow-100 p-3 rounded text-sm mb-4">
@@ -88,14 +83,15 @@
                     class="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <a href="#" class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                    𝕏 Twitter / X
-                </a>
-                <a href="#" class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                    in LinkedIn
-                </a>
-                <a href="#" class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                    f Facebook
+                https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}
+                https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->fullUrl()) }}
+                https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}
+                <a href="https://wa.me/?text={{ urlencode(request()->fullUrl()) }}"
+                     target="_blank"
+                     class="...">
+
+                      WhatsApp
+
                 </a>
                 <button onclick="navigator.clipboard.writeText(window.location.href); this.textContent='✓ Copied!'"
                     class="flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
@@ -109,52 +105,231 @@
     <main class="max-w-3xl mx-auto py-8 px-4 pb-32">
 
         {{-- ORIGINAL TOPIC POST --}}
-        <div class="mb-8">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                    <span class="text-indigo-700 font-semibold text-sm">
-                        {{ strtoupper(substr($topic->creator->username ?? 'S', 0, 1)) }}
-                    </span>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-gray-900">
-                        {{ $topic->creator->username ?? 'Unknown' }}
-                        <span class="font-normal text-gray-400 text-xs ml-2">{{ $topic->created_at?->diffForHumans() ?? '2h ago' }}</span>
-                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full ml-1 font-medium">Author</span>
+    <div class="mb-8">
+
+        <div class="bg-white rounded-xl border border-indigo-200 shadow-md overflow-hidden">
+
+         {{-- Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-indigo-50">
+
+                <div class="flex items-center gap-3">
+
+                 <div
+                     class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg font-bold">
+
+                     {{ strtoupper(substr($topic->creator->username ?? 'U',0,1)) }}
+
+                    </div>
+
+                 <div>
+
+                     <div class="flex items-center gap-2">
+
+                        <h3 class="font-semibold text-gray-900">
+                            {{ $topic->creator->username ?? 'Unknown User' }}
+                        </h3>
+
+                        <span
+                            class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                            Author
+                        </span>
+
+                    </div>
+
+                    <p class="text-xs text-gray-500">
+                        {{ $topic->created_at->format('M d, Y • h:i A') }}
                     </p>
+
                 </div>
+
             </div>
-            <div class="bg-white border border-gray-200 rounded-lg p-5">
-                <p class="text-gray-700 text-sm leading-relaxed">
-                    {{ $firstPost->content ?? 'No description available.' }}
-                </p>
-            </div>
+
+            @if($topic->category)
+
+                <span
+                    class="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
+
+                    {{ $topic->category }}
+
+                </span>
+
+            @endif
+
         </div>
+
+        {{-- Body --}}
+        <div class="p-6">
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+
+                {{ $topic->title }}
+
+            </h2>
+
+            <p class="text-gray-700 leading-8">
+
+                {{ $firstPost->content ?? 'No description available.' }}
+
+            </p>
+
+            </div>
+
+        </div>
+
+    </div>
 
         {{-- RUN DYNAMIC DB POSTS/REPLIES LOOP --}}
         <div class="space-y-6">
             @forelse($posts as $post)
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                            <span class="text-purple-700 font-semibold text-sm">
-                                {{ strtoupper(substr($post->author->username ?? $post->author->name ?? 'D', 0, 1)) }}
-                            </span>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-900">
-                            {{ $post->author->username ?? $post->author->name ?? 'Anonymous User' }}
-                            <span class="font-normal text-gray-400 text-xs ml-2">{{ $post->created_at->diffForHumans() }}</span>
-                        </p>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-lg p-5">
-                        <p class="text-gray-700 text-sm leading-relaxed">
-                            {{ $post->content }}
-                        </p>
-                    </div>
+
+    {{-- Skip the first post because it is already displayed as the topic --}}
+    @continue($firstPost && $post->post_id == $firstPost->post_id)
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-200">
+
+        {{-- Reply Header --}}
+        <div class="flex justify-between items-center px-5 py-4 border-b">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-11 h-11 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+
+                    {{ strtoupper(substr($post->author->username ?? 'U',0,1)) }}
+
                 </div>
-            @empty
-                <p class="text-center text-gray-400 text-sm py-8">No replies posted yet. Start the conversation below!</p>
-            @endforelse
+
+                <div>
+
+                    <div class="flex items-center gap-2">
+
+                        <span class="font-semibold text-gray-900">
+                            {{ $post->author->username }}
+                        </span>
+
+                        @if($post->author_id == $topic->creator_id)
+
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
+                                Author
+                            </span>
+
+                        @elseif($post->author->system_role == 'lecturer')
+
+                            <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                                Lecturer
+                            </span>
+
+                        @elseif($post->author->system_role == 'system_admin')
+
+                            <span class="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+                                Admin
+                            </span>
+
+                        @endif
+
+                    </div>
+
+                    <p class="text-xs text-gray-500">
+
+                        {{ $post->created_at->format('M d, Y • h:i A') }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- Reply Body --}}
+        <div class="p-5">
+
+            <p class="text-gray-700 leading-7">
+
+                {{ $post->content }}
+
+            </p>
+          @if($post->attachment)
+
+    <div class="mt-4">
+
+        @if(Str::startsWith($post->attachment_type, 'image/'))
+
+            <img src="{{ asset('storage/'.$post->attachment) }}"
+                 alt="Attachment"
+                 class="rounded-lg border max-h-72">
+
+        @else
+
+            <a href="{{ asset('storage/'.$post->attachment) }}"
+               target="_blank"
+               class="inline-flex items-center gap-2 text-blue-600 hover:underline">
+
+                📎 {{ $post->attachment_name }}
+
+            </a>
+
+        @endif
+
+    </div>
+
+@endif  
+        </div>
+
+        {{-- Reply Footer --}}
+        <div class="px-5 py-3 border-t flex gap-4 text-sm">
+
+            <button class="text-indigo-600 hover:text-indigo-800">
+                💬 Reply
+            </button>
+<div class="text-xs text-red-500">
+    Logged in: {{ auth()->id() }} |
+    Author: {{ $post->author_id }} |
+    Role: {{ auth()->user()->system_role }}
+</div>
+           @if(auth()->id()==$post->author_id || auth()->user()->system_role=='system_admin')
+
+    <a href="{{ route('posts.edit', $post) }}"
+       class="text-blue-600 hover:text-blue-800">
+        ✏ Edit
+    </a>
+
+    <form method="POST"
+          action="{{ route('posts.destroy', $post) }}"
+          onsubmit="return confirm('Delete this reply?')"
+          class="inline">
+
+        @csrf
+        @method('DELETE')
+
+        <button type="submit"
+                class="text-red-600 hover:text-red-800">
+            🗑 Delete
+        </button>
+
+    </form>
+
+@endif
+        </div>
+
+    </div>
+
+@empty
+
+    <div class="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
+
+        <p class="text-gray-400">
+
+            No replies yet.
+
+            <br>
+
+            Be the first to join the discussion!
+
+        </p>
+
+    </div>
+
+@endforelse
         </div>
 
         {{-- Lecturer Action Guide --}}
@@ -170,9 +345,10 @@
 
     {{-- STICKY REPLY BAR --}}
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10">
-        <form method="POST"
-            action="/topics/{{ $topic->topic_id ?? 1 }}/posts"
-            class="max-w-3xl mx-auto flex items-center gap-3">
+       <form method="POST"
+    action="/topics/{{ $topic->topic_id ?? 1 }}/posts"
+    enctype="multipart/form-data"
+    class="max-w-3xl mx-auto flex items-center gap-3">
             @csrf
             <input type="text"
                 id="reply-input"
@@ -180,6 +356,11 @@
                 placeholder="Add to the conversation..."
                 class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm
                        focus:outline-none focus:border-gray-400 focus:ring-0 transition-colors" />
+                <input
+            type="file"
+            name="attachment"
+            accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.ppt,.pptx,.zip"
+            class="text-sm text-gray-600">      
 
             <button type="submit"
                 class="bg-gray-900 text-white px-4 h-10 rounded-lg flex items-center gap-1.5 text-xs font-semibold
