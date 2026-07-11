@@ -1,19 +1,30 @@
 package forum.controllers;
 
+import forum.api.ApiClient;
+import forum.api.ApiException;
+import forum.api.dto.TopicDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
+import forum.database.PostDao;
 import forum.database.TopicDao;
 import forum.models.Topic;
 import forum.models.User;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-/** Publishes a new topic into the local cache (queued for sync). */
+import java.io.IOException;
+
+/**
+ * Publishes a topic. Online: POST to the API and cache the result.
+ * Offline: create locally (queued) with a local-only first post for display.
+ * Runs the network call off the UI thread.
+ */
 public class TopicCreationController {
 
     private static final long DEFAULT_GROUP_ID = 1;
@@ -24,33 +35,79 @@ public class TopicCreationController {
     @FXML private Label errorLabel;
 
     private final TopicDao topicDao = new TopicDao();
+    private final PostDao postDao = new PostDao();
+    private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
         if (errorLabel != null) errorLabel.setManaged(false);
         if (categoryCombo != null && categoryCombo.getItems().isEmpty()) {
-            categoryCombo.getItems().addAll("Core Curriculum", "Elective", "Seminar", "General");
+            categoryCombo.getItems().addAll("General", "Programming", "Mathematics", "Science", "Announcements");
         }
     }
 
     @FXML
     private void onPublish() {
+        clearError();
         String title = titleField == null ? "" : titleField.getText();
         if (title == null || title.isBlank()) { showError("Please enter a topic title."); return; }
+        String content = descriptionArea == null ? "" : descriptionArea.getText();
+        if (content == null || content.isBlank()) { showError("Please enter a description."); return; }
         String category = (categoryCombo != null && categoryCombo.getValue() != null)
                 ? categoryCombo.getValue() : "General";
+
         User u = Session.currentUser();
         long creatorId = (u != null) ? u.getUserId() : 0;
+        String token = Session.authToken();
 
-        Topic created = topicDao.create(DEFAULT_GROUP_ID, creatorId, title.trim(), category);
-        if (created == null) { showError("Could not publish the topic."); return; }
-        ViewState.setSelectedTopic(created);
-        SceneManager.show("TopicDetail", "ACES — " + created.getTitle());
+        Thread worker = new Thread(() -> {
+            // 1. Online — publish to the server.
+            if (token != null && !token.isBlank()) {
+                try {
+                    TopicDto dto = api.createTopic(token, DEFAULT_GROUP_ID, title.trim(), category, content.trim());
+                    topicDao.upsertFromServer(dto);
+                    Topic cached = topicDao.findById(dto.topic_id);
+                    Topic result = (cached != null) ? cached : fromDto(dto);
+                    Platform.runLater(() -> openDetail(result));
+                    return;
+                } catch (ApiException rejected) {
+                    Platform.runLater(() -> showError(rejected.getMessage()));
+                    return;
+                } catch (IOException | InterruptedException offline) {
+                    if (offline instanceof InterruptedException) Thread.currentThread().interrupt();
+                    // fall through to offline creation
+                }
+            }
+            // 2. Offline — create locally, queued for sync.
+            Topic t = topicDao.create(DEFAULT_GROUP_ID, creatorId, title.trim(), category);
+            if (t == null) { Platform.runLater(() -> showError("Could not publish the topic.")); return; }
+            postDao.createLocalOnly(t.getTopicId(), creatorId, null, content.trim());
+            Platform.runLater(() -> openDetail(t));
+        }, "aces-create-topic");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void openDetail(Topic t) {
+        ViewState.setSelectedTopic(t);
+        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
+    }
+
+    private Topic fromDto(TopicDto dto) {
+        Topic t = new Topic();
+        t.setTopicId(dto.topic_id);
+        t.setGroupId(dto.group_id);
+        t.setCreatorId(dto.creator_id);
+        t.setTitle(dto.title);
+        t.setCategory(dto.category);
+        t.setAuthorName(dto.author);
+        t.setReplyCount(dto.replies);
+        return t;
     }
 
     @FXML
     private void onCancel() {
-        SceneManager.show("ForumDashboard", "ACES");
+        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
     }
 
     private void showError(String msg) {
@@ -58,5 +115,12 @@ public class TopicCreationController {
         errorLabel.setText(msg);
         errorLabel.setManaged(true);
         errorLabel.setVisible(true);
+    }
+
+    private void clearError() {
+        if (errorLabel == null) return;
+        errorLabel.setText("");
+        errorLabel.setManaged(false);
+        errorLabel.setVisible(false);
     }
 }

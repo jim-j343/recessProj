@@ -2,43 +2,41 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES - Topic Detail  (wired to local cache) -->
+<!-- Topic Detail — mirrors web forum/show.blade.php (thread + sticky reply bar) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.TopicDetailController"
-            stylesheets="@../css/aces.css" styleClass="root"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color:#f9fafb;"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Academic Portal" styleClass="brand-sub"/></VBox>
-            </HBox>
-            <Button text="Dashboard"   styleClass="nav-item" maxWidth="Infinity" onAction="#onBack"/>
-            <Button text="Discussions" styleClass="nav-item,active" maxWidth="Infinity" onAction="#onBack"/>
-            <Button text="My Courses"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
-        </VBox>
-    </left>
-    <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="12">
-                <Hyperlink text="← Back" onAction="#onBack"/>
-                <Label fx:id="topicTitleLabel" text="Topic" styleClass="page-title"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="16" maxWidth="820">
-                    <Label fx:id="repliesCountLabel" text="Replies" styleClass="h-sm"/>
-                    <VBox fx:id="postList" spacing="12"/>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:0 0 1 0; -fx-padding:12 24 12 24;">
+            <Hyperlink text="← Back" onAction="#onBack" styleClass="muted"/>
+            <Label fx:id="topicTitleLabel" text="Topic" styleClass="label-strong"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline"/>
+            <Button text="↗ Share" styleClass="btn-sm,btn-outline"/>
+        </HBox>
+    </top>
 
-                    <!-- Composer -->
-                    <HBox styleClass="card" spacing="8" alignment="CENTER_LEFT">
-                        <TextField fx:id="composerField" promptText="Add to the conversation…" HBox.hgrow="ALWAYS" onAction="#onReply"/>
-                        <Button text="Reply →" styleClass="btn,btn-primary" onAction="#onReply"/>
-                    </HBox>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="768">
+                    <Label fx:id="repliesCountLabel" text="Replies" styleClass="h-sm"/>
+                    <VBox fx:id="postList" spacing="16"/>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
+
+    <!-- STICKY REPLY BAR -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0; -fx-padding:12 24 12 24;">
+            <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
+                <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
+                <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
+            </HBox>
+        </HBox>
+    </bottom>
 </BorderPane>

@@ -2,123 +2,151 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES - Admin Analytics Overview  (UI only) -->
+<!-- Admin Analytics — mirrors web admin/analytics.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Admin Console" styleClass="brand-sub"/></VBox>
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT">
+            <Label text="Smart Discussion Forum" styleClass="brand"/>
+            <Label text="Dashboard" styleClass="nav-link"/>
+            <Label text="Groups" styleClass="nav-link"/>
+            <Label text="Members" styleClass="nav-link"/>
+            <Label text="Analytics" styleClass="nav-link,active"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
+                <Label text="Dr. Sarah Jenkins"/>
+                <Label text="▾" styleClass="subtle"/>
             </HBox>
-            <Label text="OVERVIEW" styleClass="nav-section"/>
-            <Button text="Analytics"   styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
-            <Label text="GOVERNANCE" styleClass="nav-section"/>
-            <Button text="Compliance"  styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Members"      styleClass="nav-item" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <padding><Insets top="12"/></padding>
-                <Label text="SJ" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox><Label text="Dr. Sarah Jenkins" styleClass="label-strong"/><Label text="Lead Administrator" styleClass="brand-sub"/></VBox>
-            </HBox>
-        </VBox>
-    </left>
+        </HBox>
+    </top>
+
     <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
-                <Label text="Analytics Overview" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <TextField promptText="Search metrics..." prefWidth="300"/>
-                <Button text="Filter" styleClass="btn,btn-secondary"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24">
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1152">
+
+                    <!-- Heading row -->
                     <HBox alignment="CENTER_LEFT">
                         <VBox spacing="4">
                             <Label text="Academic Insights" styleClass="h-lg"/>
                             <Label text="Real-time performance metrics for the current semester." styleClass="muted"/>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <HBox spacing="8" alignment="CENTER_RIGHT">
+                        <HBox spacing="12" alignment="CENTER_RIGHT">
                             <ComboBox promptText="Advanced Calculus II"/>
-                            <Button text="Last 7 Days" styleClass="btn,btn-primary"/>
+                            <Button text="Last 7 Days" styleClass="btn,btn-dark"/>
                         </HBox>
                     </HBox>
 
+                    <!-- Stat cards -->
                     <HBox spacing="16">
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="ACTIVE MEMBERS" styleClass="eyebrow"/>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="TOTAL MEMBERS" styleClass="eyebrow"/>
                             <Label text="4,218" styleClass="metric-value"/>
-                            <Label text="Up 6.2% vs last week" styleClass="muted"/>
+                            <Label text="↑ +34 this week" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="THREADS POSTED" styleClass="eyebrow"/>
-                            <Label text="1,046" styleClass="metric-value"/>
-                            <Label text="Up 3.1%" styleClass="muted"/>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="ACTIVE THIS WEEK" styleClass="eyebrow"/>
+                            <Label text="1,847" styleClass="metric-value"/>
+                            <Label text="43.8% of total members" styleClass="subtle"/>
                         </VBox>
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="AVG. PARTICIPATION" styleClass="eyebrow"/>
-                            <Label text="84%" styleClass="metric-value"/>
-                            <Label text="Up 12%" styleClass="muted"/>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="WARNINGS ISSUED" styleClass="eyebrow"/>
+                            <Label text="12" styleClass="metric-value"/>
+                            <Label text="↑ +3 this week" style="-fx-text-fill:#ca8a04; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="FLAGGED ACCOUNTS" styleClass="eyebrow"/>
-                            <Label text="08" styleClass="metric-value"/>
-                            <Label text="Down 2 resolved" styleClass="muted"/>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="BLACKLISTED" styleClass="eyebrow"/>
+                            <Label text="5" styleClass="metric-value"/>
+                            <Label text="2 pending review" style="-fx-text-fill:#ef4444; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
                     </HBox>
 
+                    <!-- Chart + system status -->
                     <HBox spacing="24">
-                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="card-flat" spacing="16" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT">
-                                <VBox><Label text="Post Volume Traffic" styleClass="card-title"/><Label text="Engagement velocity across all modules" styleClass="muted"/></VBox>
+                                <VBox><Label text="Post Volume Traffic" styleClass="card-title"/><Label text="Engagement across all modules this week" styleClass="subtle"/></VBox>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Label text="Live Traffic" styleClass="badge,badge-accent"/>
+                                <Label text="● Live" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
                             </HBox>
-                            <VBox spacing="8">
-                                <HBox spacing="12" alignment="BOTTOM_LEFT" prefHeight="200">
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="70"  maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="104" maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="88"  maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="160" maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="120" maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="190" maxWidth="Infinity"/></VBox>
-                                    <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="140" maxWidth="Infinity"/></VBox>
-                                </HBox>
-                                <HBox spacing="12">
-                                    <Label text="Mon" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Tue" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Wed" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Thu" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Fri" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Sat" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                    <Label text="Sun" styleClass="muted" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
-                                </HBox>
-                            </VBox>
+                            <HBox spacing="12" alignment="BOTTOM_LEFT" prefHeight="180">
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="48"  styleClass="subtle"/><Region styleClass="bar" prefHeight="60"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="88"  styleClass="subtle"/><Region styleClass="bar" prefHeight="110" maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="72"  styleClass="subtle"/><Region styleClass="bar" prefHeight="90"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="120" styleClass="subtle"/><Region styleClass="bar" prefHeight="150" maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="104" styleClass="subtle"/><Region styleClass="bar" prefHeight="130" maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="144" styleClass="subtle"/><Region styleClass="bar" prefHeight="170" maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER" spacing="4"><Label text="112" styleClass="subtle"/><Region styleClass="bar" prefHeight="140" maxWidth="Infinity"/></VBox>
+                            </HBox>
+                            <HBox spacing="12">
+                                <Label text="Mon" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Tue" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Wed" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Thu" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Fri" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Sat" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Sun" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                            </HBox>
                         </VBox>
-                        <VBox spacing="16" prefWidth="280" minWidth="280">
-                            <VBox styleClass="card" spacing="4">
-                                <Label text="OPERATIONAL" styleClass="eyebrow"/>
-                                <Label text="System Sync" styleClass="muted"/>
+
+                        <VBox spacing="16" prefWidth="300" minWidth="300">
+                            <VBox styleClass="card-flat" spacing="4">
+                                <HBox alignment="CENTER_LEFT"><Label text="SYSTEM SYNC" styleClass="eyebrow"/><Region HBox.hgrow="ALWAYS"/><Label text="OPERATIONAL" styleClass="badge,badge-success"/></HBox>
                                 <Label text="99.8%" styleClass="metric-value"/>
+                                <ProgressBar progress="0.998" maxWidth="Infinity"/>
                             </VBox>
-                            <VBox styleClass="card" spacing="4">
-                                <Label text="STABLE" styleClass="eyebrow"/>
-                                <Label text="Offline Reliability" styleClass="muted"/>
+                            <VBox styleClass="card-flat" spacing="4">
+                                <HBox alignment="CENTER_LEFT"><Label text="OFFLINE RELIABILITY" styleClass="eyebrow"/><Region HBox.hgrow="ALWAYS"/><Label text="STABLE" styleClass="badge,badge-neutral"/></HBox>
                                 <Label text="Active" styleClass="h-md"/>
-                                <Label text="Local caching active for 4.2k users" styleClass="muted" wrapText="true"/>
+                                <Label text="Local caching active for 4.2k users" styleClass="subtle" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="card-flat" spacing="4">
+                                <HBox alignment="CENTER_LEFT"><Label text="QUIZ SESSIONS" styleClass="eyebrow"/><Region HBox.hgrow="ALWAYS"/><Label text="SCHEDULED" styleClass="badge,badge-warning"/></HBox>
+                                <Label text="3" styleClass="metric-value"/>
+                                <Label text="Next: Week 3 Quiz · 30 Jun" styleClass="subtle"/>
                             </VBox>
                         </VBox>
                     </HBox>
+
+                    <!-- Trending + activity -->
+                    <HBox spacing="24">
+                        <VBox styleClass="card-flat" spacing="16" HBox.hgrow="ALWAYS">
+                            <VBox><Label text="Trending Topics" styleClass="card-title"/><Label text="AI-curated semantic clusters" styleClass="subtle"/></VBox>
+                            <FlowPane hgap="8" vgap="8">
+                                <Label text="Quantum Mechanics" styleClass="chip" style="-fx-background-color:#111827; -fx-text-fill:white;"/>
+                                <Label text="Latex Formatting" styleClass="chip-outline"/>
+                                <Label text="Final Review" styleClass="chip-outline"/>
+                                <Label text="Study Groups" styleClass="chip-outline"/>
+                                <Label text="Peer Feedback" styleClass="chip" style="-fx-background-color:#111827; -fx-text-fill:white;"/>
+                                <Label text="Neural Networks" styleClass="chip-outline"/>
+                                <Label text="Office Hours" styleClass="chip-outline"/>
+                            </FlowPane>
+                        </VBox>
+
+                        <VBox styleClass="card-flat" spacing="16" prefWidth="360" minWidth="360">
+                            <HBox alignment="CENTER_LEFT"><Label text="Recent Activity" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/><Hyperlink text="View all" styleClass="subtle"/></HBox>
+                            <HBox spacing="12" alignment="TOP_LEFT">
+                                <Label text="M" styleClass="avatar-soft" minWidth="32" minHeight="32"/>
+                                <VBox><Label text="Marcus V. posted in Calculus II" styleClass="label-strong" wrapText="true"/><Label text="Could anyone clarify the integration b..." styleClass="subtle"/><Label text="2 minutes ago" styleClass="subtle"/></VBox>
+                            </HBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <HBox spacing="12" alignment="TOP_LEFT">
+                                <Label text="L" styleClass="avatar-soft" minWidth="32" minHeight="32" style="-fx-background-color:#dcfce7; -fx-text-fill:#15803d;"/>
+                                <VBox><Label text="Lila K. uploaded Assignment_3.pdf" styleClass="label-strong" wrapText="true"/><Label text="Submitted to Intro to Philosophy..." styleClass="subtle"/><Label text="15 minutes ago" styleClass="subtle"/></VBox>
+                            </HBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <HBox spacing="12" alignment="TOP_LEFT">
+                                <Label text="C" styleClass="avatar-soft" minWidth="32" minHeight="32" style="-fx-background-color:#f3e8ff; -fx-text-fill:#7e22ce;"/>
+                                <VBox><Label text="Chen J. joined Macroeconomics" styleClass="label-strong" wrapText="true"/><Label text="New student enrollment completed..." styleClass="subtle"/><Label text="1 hour ago" styleClass="subtle"/></VBox>
+                            </HBox>
+                        </VBox>
+                    </HBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

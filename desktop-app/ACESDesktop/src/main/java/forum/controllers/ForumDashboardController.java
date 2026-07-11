@@ -6,18 +6,23 @@ import forum.app.ViewState;
 import forum.database.TopicDao;
 import forum.models.Topic;
 import forum.models.User;
+import forum.services.AuthService;
+import forum.services.SyncService;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-/** Loads recent topics from the local cache into the Forum Dashboard. */
+/**
+ * Forum Dashboard — offline-first.
+ * Renders topics from the local cache immediately, then runs a background
+ * sync (push queued rows + pull server topics) and re-renders.
+ */
 public class ForumDashboardController {
 
     @FXML private VBox discussionList;
@@ -34,13 +39,24 @@ public class ForumDashboardController {
             if (userMetaLabel != null && u.getRole() != null)
                 userMetaLabel.setText(u.getRole().label());
         }
-        reload();
+        renderTopics(topicDao.listRecent(10));   // instant, from cache
+        syncInBackground();                       // push/pull, then refresh
     }
 
-    private void reload() {
+    /** Push pending rows + pull server topics off the UI thread, then re-render. */
+    private void syncInBackground() {
+        Thread worker = new Thread(() -> {
+            new SyncService().syncNow();
+            List<Topic> fresh = topicDao.listRecent(10);
+            Platform.runLater(() -> renderTopics(fresh));
+        }, "aces-forum-sync");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void renderTopics(List<Topic> topics) {
         if (discussionList == null) return;
         discussionList.getChildren().clear();
-        List<Topic> topics = topicDao.listRecent(10);
         if (topics.isEmpty()) {
             Label empty = new Label("No discussions yet. Start the first thread.");
             empty.getStyleClass().add("muted");
@@ -81,12 +97,23 @@ public class ForumDashboardController {
 
     private void openTopic(Topic t) {
         ViewState.setSelectedTopic(t);
-        SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
+        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
     }
 
     @FXML
     private void onNewThread() {
-        SceneManager.show("TopicCreation", "ACES — New Topic");
+        SceneManager.show("TopicCreation", "Smart Discussion Forum — New Topic");
+    }
+
+    @FXML
+    private void onLogout() {
+        String token = Session.authToken();
+        Session.end();
+        // best-effort server-side revoke, off the UI thread
+        Thread t = new Thread(() -> new AuthService().logout(token), "aces-logout");
+        t.setDaemon(true);
+        t.start();
+        SceneManager.show("Login", "Smart Discussion Forum");
     }
 
     private String safe(String s) { return s == null ? "Unknown" : s; }

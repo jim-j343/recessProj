@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 // 1. Updated with your NEW migration columns
 #[Fillable(['username', 'email', 'password_hash', 'system_role', 'status', 'agreed_to_rules', 'last_active_at'])]
@@ -15,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     // 2. REQUIRED: Tell Laravel your primary key is user_id, not id
     protected $primaryKey = 'user_id';
