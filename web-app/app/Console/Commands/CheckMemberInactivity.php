@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Blacklist;
 use App\Models\Group;
 use App\Models\GroupMembership;
+use App\Models\Notification;
 use App\Models\Warning;
 use Illuminate\Console\Command;
 
@@ -69,6 +70,8 @@ class CheckMemberInactivity extends Command
                     $membership->update(['status' => 'blacklisted']);
                     $member->update(['status' => 'blacklisted']);
 
+                    Notification::notify($member->user_id, 'blacklisted');
+
                     $blacklisted++;
                     $this->line("Blacklisted {$member->username} in {$group->name} ({$daysInactive} days inactive).");
                 } elseif ($daysInactive >= $threshold * 2 && $warningCount === 1) {
@@ -81,6 +84,8 @@ class CheckMemberInactivity extends Command
                         'is_heeded'      => false,
                     ]);
 
+                    Notification::notify($member->user_id, 'warning');
+
                     $warned2++;
                     $this->line("Issued warning #2 to {$member->username} in {$group->name}.");
                 } elseif ($daysInactive >= $threshold && $warningCount === 0) {
@@ -92,6 +97,8 @@ class CheckMemberInactivity extends Command
                         'deadline'       => now()->addDays($threshold),
                         'is_heeded'      => false,
                     ]);
+
+                    Notification::notify($member->user_id, 'warning');
 
                     $warned1++;
                     $this->line("Issued warning #1 to {$member->username} in {$group->name}.");
