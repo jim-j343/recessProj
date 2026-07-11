@@ -22,12 +22,6 @@
                 <a href="{{ route('forum.index') }}" class="flex items-center gap-2 bg-gray-100 text-gray-900 px-4 py-2 rounded font-medium">
                     <x-icon name="chat" class="w-4 h-4" /> Forums
                 </a>
-                <a href="#" class="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">
-                    <x-icon name="quiz" class="w-4 h-4" /> My Quizzes
-                </a>
-                <a href="{{ route('forum.index') }}" class="text-gray-600 hover:bg-gray-50 px-4 py-2 rounded">
-                    <x-icon name="quiz" class="w-4 h-4" /> My Quizzes
-                </a>
             </nav>
 
             <!-- QUICK STATS (uses existing group/topic/post counters) -->

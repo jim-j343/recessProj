@@ -7,9 +7,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div style="background:red;color:white;padding:20px;font-size:30px;">
-    TESTING SHOW.BLADE.PHP
-</div>
 
     {{-- TOP BAR --}}
     <header class="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center sticky top-0 z-10">
@@ -26,58 +23,51 @@
         {{-- SDD: Export to PDF + Forward to Social Media --}}
         <div class="flex items-center gap-2 shrink-0 ml-4">
 
-    {{-- Export PDF --}}
-    <a href="{{ route('topics.pdf', $topic) }}"
-        class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
-               px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-        ↓ Export PDF
-    </a>
-
-    {{-- Share --}}
-    <button onclick="document.getElementById('share-modal').classList.remove('hidden')"
-        class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
-               px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-        ↗ Share
-    </button>
-    <div style="background:red;color:white;padding:10px;">
-    THIS SHOULD ALWAYS APPEAR
-     </div>
-
-    {{-- Edit/Delete (Owner or Admin only) --}}
-    @if(true)
-
-        <a href="{{ route('topics.edit', $topic) }}"
-           class="flex items-center gap-1.5 border border-blue-200 text-blue-700 hover:bg-blue-50
-                  px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-            ✏ Edit
-        </a>
-
-        <form method="POST"
-              action="{{ route('topics.destroy', $topic) }}"
-              onsubmit="return confirm('Delete this topic?')"
-              class="inline">
-
-            @csrf
-            @method('DELETE')
-
-            <button type="submit"
-                class="flex items-center gap-1.5 border border-red-200 text-red-700 hover:bg-red-50
+            {{-- Export PDF --}}
+            <a href="{{ route('topics.pdf', $topic) }}"
+                class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
                        px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
-                🗑 Delete
+                ↓ Export PDF
+            </a>
+
+            {{-- Share --}}
+            <button onclick="document.getElementById('share-modal').classList.remove('hidden')"
+                class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50
+                       px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                ↗ Share
             </button>
 
-        </form>
+            {{-- Edit/Delete (Owner or Admin only) --}}
+            @if(auth()->id() === $topic->creator_id || auth()->user()->isAdmin())
 
-    @endif
+                {{-- Edit disabled until 'topics.edit' route + controller method exist
+                <a href="{{ route('topics.edit', $topic) }}"
+                   class="flex items-center gap-1.5 border border-blue-200 text-blue-700 hover:bg-blue-50
+                          px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                    ✏ Edit
+                </a>
+                --}}
 
-</div>
+                <form method="POST"
+                      action="{{ route('topics.destroy', $topic) }}"
+                      onsubmit="return confirm('Delete this topic?')"
+                      class="inline">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="submit"
+                        class="flex items-center gap-1.5 border border-red-200 text-red-700 hover:bg-red-50
+                               px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                        🗑 Delete
+                    </button>
+
+                </form>
+
+            @endif
+
         </div>
     </header>
-        <div class="bg-yellow-100 p-3 rounded text-sm mb-4">
-            Logged in ID: {{ auth()->id() }} <br>
-            Topic creator ID: {{ $topic->creator_id }} <br>
-            Role: {{ auth()->user()->system_role }}
-        </div>  
 
     {{-- SHARE MODAL (Forward to Social Media) --}}
     <div id="share-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
@@ -134,60 +124,6 @@
         {{-- RUN DYNAMIC DB POSTS/REPLIES LOOP --}}
         <div class="space-y-6">
             @forelse($posts as $post)
-                <div>
+                <div id="post-{{ $post->post_id }}">
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                            <span class="text-purple-700 font-semibold text-sm">
-                                {{ strtoupper(substr($post->author->username ?? $post->author->name ?? 'D', 0, 1)) }}
-                            </span>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-900">
-                            {{ $post->author->username ?? $post->author->name ?? 'Anonymous User' }}
-                            <span class="font-normal text-gray-400 text-xs ml-2">{{ $post->created_at->diffForHumans() }}</span>
-                        </p>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-lg p-5">
-                        <p class="text-gray-700 text-sm leading-relaxed">
-                            {{ $post->content }}
-                        </p>
-                    </div>
-                </div>
-            @empty
-                <p class="text-center text-gray-400 text-sm py-8">No replies posted yet. Start the conversation below!</p>
-            @endforelse
-        </div>
-
-        {{-- Lecturer Action Guide --}}
-        @if(auth()->check() && auth()->user()->system_role === 'lecturer')
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
-            <p class="text-sm text-green-700 font-semibold">
-                ✓ Lecturer Console Action: You can award marks or highlight solutions directly inside thread panels.
-            </p>
-        </div>
-        @endif
-
-    </main>
-
-    {{-- STICKY REPLY BAR --}}
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10">
-        <form method="POST"
-            action="/topics/{{ $topic->topic_id ?? 1 }}/posts"
-            class="max-w-3xl mx-auto flex items-center gap-3">
-            @csrf
-            <input type="text"
-                id="reply-input"
-                name="content"
-                placeholder="Add to the conversation..."
-                class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm
-                       focus:outline-none focus:border-gray-400 focus:ring-0 transition-colors" />
-
-            <button type="submit"
-                class="bg-gray-900 text-white px-4 h-10 rounded-lg flex items-center gap-1.5 text-xs font-semibold
-                       hover:bg-gray-700 transition-colors shrink-0">
-                ↩ Reply
-            </button>
-        </form>
-    </div>
-
-</body>
-</html>
+                        <div class="w-9 h-9
