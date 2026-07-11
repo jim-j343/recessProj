@@ -2,100 +2,114 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES · Compliance Monitoring  (UI only) -->
+<!-- Member Management — mirrors web admin/members.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Admin Console" styleClass="brand-sub"/></VBox>
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link"/>
+                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="Members" styleClass="nav-link,active"/>
+                <Label text="Analytics" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Dr. Sarah Jenkins"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
             </HBox>
-            <Label text="OVERVIEW" styleClass="nav-section"/>
-            <Button text="Analytics"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity"/>
-            <Label text="GOVERNANCE" styleClass="nav-section"/>
-            <Button text="Compliance"  styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="Members"      styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Audit Log"    styleClass="nav-item" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
-                <Label text="SJ" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox><Label text="Dr. Sarah Jenkins" styleClass="label-strong"/><Label text="Lead Administrator" styleClass="brand-sub"/></VBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Member Management" styleClass="page-title"/>
             </HBox>
         </VBox>
-    </left>
-    <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
-                <Label text="Compliance Monitoring" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <TextField promptText="Search accounts…" prefWidth="260"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24" maxWidth="1080">
-                    <VBox spacing="4">
-                        <Label text="Compliance Monitoring" styleClass="h-lg"/>
-                        <Label text="Manage flagged accounts and system restrictions." styleClass="muted"/>
-                    </VBox>
+    </top>
 
-                    <HBox styleClass="segmented" alignment="CENTER_LEFT" spacing="0" maxWidth="380">
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="896">
+                    <Label text="Manage flagged accounts and issue warnings or restrictions." styleClass="muted"/>
+
+                    <!-- Search -->
+                    <TextField promptText="Search by username or email..." maxWidth="Infinity"/>
+
+                    <!-- Filter tabs -->
+                    <HBox styleClass="segmented" alignment="CENTER_LEFT" spacing="8">
                         <fx:define><ToggleGroup fx:id="filter"/></fx:define>
-                        <ToggleButton text="All Flags"   toggleGroup="$filter" selected="true"/>
+                        <ToggleButton text="All"         toggleGroup="$filter" selected="true"/>
                         <ToggleButton text="Blacklisted" toggleGroup="$filter"/>
                         <ToggleButton text="Warning"     toggleGroup="$filter"/>
-                        <ToggleButton text="Review"      toggleGroup="$filter"/>
+                        <ToggleButton text="Active"      toggleGroup="$filter"/>
                     </HBox>
 
-                    <!-- Expanded flagged card -->
+                    <!-- Expanded flagged member card -->
                     <VBox styleClass="card" spacing="16">
                         <HBox alignment="CENTER_LEFT" spacing="14">
-                            <Label text="JV" styleClass="brand-logo" minWidth="44" minHeight="44"/>
-                            <VBox><Label text="Julian Vance" styleClass="h-sm"/><Label text="ID: #UX-9021" styleClass="muted"/></VBox>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label text="⊘ Blacklisted" styleClass="badge,badge-danger"/>
-                        </HBox>
-
-                        <HBox styleClass="alert-danger" alignment="CENTER_LEFT">
-                            <VBox>
-                                <Label text="ACCESS RESTRICTION" styleClass="eyebrow"/>
-                                <Label text="6 Days Remaining" styleClass="alert-danger-text"/>
+                            <Label text="JV" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
+                            <VBox spacing="2">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <Label text="Julian Vance" styleClass="label-strong"/>
+                                    <Label text="⛔ Blacklisted" styleClass="badge,badge-danger"/>
+                                    <Label text="Student" styleClass="badge,badge-neutral"/>
+                                </HBox>
+                                <Label text="j.vance@university.ac.ug · 142 posts · last active 3 weeks ago" styleClass="subtle"/>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="Extend" styleClass="btn,btn-primary"/>
+                            <Label text="⌃" styleClass="subtle"/>
                         </HBox>
 
-                        <HBox spacing="16">
-                            <VBox HBox.hgrow="ALWAYS"><Label text="Reason for Flag" styleClass="muted"/><Label text="Academic Integrity Violation" styleClass="label-strong" wrapText="true"/></VBox>
-                            <VBox HBox.hgrow="ALWAYS"><Label text="Reported By" styleClass="muted"/><Label text="AI Auditor (System)" styleClass="label-strong"/></VBox>
-                            <VBox HBox.hgrow="ALWAYS"><Label text="Confidence" styleClass="muted"/><Label text="98.4%" styleClass="label-strong"/></VBox>
-                            <VBox HBox.hgrow="ALWAYS"><Label text="Last Action" styleClass="muted"/><Label text="Dec 12, 2025" styleClass="label-strong"/></VBox>
+                        <Region styleClass="divider" prefHeight="1"/>
+
+                        <HBox styleClass="alert-danger" alignment="CENTER_LEFT" style="-fx-background-color:#fef2f2; -fx-border-color:#fecaca; -fx-border-width:1; -fx-background-radius:8; -fx-border-radius:8;">
+                            <VBox spacing="2">
+                                <Label text="ACCESS RESTRICTION" styleClass="eyebrow" style="-fx-text-fill:#b91c1c;"/>
+                                <Label text="6 days remaining" styleClass="alert-danger-text"/>
+                                <Label text="Reason: Academic Integrity Violation" style="-fx-text-fill:#dc2626; -fx-font-size:12px;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Lift Blacklist" styleClass="btn,btn-outline" style="-fx-text-fill:#b91c1c; -fx-border-color:#fecaca;"/>
                         </HBox>
-                        <Separator styleClass="divider"/>
-                        <HBox spacing="12">
-                            <Button text="🛡 Full Review" styleClass="btn,btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                            <Button text="✉ Notify Student" styleClass="btn,btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                        </HBox>
+
+                        <VBox spacing="4">
+                            <Label text="WARNING HISTORY" styleClass="eyebrow"/>
+                            <Label text="Warning #1 — issued 12 Nov 2025, deadline 26 Nov 2025 · heeded ✓" styleClass="subtle"/>
+                            <Label text="Warning #2 — issued 03 Dec 2025, deadline 17 Dec 2025 · unheeded" styleClass="subtle"/>
+                        </VBox>
                     </VBox>
 
                     <!-- Collapsed rows -->
                     <HBox styleClass="card" alignment="CENTER_LEFT" spacing="14">
-                        <Label text="ER" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                        <VBox><Label text="Elena Rodriguez" styleClass="label-strong"/><Label text="ID: #UX-7742" styleClass="muted"/></VBox>
+                        <Label text="ER" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
+                        <VBox spacing="2">
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="Elena Rodriguez" styleClass="label-strong"/>
+                                <Label text="⚠ Warning #1" styleClass="badge,badge-warning"/>
+                                <Label text="Student" styleClass="badge,badge-neutral"/>
+                            </HBox>
+                            <Label text="e.rodriguez@university.ac.ug · 58 posts · last active 2 days ago" styleClass="subtle"/>
+                        </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="⚠ Warning" styleClass="badge,badge-warning"/>
+                        <Label text="⌄" styleClass="subtle"/>
                     </HBox>
                     <HBox styleClass="card" alignment="CENTER_LEFT" spacing="14">
-                        <Label text="KA" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                        <VBox><Label text="Kaleb Aris" styleClass="label-strong"/><Label text="ID: #UX-5521" styleClass="muted"/></VBox>
+                        <Label text="KA" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
+                        <VBox spacing="2">
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="Kaleb Aris" styleClass="label-strong"/>
+                                <Label text="Active" styleClass="badge,badge-success"/>
+                                <Label text="Lecturer" styleClass="badge,badge-neutral"/>
+                            </HBox>
+                            <Label text="k.aris@university.ac.ug · 210 posts · last active 4 hours ago" styleClass="subtle"/>
+                        </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="✔ Active" styleClass="badge,badge-success"/>
+                        <Label text="⌄" styleClass="subtle"/>
                     </HBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

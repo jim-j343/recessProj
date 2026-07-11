@@ -3,47 +3,60 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- ACES · Quiz Focus / Proctored Takeover Mode  (UI only) -->
+<!-- Quiz Focus Mode — mirrors web quiz/show.blade.php (locked assessment) -->
 <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
            stylesheets="@../css/aces.css" styleClass="root,focus-bg"
            prefWidth="1000" prefHeight="720">
-    <VBox alignment="TOP_RIGHT">
-        <padding><Insets top="20" right="32"/></padding>
-        <Label text="⏱ 24:57" styleClass="timer-danger"/>
-        <Label text="TIME REMAINING" styleClass="eyebrow"/>
+
+    <!-- Timer (top-right) -->
+    <VBox alignment="TOP_RIGHT" StackPane.alignment="TOP_RIGHT" maxHeight="120">
+        <padding><Insets top="24" right="32"/></padding>
+        <HBox alignment="CENTER_RIGHT" spacing="8" style="-fx-background-color:white; -fx-background-radius:999; -fx-border-color:#fecaca; -fx-border-width:1; -fx-padding:8 16 8 16;">
+            <Label text="⏱" style="-fx-text-fill:#dc2626;"/>
+            <Label text="24:57" styleClass="timer-danger"/>
+        </HBox>
+        <Label text="TIME REMAINING" style="-fx-text-fill:#dc2626; -fx-font-size:11px; -fx-font-weight:bold;"/>
     </VBox>
 
-    <VBox styleClass="card" maxWidth="640" maxHeight="480" spacing="20">
-        <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
-        <HBox alignment="CENTER_LEFT">
-            <VBox><Label text="Advanced Web Systems" styleClass="h-sm"/><Label text="Question 12 of 30 · Multiple Choice" styleClass="muted"/></VBox>
+    <!-- Quiz card -->
+    <VBox styleClass="quiz-card" maxWidth="576" maxHeight="520" spacing="0" StackPane.alignment="CENTER">
+        <!-- progress bar -->
+        <Region prefHeight="4" maxWidth="Infinity" style="-fx-background-color:#111827;" maxHeight="4"/>
+
+        <!-- header -->
+        <HBox alignment="CENTER_LEFT" style="-fx-padding:16 24 16 24; -fx-border-color:#f3f4f6; -fx-border-width:0 0 1 0;">
+            <VBox>
+                <Label text="Advanced Web Systems" styleClass="card-title"/>
+                <Label text="Question 12 of 30 • Multiple Choice" styleClass="subtle"/>
+            </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="🔒 LOCKED" styleClass="badge,badge-neutral"/>
         </HBox>
 
-        <Label text="What is the primary benefit of using a Virtual DOM in modern web frameworks?" styleClass="h-md" wrapText="true"/>
-
-        <fx:define><ToggleGroup fx:id="answer"/></fx:define>
-        <VBox spacing="12">
-            <RadioButton text="Faster initial render" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
-            <RadioButton text="Efficient updates by minimizing direct DOM manipulation" toggleGroup="$answer" selected="true" styleClass="answer-option,selected" maxWidth="Infinity"/>
-            <RadioButton text="Automatic SEO optimization" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
-            <RadioButton text="Native browser support" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+        <!-- question -->
+        <VBox spacing="20" style="-fx-padding:32;">
+            <Label text="What is the primary benefit of using a Virtual DOM in modern web frameworks?" styleClass="h-md" wrapText="true"/>
+            <fx:define><ToggleGroup fx:id="answer"/></fx:define>
+            <VBox spacing="12">
+                <RadioButton text="Faster initial render" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+                <RadioButton text="Efficient updates by minimizing direct DOM manipulation" toggleGroup="$answer" selected="true" styleClass="answer-option,selected" maxWidth="Infinity"/>
+                <RadioButton text="Automatic SEO optimization" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+                <RadioButton text="Native browser support" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
+            </VBox>
         </VBox>
 
-        <Separator styleClass="divider"/>
-        <HBox alignment="CENTER_LEFT">
-            <Button text="🚩 Review Later" styleClass="btn,btn-ghost"/>
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- footer -->
+        <HBox alignment="CENTER_LEFT" style="-fx-padding:16 24 16 24; -fx-background-color:#f9fafb; -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0;">
+            <Button text="← Previous" styleClass="btn,btn-ghost"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <HBox spacing="8">
-                <Button text="Previous" styleClass="btn,btn-secondary"/>
-                <Button text="Next Question →" styleClass="btn,btn-primary"/>
-            </HBox>
+            <Button text="Next →" styleClass="btn,btn-dark"/>
         </HBox>
     </VBox>
 
-    <VBox alignment="BOTTOM_CENTER">
+    <VBox alignment="BOTTOM_CENTER" StackPane.alignment="BOTTOM_CENTER" pickOnBounds="false">
         <padding><Insets bottom="16"/></padding>
-        <Label text="🛡 Proctoring Active · Screen Recording &amp; Tab Locking Enabled" styleClass="muted"/>
+        <Label text="👁 Navigation disabled during assessment" styleClass="subtle"/>
     </VBox>
 </StackPane>

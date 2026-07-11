@@ -47,10 +47,10 @@ public class RegisterController {
             return;
         }
         try {
-            User user = authService.register(name, email, pwd, selectedRole());
-            if (user == null) { showError("Could not create the account."); return; }
-            Session.begin(user, null);
-            SceneManager.showHomeFor(user.getRole());
+            AuthService.Result result = authService.register(name, email, pwd, selectedRole());
+            if (result.user() == null) { showError("Could not create the account."); return; }
+            Session.begin(result.user(), result.token());
+            SceneManager.showHomeFor(result.user().getRole());
         } catch (AuthService.AuthException e) {
             showError(e.getMessage());
         }

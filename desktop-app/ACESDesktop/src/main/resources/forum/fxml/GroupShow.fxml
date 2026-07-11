@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Group Detail — mirrors web groups/show.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link"/>
+                <Label text="Groups" styleClass="nav-link,active"/>
+                <Label text="Analytics" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Dr. Sarah Jenkins"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Computer Science Year 2" styleClass="page-title"/>
+                    <Label text="Core CS discussions, coursework and revision for second-year students." styleClass="subtle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox spacing="8">
+                    <Button text="Go to Forum" styleClass="btn,btn-primary"/>
+                    <Button text="Leave group" styleClass="btn" style="-fx-background-color:#fee2e2; -fx-text-fill:#b91c1c;"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Stats -->
+                    <HBox spacing="16">
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS"><Label text="42" style="-fx-text-fill:#4f46e5; -fx-font-size:24px; -fx-font-weight:bold;"/><Label text="Members" styleClass="subtle"/></VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS"><Label text="18" style="-fx-text-fill:#16a34a; -fx-font-size:24px; -fx-font-weight:bold;"/><Label text="Topics" styleClass="subtle"/></VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS"><Label text="7" style="-fx-text-fill:#374151; -fx-font-size:24px; -fx-font-weight:bold;"/><Label text="Days before warning" styleClass="subtle"/></VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS"><Label text="30" style="-fx-text-fill:#dc2626; -fx-font-size:24px; -fx-font-weight:bold;"/><Label text="Blacklist duration (days)" styleClass="subtle"/></VBox>
+                    </HBox>
+
+                    <HBox spacing="24">
+                        <!-- Recent topics -->
+                        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+                            <Label text="Recent Topics" styleClass="card-title"><VBox.margin><Insets bottom="12"/></VBox.margin></Label>
+                            <HBox alignment="TOP_LEFT"><padding><Insets top="10" bottom="10"/></padding>
+                                <VBox HBox.hgrow="ALWAYS"><Label text="Wave-Particle Duality explained" styleClass="label-strong"/><Label text="by Alex Rivers · 2 hours ago" styleClass="subtle"/></VBox>
+                                <Label text="Science" styleClass="chip"/>
+                            </HBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <HBox alignment="TOP_LEFT"><padding><Insets top="10" bottom="10"/></padding>
+                                <VBox HBox.hgrow="ALWAYS"><Label text="Big-O of recursive merge sort" styleClass="label-strong"/><Label text="by Marcus V. · 1 day ago" styleClass="subtle"/></VBox>
+                                <Label text="Programming" styleClass="chip"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Members -->
+                        <VBox styleClass="card" spacing="0" prefWidth="340" minWidth="340">
+                            <Label text="Members" styleClass="card-title"><VBox.margin><Insets bottom="12"/></VBox.margin></Label>
+                            <HBox alignment="CENTER_LEFT" spacing="12"><padding><Insets top="8" bottom="8"/></padding>
+                                <Label text="A" styleClass="avatar-soft" minWidth="32" minHeight="32"/>
+                                <VBox HBox.hgrow="ALWAYS"><Label text="Alex Rivers" styleClass="label-strong"/><Label text="Member" styleClass="subtle"/></VBox>
+                            </HBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <HBox alignment="CENTER_LEFT" spacing="12"><padding><Insets top="8" bottom="8"/></padding>
+                                <Label text="K" styleClass="avatar-soft" minWidth="32" minHeight="32"/>
+                                <VBox HBox.hgrow="ALWAYS"><Label text="Dr. K. Owen" styleClass="label-strong"/><Label text="Admin" styleClass="subtle"/></VBox>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

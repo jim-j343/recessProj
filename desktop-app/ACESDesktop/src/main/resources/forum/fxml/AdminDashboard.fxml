@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Admin Dashboard — mirrors web admin/dashboard.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link,active"/>
+                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="Members" styleClass="nav-link"/>
+                <Label text="Analytics" styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label text="Dr. Sarah Jenkins"/>
+                    <Label text="▾" styleClass="subtle"/>
+                </HBox>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Admin Analytics Dashboard" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="32" maxWidth="1120">
+
+                    <!-- Stat cards -->
+                    <HBox spacing="24">
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="4,218" style="-fx-text-fill:#4f46e5; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                            <Label text="Total Members" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="1,847" style="-fx-text-fill:#16a34a; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                            <Label text="Active Today" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="12" style="-fx-text-fill:#ca8a04; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                            <Label text="Members Warned" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="5" style="-fx-text-fill:#dc2626; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                            <Label text="Blacklisted" styleClass="muted"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Settings row -->
+                    <HBox spacing="24">
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <VBox spacing="2">
+                                <Label text="Automated Blacklist Engine" styleClass="h-md"/>
+                                <Label text="Configure triggers for silent or non-communicative accounts." styleClass="subtle" wrapText="true"/>
+                            </VBox>
+                            <VBox spacing="6">
+                                <Label text="Warning Count Before Penalty" styleClass="field-label"/>
+                                <TextField text="2"/>
+                            </VBox>
+                            <HBox spacing="12">
+                                <VBox spacing="6" HBox.hgrow="ALWAYS"><Label text="Days Before Warning" styleClass="field-label"/><TextField promptText="e.g. 14"/></VBox>
+                                <VBox spacing="6" HBox.hgrow="ALWAYS"><Label text="Blacklist Duration (Days)" styleClass="field-label"/><TextField promptText="e.g. 30"/></VBox>
+                            </HBox>
+                            <Button text="APPLY COMPLIANCE RULES" styleClass="btn,btn-dark" maxWidth="Infinity"/>
+                        </VBox>
+
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <VBox spacing="2">
+                                <Label text="Communication Exclusions" styleClass="h-md"/>
+                                <Label text="Set system baseline visibility properties for subgroup communications." styleClass="subtle" wrapText="true"/>
+                            </VBox>
+                            <HBox styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12" style="-fx-background-color:#f9fafb; -fx-border-color:#e5e7eb; -fx-border-width:1; -fx-background-radius:8; -fx-border-radius:8;">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <Label text="Enable Target Exclusions" styleClass="label-strong"/>
+                                    <Label text="Allows users to isolate individuals from selective feeds." styleClass="subtle" wrapText="true"/>
+                                </VBox>
+                                <CheckBox selected="true"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Member table -->
+                    <TableView prefHeight="260">
+                        <columns>
+                            <TableColumn text="MEMBER" prefWidth="260"/>
+                            <TableColumn text="LAST ACTIVE" prefWidth="260"/>
+                            <TableColumn text="POSTS" prefWidth="160"/>
+                            <TableColumn text="STATUS" prefWidth="180"/>
+                        </columns>
+                        <placeholder><Label text="No members to display." styleClass="muted"/></placeholder>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
