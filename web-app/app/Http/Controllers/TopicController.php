@@ -230,7 +230,7 @@ class TopicController extends Controller
     public function exportPdf(Topic $topic)
     {
         $posts = $topic->posts()
-            ->with('austhor')
+            ->with('author')
             ->orderBy('created_at')
             ->get();
 
