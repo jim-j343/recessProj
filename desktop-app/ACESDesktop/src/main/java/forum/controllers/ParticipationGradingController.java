@@ -1,5 +1,7 @@
 package forum.controllers;
 
+import forum.api.ApiClient;
+import forum.api.ApiException;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -12,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -35,6 +38,7 @@ public class ParticipationGradingController {
     @FXML private TableColumn<GradeRow, String> colRemarks;
 
     private final ObservableList<GradeRow> rows = FXCollections.observableArrayList();
+    private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
@@ -96,8 +100,8 @@ public class ParticipationGradingController {
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
                 HttpRequest req = HttpRequest.newBuilder(
-                                URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                        .replace("/api", "") + "/participation/grade-json"))
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                .replace("/api", "") + "/participation/grade-json"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .GET().build();
@@ -118,16 +122,6 @@ public class ParticipationGradingController {
                         row.quality   = node.get("quality").asText();
                         row.grade     = node.has("existing_grade") ? node.get("existing_grade").asText("") : "";
                         row.remarks   = "";
-                        if (node.has("user_id")) row.userId = node.get("user_id").asLong();
-                        if (node.has("username")) row.username = node.get("username").asText();
-                        if (node.has("group_name")) row.groupName = node.get("group_name").asText();
-                        else row.groupName = "—";
-                        if (node.has("post_count")) row.posts = node.get("post_count").asInt();
-                        if (node.has("reply_count")) row.replies = node.get("reply_count").asInt();
-                        if (node.has("quality")) row.quality = node.get("quality").asText();
-                        if (node.has("existing_grade")) row.grade = node.get("existing_grade").asText("");
-                        else row.grade = "";
-                        row.remarks = "";
                         result.add(row);
                     }
                     Platform.runLater(() -> rows.setAll(result));
@@ -156,21 +150,19 @@ public class ParticipationGradingController {
                     if (row.grade == null || row.grade.isBlank()) continue;
                     if (!first) json.append(",");
                     json.append("\"").append(row.userId).append("\":")
-                            .append("{\"grade\":\"").append(row.grade).append("\",")
-                            .append("\"remark\":\"").append(
-                                    row.remarks != null ? row.remarks.replace("\"", "'") : "")
-                            .append("\"}");
+                        .append("{\"grade\":\"").append(row.grade).append("\",")
+                        .append("\"remark\":\"").append(
+                                row.remarks != null ? row.remarks.replace("\"", "'") : "")
+                        .append("\"}");
                     first = false;
                 }
                 json.append("}}");
 
-                String baseUrl = forum.config.DatabaseConfig.API_BASE_URL;
-                String apiUrl = baseUrl.endsWith("/api") ? baseUrl.substring(0, baseUrl.length() - 4) : baseUrl;
-                String gradeUrl = apiUrl + "/participation/grade";
-
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
-                HttpRequest req = HttpRequest.newBuilder(URI.create(gradeUrl))
+                HttpRequest req = HttpRequest.newBuilder(
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                .replace("/api", "") + "/participation/grade"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json")

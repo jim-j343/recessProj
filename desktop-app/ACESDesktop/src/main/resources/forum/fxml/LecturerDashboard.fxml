@@ -3,30 +3,29 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Lecturer Dashboard — mirrors web lecturer/dashboard.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.LecturerDashboardController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link,active"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="New Topic" styleClass="nav-link"/>
-                <Label text="Quiz Center" styleClass="nav-link"/>
-                <Label text="Grading" styleClass="nav-link"/>
+                <Label text="Dashboard"   styleClass="nav-link,active"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Dr. K. Owen"/>
-                    <Label text="▾" styleClass="subtle"/>
+                    <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label fx:id="userNameLabel"/>
                 </HBox>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Lecturer Dashboard" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="+ New Quiz" styleClass="btn,btn-primary"/>
+                <Button text="+ New Quiz" styleClass="btn,btn-primary" onAction="#onQuizCenter"/>
             </HBox>
         </VBox>
     </top>
@@ -39,15 +38,21 @@
                     <!-- Stats -->
                     <HBox spacing="16">
                         <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="12" style="-fx-text-fill:#4f46e5; -fx-font-size:26px; -fx-font-weight:bold;"/>
+                            <Label fx:id="quizCountLabel"
+                                   style="-fx-text-fill:#4f46e5; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
                             <Label text="Quizzes created" styleClass="muted"/>
                         </VBox>
                         <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="5" style="-fx-text-fill:#16a34a; -fx-font-size:26px; -fx-font-weight:bold;"/>
+                            <Label fx:id="groupCountLabel"
+                                   style="-fx-text-fill:#16a34a; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
                             <Label text="Groups joined" styleClass="muted"/>
                         </VBox>
                         <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="24" style="-fx-text-fill:#374151; -fx-font-size:26px; -fx-font-weight:bold;"/>
+                            <Label fx:id="topicCountLabel"
+                                   style="-fx-text-fill:#374151; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
                             <Label text="Topics created" styleClass="muted"/>
                         </VBox>
                     </HBox>
@@ -59,30 +64,37 @@
                                 <padding><Insets bottom="12"/></padding>
                                 <Label text="My Quizzes" styleClass="card-title"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Hyperlink text="+ New" styleClass="subtle"/>
+                                <Hyperlink text="+ New" onAction="#onQuizCenter" styleClass="subtle"/>
                             </HBox>
-                            <HBox alignment="CENTER_LEFT">
-                                <padding><Insets top="10" bottom="10"/></padding>
-                                <VBox HBox.hgrow="ALWAYS"><Label text="Advanced Macroeconomics Midterm" styleClass="label-strong"/><Label text="20 May 2026 10:00 · 60 mins" styleClass="subtle"/></VBox>
-                                <Label text="Published" styleClass="badge,badge-success"/>
-                            </HBox>
-                            <Region styleClass="divider" prefHeight="1"/>
-                            <HBox alignment="CENTER_LEFT">
-                                <padding><Insets top="10" bottom="10"/></padding>
-                                <VBox HBox.hgrow="ALWAYS"><Label text="Week 3 Data Structures Quiz" styleClass="label-strong"/><Label text="30 Jun 2026 14:00 · 30 mins" styleClass="subtle"/></VBox>
-                                <Label text="Draft" styleClass="badge,badge-neutral"/>
-                            </HBox>
+                            <VBox fx:id="quizListBox" spacing="0"/>
+                            <Label fx:id="noQuizzesLabel" text="No quizzes yet. Create your first one."
+                                   styleClass="muted" managed="false" visible="false"/>
                         </VBox>
 
                         <!-- Quick actions -->
                         <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
                             <Label text="Quick Actions" styleClass="card-title"/>
-                            <Label text="📝  Create a new quiz" styleClass="btn,btn-secondary" maxWidth="Infinity"/>
-                            <Label text="💬  Post a new topic" styleClass="btn,btn-secondary" maxWidth="Infinity"/>
-                            <Label text="👁  View forum" styleClass="btn,btn-secondary" maxWidth="Infinity"/>
-                            <Label text="🏆  Award participation marks" styleClass="btn,btn-secondary" maxWidth="Infinity"/>
+                            <Button text="📝  Create a new quiz"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onQuizCenter"/>
+                            <Button text="💬  Post a new topic"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onNewTopic"/>
+                            <Button text="👁  View forum"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onForum"/>
+                            <Button text="🏆  Award participation marks"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onGrading"/>
+                            <Button text="👥  Manage groups"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onGroups"/>
+                            <Region VBox.vgrow="ALWAYS"/>
+                            <Button text="Log Out" styleClass="btn,btn-ghost"
+                                    maxWidth="Infinity" onAction="#onLogout"/>
                         </VBox>
                     </HBox>
+
                 </VBox>
             </VBox>
         </ScrollPane>
