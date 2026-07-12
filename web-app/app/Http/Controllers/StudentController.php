@@ -11,6 +11,7 @@ use App\Models\Submission;
 use App\Models\Topic;
 use App\Models\Warning;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -125,6 +126,90 @@ class StudentController extends Controller
             'recentActivity',
             'overallScore',
             'latestTopic'
+        ));
+    }
+
+    // "My Progress" — a deeper-dive companion to the dashboard: full
+    // assessment history with real quiz scores and a real participation
+    // breakdown, using the same formula the lecturer's grading table uses.
+    public function progress()
+    {
+        $user = Auth::user();
+
+        $groupIds = GroupMembership::where('user_id', $user->user_id)
+            ->where('status', 'active')
+            ->pluck('group_id');
+
+        // ---- Participation: same definition as ParticipationController —
+        // a topic's opening post doesn't count, everything after it does ----
+        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->groupBy('topic_id')
+            ->pluck('post_id');
+
+        $postCount = Post::where('author_id', $user->user_id)
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->count();
+
+        $replyCount = Post::where('author_id', $user->user_id)
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->whereNotIn('post_id', $openingPostIds)
+            ->count();
+
+        $participationPct = min($replyCount, 10) * 10;
+
+        // ---- Real activity for the last 7 days, replacing the fake chart ----
+        $activityByDay = collect(range(6, 0))->map(function ($daysAgo) use ($user, $groupIds) {
+            $date = now()->subDays($daysAgo);
+            $count = Post::where('author_id', $user->user_id)
+                ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+                ->whereDate('created_at', $date->toDateString())
+                ->count();
+
+            return ['label' => $date->format('D'), 'count' => $count];
+        });
+
+        // ---- Assessment history: every completed quiz, with a real peer
+        // average (mean score of everyone who's completed that same quiz) ----
+        $submissions = Submission::where('user_id', $user->user_id)
+            ->whereNotNull('submitted_at')
+            ->whereHas('quiz', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->with('quiz.questions')
+            ->latest('submitted_at')
+            ->get();
+
+        $assessmentHistory = $submissions->map(function ($submission) {
+            $totalMarks = $submission->quiz->questions->sum('marks');
+            $scorePct = $totalMarks > 0 ? round(($submission->score / $totalMarks) * 100, 1) : 0.0;
+
+            $peerAvgPct = Submission::where('quiz_id', $submission->quiz_id)
+                ->whereNotNull('submitted_at')
+                ->get()
+                ->avg(fn ($s) => $totalMarks > 0 ? ($s->score / $totalMarks) * 100 : 0);
+
+            return (object) [
+                'title'       => $submission->quiz->title,
+                'submittedAt' => $submission->submitted_at,
+                'scorePct'    => $scorePct,
+                'vsPeerPct'   => $peerAvgPct !== null ? round($scorePct - $peerAvgPct, 1) : null,
+            ];
+        });
+
+        // ---- Most recent remark a lecturer actually left when grading —
+        // real, rather than a fabricated "professor's insight" ----
+        $latestRemark = ParticipationScore::where('user_id', $user->user_id)
+            ->whereIn('group_id', $groupIds)
+            ->latest('created_at')
+            ->first();
+
+        return view('participation.index', compact(
+            'user',
+            'postCount',
+            'replyCount',
+            'participationPct',
+            'activityByDay',
+            'assessmentHistory',
+            'latestRemark'
         ));
     }
 }
