@@ -3,59 +3,72 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Quiz Focus Mode — mirrors web quiz/show.blade.php (locked assessment) -->
 <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+           fx:controller="forum.controllers.QuizFocusModeController"
            stylesheets="@../css/aces.css" styleClass="root,focus-bg"
            prefWidth="1000" prefHeight="720">
 
-    <!-- Timer (top-right) -->
+    <!-- Timer -->
     <VBox alignment="TOP_RIGHT" StackPane.alignment="TOP_RIGHT" maxHeight="120">
         <padding><Insets top="24" right="32"/></padding>
-        <HBox alignment="CENTER_RIGHT" spacing="8" style="-fx-background-color:white; -fx-background-radius:999; -fx-border-color:#fecaca; -fx-border-width:1; -fx-padding:8 16 8 16;">
+        <HBox fx:id="timerBox" alignment="CENTER_RIGHT" spacing="8"
+              style="-fx-background-color:white; -fx-background-radius:999;
+                     -fx-border-color:#fecaca; -fx-border-width:1;
+                     -fx-padding:8 16 8 16;">
             <Label text="⏱" style="-fx-text-fill:#dc2626;"/>
-            <Label text="24:57" styleClass="timer-danger"/>
+            <Label fx:id="timerLabel" text="--:--" styleClass="timer-danger"/>
         </HBox>
-        <Label text="TIME REMAINING" style="-fx-text-fill:#dc2626; -fx-font-size:11px; -fx-font-weight:bold;"/>
+        <Label text="TIME REMAINING"
+               style="-fx-text-fill:#dc2626; -fx-font-size:11px; -fx-font-weight:bold;"/>
     </VBox>
 
     <!-- Quiz card -->
-    <VBox styleClass="quiz-card" maxWidth="576" maxHeight="520" spacing="0" StackPane.alignment="CENTER">
-        <!-- progress bar -->
-        <Region prefHeight="4" maxWidth="Infinity" style="-fx-background-color:#111827;" maxHeight="4"/>
+    <VBox fx:id="quizCard" styleClass="quiz-card"
+          maxWidth="576" maxHeight="560" spacing="0"
+          StackPane.alignment="CENTER">
 
-        <!-- header -->
-        <HBox alignment="CENTER_LEFT" style="-fx-padding:16 24 16 24; -fx-border-color:#f3f4f6; -fx-border-width:0 0 1 0;">
+        <!-- Progress bar -->
+        <ProgressBar fx:id="progressBar" progress="0"
+                     maxWidth="Infinity" prefHeight="4"/>
+
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-padding:16 24 16 24; -fx-border-color:#f3f4f6;
+                     -fx-border-width:0 0 1 0;">
             <VBox>
-                <Label text="Advanced Web Systems" styleClass="card-title"/>
-                <Label text="Question 12 of 30 • Multiple Choice" styleClass="subtle"/>
+                <Label fx:id="quizTitleLabel" styleClass="card-title"/>
+                <Label fx:id="questionIndexLabel" styleClass="subtle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="🔒 LOCKED" styleClass="badge,badge-neutral"/>
         </HBox>
 
-        <!-- question -->
+        <!-- Question -->
         <VBox spacing="20" style="-fx-padding:32;">
-            <Label text="What is the primary benefit of using a Virtual DOM in modern web frameworks?" styleClass="h-md" wrapText="true"/>
-            <fx:define><ToggleGroup fx:id="answer"/></fx:define>
-            <VBox spacing="12">
-                <RadioButton text="Faster initial render" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
-                <RadioButton text="Efficient updates by minimizing direct DOM manipulation" toggleGroup="$answer" selected="true" styleClass="answer-option,selected" maxWidth="Infinity"/>
-                <RadioButton text="Automatic SEO optimization" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
-                <RadioButton text="Native browser support" toggleGroup="$answer" styleClass="answer-option" maxWidth="Infinity"/>
-            </VBox>
+            <Label fx:id="questionTextLabel" styleClass="h-md" wrapText="true"/>
+            <VBox fx:id="answersBox" spacing="12"/>
         </VBox>
 
         <Region VBox.vgrow="ALWAYS"/>
 
-        <!-- footer -->
-        <HBox alignment="CENTER_LEFT" style="-fx-padding:16 24 16 24; -fx-background-color:#f9fafb; -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0;">
-            <Button text="← Previous" styleClass="btn,btn-ghost"/>
+        <!-- Footer -->
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-padding:16 24 16 24; -fx-background-color:#f9fafb;
+                     -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0;">
+            <Button fx:id="prevBtn" text="← Previous"
+                    styleClass="btn,btn-ghost" onAction="#onPrev"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Next →" styleClass="btn,btn-dark"/>
+            <Button fx:id="nextBtn" text="Next →"
+                    styleClass="btn,btn-dark"  onAction="#onNext"/>
+            <Button fx:id="submitBtn" text="Submit Quiz"
+                    styleClass="btn,btn-primary"
+                    onAction="#onSubmit"
+                    managed="false" visible="false"/>
         </HBox>
     </VBox>
 
-    <VBox alignment="BOTTOM_CENTER" StackPane.alignment="BOTTOM_CENTER" pickOnBounds="false">
+    <VBox alignment="BOTTOM_CENTER" StackPane.alignment="BOTTOM_CENTER"
+          pickOnBounds="false">
         <padding><Insets bottom="16"/></padding>
         <Label text="👁 Navigation disabled during assessment" styleClass="subtle"/>
     </VBox>
