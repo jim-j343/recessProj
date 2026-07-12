@@ -86,14 +86,24 @@ class TopicController extends Controller
     }
 
     // Show one topic
+    // Show one topic
     public function show(Topic $topic)
     {
-        $posts = $topic->posts()
+        $allPosts = $topic->posts()
             ->with('author')
             ->orderBy('created_at')
             ->get();
 
-        $firstPost = $posts->whereNull('parent_post_id')->first();
+        // The topic's opening post (created alongside the topic itself) is
+        // shown separately as the "original post" card — everything else
+        // is a reply. parent_post_id exists in the schema for true threaded
+        // replies, but no UI sets it yet, so the opening post is identified
+        // as whichever post came first instead.
+        $firstPost = $allPosts->whereNull('parent_post_id')->first() ?? $allPosts->first();
+
+        $posts = $firstPost
+            ? $allPosts->reject(fn ($post) => $post->post_id === $firstPost->post_id)->values()
+            : $allPosts;
 
         return view('forum.show', compact(
             'topic',
@@ -235,3 +245,4 @@ class TopicController extends Controller
             ->header('Content-Type', 'text/html');
     }
 }
+
