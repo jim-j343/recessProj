@@ -134,4 +134,43 @@ public class TopicDetailController {
     private void onBack() {
         SceneManager.show("ForumDashboard", "Smart Discussion Forum");
     }
+
+    @FXML
+    private void onExportPdf() {
+        if (topic == null) return;
+        String token = Session.authToken();
+        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
+        if (token == null || serverTopicId <= 0) return;
+
+        // Open the PDF export URL in the system browser
+        String url = forum.config.DatabaseConfig.API_BASE_URL
+                .replace("/api", "") + "/topics/" + serverTopicId + "/export-pdf";
+        try {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onShare() {
+        if (topic == null) return;
+        // Build the web URL for this topic and copy it to clipboard
+        String url = forum.config.DatabaseConfig.API_BASE_URL
+                .replace("/api", "") + "/topics/" + topicDao.serverIdFor(topic.getTopicId());
+
+        javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+        content.putString(url);
+        javafx.scene.input.Clipboard.getSystemClipboard().setContent(content);
+
+        // Brief visual feedback
+        if (topicTitleLabel != null) {
+            String original = topicTitleLabel.getText();
+            topicTitleLabel.setText("✓ Link copied to clipboard!");
+            new Thread(() -> {
+                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+                Platform.runLater(() -> topicTitleLabel.setText(original));
+            }).start();
+        }
+    }
 }
