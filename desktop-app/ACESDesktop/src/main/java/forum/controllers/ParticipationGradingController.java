@@ -1,7 +1,5 @@
 package forum.controllers;
 
-import forum.api.ApiClient;
-import forum.api.ApiException;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -14,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,7 +35,6 @@ public class ParticipationGradingController {
     @FXML private TableColumn<GradeRow, String> colRemarks;
 
     private final ObservableList<GradeRow> rows = FXCollections.observableArrayList();
-    private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
@@ -168,11 +164,6 @@ public class ParticipationGradingController {
                 }
                 json.append("}}");
 
-                HttpClient http = HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(8)).build();
-                HttpRequest req = HttpRequest.newBuilder(
-                                URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                        .replace("/api", "") + "/participation/grade"))
                 String baseUrl = forum.config.DatabaseConfig.API_BASE_URL;
                 String apiUrl = baseUrl.endsWith("/api") ? baseUrl.substring(0, baseUrl.length() - 4) : baseUrl;
                 String gradeUrl = apiUrl + "/participation/grade";

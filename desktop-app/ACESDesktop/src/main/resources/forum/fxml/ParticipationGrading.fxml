@@ -5,6 +5,7 @@
 
 <!-- Participation Grading — mirrors web participation/grade.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.ParticipationGradingController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
@@ -19,7 +20,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
                     <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Dr. K. Owen"/>
+                    <Label fx:id="userNameLabel" text="Dr. K. Owen"/>
                     <Label text="▾" styleClass="subtle"/>
                 </HBox>
             </HBox>
@@ -55,12 +56,13 @@
                             <padding><Insets bottom="16"/></padding>
                             <Label text="Student Forum Participation" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Hyperlink text="💾 Save All Grades" styleClass="btn-ghost" style="-fx-text-fill:#4f46e5; -fx-font-weight:600;"/>
+                            <Hyperlink text="💾 Save All Grades" onAction="#onSaveGrades" styleClass="btn-ghost" style="-fx-text-fill:#4f46e5; -fx-font-weight:600;"/>
                         </HBox>
+                        <Label fx:id="statusLabel" managed="false" visible="false" styleClass="muted"/>
                         <TableView fx:id="gradesTable" prefHeight="360">
                             <columns>
                                 <TableColumn fx:id="colStudent" text="STUDENT" prefWidth="200"/>
-                                <TableColumn fx:id="colTopic"   text="LATEST TOPIC" prefWidth="200"/>
+                                <TableColumn fx:id="colGroup"   text="GROUP" prefWidth="200"/>
                                 <TableColumn fx:id="colPosts"   text="POSTS" prefWidth="90"/>
                                 <TableColumn fx:id="colReplies" text="REPLIES" prefWidth="90"/>
                                 <TableColumn fx:id="colQuality" text="QUALITY" prefWidth="120"/>
