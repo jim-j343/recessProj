@@ -7,6 +7,7 @@ import forum.api.dto.MemberDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
+import forum.config.AppConstants;
 import forum.models.Role;
 import forum.models.User;
 
@@ -22,8 +23,11 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GroupShowController {
+
+    private static final Logger LOGGER = Logger.getLogger(GroupShowController.class.getName());
 
     @FXML private Label  userNameLabel;
     @FXML private Label  groupNameLabel;
@@ -53,7 +57,7 @@ public class GroupShowController {
         myStatusLabel.setText(group.myStatus != null ? capitalize(group.myStatus) : "Not joined");
 
         // Show manage members button for group admin/lecturer
-        boolean isAdmin = "admin".equals(group.myRole);
+        boolean isAdmin = AppConstants.ROLE_ADMIN.equals(group.myRole);
         boolean isLecturer = u != null && u.getRole() == Role.LECTURER;
         if (isAdmin || (isLecturer && group.adminId == (u != null ? u.getUserId() : -1))) {
             manageMembersBtn.setManaged(true);
@@ -68,7 +72,7 @@ public class GroupShowController {
         if (token == null) return;
 
         // Only admins can see the full member list via /members endpoint
-        if (!"admin".equals(group.myRole)) return;
+        if (!AppConstants.ROLE_ADMIN.equals(group.myRole)) return;
 
         Thread worker = new Thread(() -> {
             try {
@@ -76,16 +80,16 @@ public class GroupShowController {
                 List<MemberRow> active  = new ArrayList<>();
                 List<MemberRow> pending = new ArrayList<>();
 
-                JsonNode activeNode  = root.get("active");
-                JsonNode pendingNode = root.get("pending");
+                JsonNode activeNode  = root.get(AppConstants.STATUS_ACTIVE);
+                JsonNode pendingNode = root.get(AppConstants.STATUS_PENDING);
 
                 if (activeNode != null) {
                     for (JsonNode n : activeNode) {
                         active.add(new MemberRow(
                                 n.get("user_id").asLong(),
                                 n.get("username").asText(),
-                                n.has("role") ? n.get("role").asText() : "member",
-                                "active"));
+                                n.has("role") ? n.get("role").asText() : AppConstants.ROLE_MEMBER,
+                                AppConstants.STATUS_ACTIVE));
                     }
                 }
                 if (pendingNode != null) {
@@ -93,14 +97,15 @@ public class GroupShowController {
                         pending.add(new MemberRow(
                                 n.get("user_id").asLong(),
                                 n.get("username").asText(),
-                                "member",
-                                "pending"));
+                                AppConstants.ROLE_MEMBER,
+                                AppConstants.STATUS_PENDING));
                     }
                 }
 
                 Platform.runLater(() -> renderMembers(active, pending));
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                LOGGER.severe("Failed to load group members: " + e.getMessage());
             }
         }, "load-members");
         worker.setDaemon(true);
@@ -161,6 +166,7 @@ public class GroupShowController {
                 Platform.runLater(this::loadMembers);
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                LOGGER.severe("Failed to approve member: " + e.getMessage());
                 Platform.runLater(() -> btn.setDisable(false));
             }
         }, "approve-member");
