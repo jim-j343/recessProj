@@ -126,4 +126,74 @@
             @forelse($posts as $post)
                 <div id="post-{{ $post->post_id }}">
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-9 h-9
+                        <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                            <span class="text-purple-700 font-semibold text-sm">
+                                {{ strtoupper(substr($post->author->username ?? $post->author->name ?? 'D', 0, 1)) }}
+                            </span>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-900">
+                            {{ $post->author->username ?? $post->author->name ?? 'Anonymous User' }}
+                            <span class="font-normal text-gray-400 text-xs ml-2">{{ $post->created_at->diffForHumans() }}</span>
+                        </p>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg p-5">
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            {{ $post->content }}
+                        </p>
+                    </div>
+                </div>
+            @empty
+                <p class="text-center text-gray-400 text-sm py-8">No replies posted yet. Start the conversation below!</p>
+            @endforelse
+        </div>
+
+        {{-- Lecturer Action Guide --}}
+        @if(auth()->check() && auth()->user()->system_role === 'lecturer')
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
+            <p class="text-sm text-green-700 font-semibold">
+                ✓ Lecturer Console Action: You can award marks or highlight solutions directly inside thread panels.
+            </p>
+        </div>
+        @endif
+
+    </main>
+
+    {{-- STICKY REPLY BAR --}}
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10">
+        <form method="POST"
+            action="/topics/{{ $topic->topic_id ?? 1 }}/posts"
+            class="max-w-3xl mx-auto flex items-center gap-3">
+            @csrf
+            <input type="text"
+                id="reply-input"
+                name="content"
+                placeholder="Add to the conversation..."
+                class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-sm
+                       focus:outline-none focus:border-gray-400 focus:ring-0 transition-colors" />
+
+            <button type="submit"
+                class="bg-gray-900 text-white px-4 h-10 rounded-lg flex items-center gap-1.5 text-xs font-semibold
+                       hover:bg-gray-700 transition-colors shrink-0">
+                ↩ Reply
+            </button>
+        </form>
+    </div>
+
+    {{-- After posting a reply, jump to it instead of landing back at the
+         top of the page (the default behaviour of a full-page redirect) --}}
+    @if(session('success') === 'Reply posted!')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const posts = document.querySelectorAll('[id^="post-"]');
+                const lastPost = posts[posts.length - 1];
+                if (lastPost) {
+                    lastPost.scrollIntoView({ behavior: 'instant', block: 'end' });
+                } else {
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            });
+        </script>
+    @endif
+
+</body>
+</html>
