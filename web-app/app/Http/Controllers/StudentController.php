@@ -33,6 +33,7 @@ class StudentController extends Controller
         // ---- Quizzes eligible for this student's groups ----
         $quizzes = Quiz::whereIn('group_id', $groupIds)
             ->where('is_published', true)
+            ->with('questions')
             ->orderByDesc('start_time')
             ->get();
 
@@ -65,16 +66,25 @@ class StudentController extends Controller
             }
         }
 
-        // ---- Grades ----
+        // ---- Grades — each score is converted to a % of that quiz's own
+        // total marks before displaying or averaging, so a 3/4 quiz and a
+        // 5/5 quiz compare fairly instead of averaging raw mark counts ----
         $gradedSubmissions = $submissions->filter(fn ($s) => $s->score !== null)
             ->map(function ($submission) use ($quizzes) {
-                $submission->setRelation('quiz', $quizzes->firstWhere('quiz_id', $submission->quiz_id));
+                $quiz = $quizzes->firstWhere('quiz_id', $submission->quiz_id);
+                $submission->setRelation('quiz', $quiz);
+
+                $totalMarks = $quiz?->questions->sum('marks') ?? 0;
+                $submission->scorePct = $totalMarks > 0
+                    ? round(($submission->score / $totalMarks) * 100, 1)
+                    : 0.0;
+
                 return $submission;
             })
             ->sortByDesc('submitted_at')
             ->values();
 
-        $averageGrade = $gradedSubmissions->count() ? round($gradedSubmissions->avg('score'), 1) : null;
+        $averageGrade = $gradedSubmissions->count() ? round($gradedSubmissions->avg('scorePct'), 1) : null;
         $quizzesCompleted = $submissions->filter(fn ($s) => $s->submitted_at !== null)->count();
         $quizzesTotal = $quizzes->count();
         $quizProgress = $quizzesTotal > 0 ? (int) round(($quizzesCompleted / $quizzesTotal) * 100) : 0;
