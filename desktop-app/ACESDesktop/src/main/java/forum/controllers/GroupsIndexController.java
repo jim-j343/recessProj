@@ -6,7 +6,6 @@ import forum.api.dto.GroupDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
-import forum.config.AppConstants;
 import forum.models.Role;
 import forum.models.User;
 
@@ -21,11 +20,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class GroupsIndexController {
-
-    private static final Logger LOGGER = Logger.getLogger(GroupsIndexController.class.getName());
 
     @FXML private Label     avatarLabel;
     @FXML private Label     userNameLabel;
@@ -60,7 +56,6 @@ public class GroupsIndexController {
                 Platform.runLater(() -> renderGroups(groups));
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-                LOGGER.severe("Failed to load groups: " + e.getMessage());
                 Platform.runLater(() -> showStatus("Could not load groups: " + e.getMessage()));
             }
         }, "load-groups");
@@ -104,11 +99,11 @@ public class GroupsIndexController {
         actionBtn.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(actionBtn, javafx.scene.layout.Priority.ALWAYS);
 
-        if (AppConstants.STATUS_ACTIVE.equals(g.myStatus)) {
+        if ("active".equals(g.myStatus)) {
             actionBtn.setText("✓ Joined");
             actionBtn.getStyleClass().addAll("badge", "badge-success");
             actionBtn.setDisable(true);
-        } else if (AppConstants.STATUS_PENDING.equals(g.myStatus)) {
+        } else if ("pending".equals(g.myStatus)) {
             actionBtn.setText("Pending");
             actionBtn.getStyleClass().addAll("badge", "badge-neutral");
             actionBtn.setDisable(true);
@@ -141,16 +136,14 @@ public class GroupsIndexController {
             try {
                 api.joinGroup(token, g.groupId);
                 Platform.runLater(() -> {
-                    btn.setText(AppConstants.STATUS_PENDING);
+                    btn.setText("Pending");
                     btn.getStyleClass().removeAll("btn-primary");
                     btn.getStyleClass().add("badge-neutral");
                 });
             } catch (ApiException ex) {
-                LOGGER.severe("Failed to join group: " + ex.getMessage());
                 Platform.runLater(() -> { btn.setDisable(false); btn.setText("Join"); });
             } catch (Exception ex) {
                 if (ex instanceof InterruptedException) Thread.currentThread().interrupt();
-                LOGGER.severe("Error joining group: " + ex.getMessage());
                 Platform.runLater(() -> { btn.setDisable(false); btn.setText("Join"); });
             }
         }, "join-group");

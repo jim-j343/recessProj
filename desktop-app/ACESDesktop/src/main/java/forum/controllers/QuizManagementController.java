@@ -137,8 +137,8 @@ public class QuizManagementController {
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(10)).build();
                 HttpRequest req = HttpRequest.newBuilder(
-                                URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                        .replace("/api", "") + "/quiz/store"))
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                .replace("/api", "") + "/quiz/store"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json")

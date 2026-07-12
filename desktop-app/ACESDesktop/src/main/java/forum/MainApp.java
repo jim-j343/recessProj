@@ -71,7 +71,7 @@ public class MainApp extends Application {
     public void start(Stage stage) {
         try {
             stage.getIcons().add(new Image(
-                    getClass().getResourceAsStream("/forum/images/aces-logo-256.png")));
+                    getClass().getResourceAsStream("/forum/images/aces-logo.png")));
         } catch (Exception ignored) { }
 
         // Initialise the local SQLite cache and seed demo accounts.

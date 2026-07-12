@@ -3,30 +3,26 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Create Quiz — mirrors web quiz/create.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.QuizManagementController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="New Topic" styleClass="nav-link"/>
+                <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
                 <Label text="Quiz Center" styleClass="nav-link,active"/>
-                <Label text="Grading" styleClass="nav-link"/>
+                <Label text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Dr. K. Owen"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <Label fx:id="userNameLabel" styleClass="subtle"/>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Create Quiz" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="← Back to Dashboard" styleClass="btn,btn-secondary"/>
+                <Button text="← Back to Dashboard" styleClass="btn,btn-secondary"
+                        onAction="#onDashboard"/>
             </HBox>
         </VBox>
     </top>
@@ -36,30 +32,42 @@
             <VBox alignment="TOP_CENTER">
                 <VBox spacing="24" maxWidth="768">
 
+                    <Label fx:id="statusLabel" styleClass="muted"
+                           managed="false" visible="false"/>
+
                     <!-- General details -->
                     <VBox styleClass="card-flat" spacing="16">
                         <Label text="⚙ General Details" styleClass="card-title"/>
+
                         <VBox spacing="6">
                             <Label text="QUIZ TITLE *" styleClass="eyebrow"/>
-                            <TextField promptText="Advanced Macroeconomics Midterm"/>
+                            <TextField fx:id="titleField"
+                                       promptText="e.g. Advanced Macroeconomics Midterm"/>
                         </VBox>
+
                         <VBox spacing="6">
                             <Label text="GROUP *" styleClass="eyebrow"/>
-                            <ComboBox promptText="-- Select a group --" maxWidth="Infinity"/>
+                            <ComboBox fx:id="groupCombo"
+                                      promptText="-- Select a group --"
+                                      maxWidth="Infinity"/>
                         </VBox>
+
                         <HBox spacing="16">
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
                                 <Label text="START DATE &amp; TIME *" styleClass="eyebrow"/>
-                                <TextField promptText="05/20/2026 10:00 AM"/>
+                                <TextField fx:id="startTimeField"
+                                           promptText="2026-07-20T10:00:00"/>
                             </VBox>
                             <VBox spacing="6" HBox.hgrow="ALWAYS">
                                 <Label text="DURATION (MINUTES) *" styleClass="eyebrow"/>
-                                <TextField text="30"/>
+                                <TextField fx:id="durationField" text="30"/>
                             </VBox>
                         </HBox>
+
                         <VBox spacing="6">
                             <Label text="STUDENT CATEGORY" styleClass="eyebrow"/>
-                            <TextField promptText="e.g. Year 2 Computer Science"/>
+                            <TextField fx:id="categoryField"
+                                       promptText="e.g. Year 2 Computer Science"/>
                         </VBox>
                     </VBox>
 
@@ -68,29 +76,22 @@
                         <HBox alignment="CENTER_LEFT">
                             <Label text="📝 Questions" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="+ Add Question" styleClass="btn,btn-primary"/>
+                            <Button text="+ Add Question" styleClass="btn,btn-primary"
+                                    onAction="#onAddQuestion"/>
                         </HBox>
-                        <VBox spacing="12" style="-fx-background-color:#f9fafb; -fx-border-color:#e5e7eb; -fx-border-width:1; -fx-background-radius:8; -fx-border-radius:8; -fx-padding:20;">
-                            <HBox alignment="CENTER_LEFT">
-                                <Label text="Question 1" styleClass="label-strong"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Hyperlink text="Remove" style="-fx-text-fill:#ef4444;"/>
-                            </HBox>
-                            <TextField promptText="Enter your question here..."/>
-                            <fx:define><ToggleGroup fx:id="q1"/></fx:define>
-                            <HBox spacing="12" alignment="CENTER_LEFT"><RadioButton toggleGroup="$q1" selected="true"/><TextField promptText="Answer option 1" HBox.hgrow="ALWAYS"/></HBox>
-                            <HBox spacing="12" alignment="CENTER_LEFT"><RadioButton toggleGroup="$q1"/><TextField promptText="Answer option 2" HBox.hgrow="ALWAYS"/></HBox>
-                            <HBox spacing="12" alignment="CENTER_LEFT"><RadioButton toggleGroup="$q1"/><TextField promptText="Answer option 3" HBox.hgrow="ALWAYS"/></HBox>
-                            <HBox spacing="12" alignment="CENTER_LEFT"><RadioButton toggleGroup="$q1"/><TextField promptText="Answer option 4" HBox.hgrow="ALWAYS"/></HBox>
-                            <Label text="Select the radio button next to the correct answer." styleClass="subtle"/>
-                        </VBox>
+                        <VBox fx:id="questionsBox" spacing="16"/>
                     </VBox>
 
                     <!-- Submit -->
                     <HBox spacing="16">
-                        <Button text="🚀 Publish Quiz" styleClass="btn,btn-dark" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                        <Button text="💾 Save as Draft" styleClass="btn,btn-outline" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Button text="🚀 Publish Quiz" styleClass="btn,btn-dark"
+                                maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                onAction="#onPublish"/>
+                        <Button text="💾 Save as Draft" styleClass="btn,btn-outline"
+                                maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                onAction="#onSaveDraft"/>
                     </HBox>
+
                 </VBox>
             </VBox>
         </ScrollPane>

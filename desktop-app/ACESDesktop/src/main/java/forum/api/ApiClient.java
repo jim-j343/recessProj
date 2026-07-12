@@ -134,111 +134,111 @@ public class ApiClient {
         return mapper.readValue(resp.body(), PostDto.class);
     }
 
-    // ---------------------------------------------------------------
+// ---------------------------------------------------------------
 //  Groups
 // ---------------------------------------------------------------
 
-    /** GET /api/groups */
-    public List<GroupDto> listGroups(String token)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/groups", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), new TypeReference<List<GroupDto>>() {});
-    }
+/** GET /api/groups */
+public List<GroupDto> listGroups(String token)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), new TypeReference<List<GroupDto>>() {});
+}
 
-    /** POST /api/groups */
-    public GroupDto createGroup(String token, String name, String description)
-            throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("name", name);
-        body.put("description", description);
-        HttpResponse<String> resp = send(request("/groups", token)
-                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
-        ok(resp);
-        return mapper.readValue(resp.body(), GroupDto.class);
-    }
+/** POST /api/groups */
+public GroupDto createGroup(String token, String name, String description)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("name", name);
+    body.put("description", description);
+    HttpResponse<String> resp = send(request("/groups", token)
+            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+    return mapper.readValue(resp.body(), GroupDto.class);
+}
 
-    /** POST /api/groups/{id}/join */
-    public void joinGroup(String token, long groupId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/groups/" + groupId + "/join", token)
-                .POST(HttpRequest.BodyPublishers.noBody()).build());
-        ok(resp);
-    }
+/** POST /api/groups/{id}/join */
+public void joinGroup(String token, long groupId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/join", token)
+            .POST(HttpRequest.BodyPublishers.noBody()).build());
+    ok(resp);
+}
 
-    /** GET /api/groups/{id}/members */
-    public com.fasterxml.jackson.databind.JsonNode groupMembers(String token, long groupId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/groups/" + groupId + "/members", token).GET().build());
-        ok(resp);
-        return mapper.readTree(resp.body());
-    }
+/** GET /api/groups/{id}/members */
+public com.fasterxml.jackson.databind.JsonNode groupMembers(String token, long groupId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/members", token).GET().build());
+    ok(resp);
+    return mapper.readTree(resp.body());
+}
 
-    /** PATCH /api/groups/{groupId}/members/{userId}/approve */
-    public void approveMember(String token, long groupId, long userId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request(
-                "/groups/" + groupId + "/members/" + userId + "/approve", token)
-                .method("PATCH", HttpRequest.BodyPublishers.noBody()).build());
-        ok(resp);
-    }
+/** PATCH /api/groups/{groupId}/members/{userId}/approve */
+public void approveMember(String token, long groupId, long userId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request(
+            "/groups/" + groupId + "/members/" + userId + "/approve", token)
+            .method("PATCH", HttpRequest.BodyPublishers.noBody()).build());
+    ok(resp);
+}
 
 // ---------------------------------------------------------------
 //  Quizzes
 // ---------------------------------------------------------------
 
-    /** GET /api/quizzes — student: available quizzes */
-    public List<QuizDto> listQuizzes(String token)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/quizzes", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
-    }
+/** GET /api/quizzes — student: available quizzes */
+public List<QuizDto> listQuizzes(String token)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
+}
 
-    /** GET /api/quizzes/my — lecturer: their own quizzes */
-    public List<QuizDto> myQuizzes(String token)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/quizzes/my", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
-    }
+/** GET /api/quizzes/my — lecturer: their own quizzes */
+public List<QuizDto> myQuizzes(String token)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes/my", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
+}
 
-    /** GET /api/quizzes/{id} — quiz with questions */
-    public QuizDetailResponse getQuiz(String token, long quizId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/quizzes/" + quizId, token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), QuizDetailResponse.class);
-    }
+/** GET /api/quizzes/{id} — quiz with questions */
+public QuizDetailResponse getQuiz(String token, long quizId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes/" + quizId, token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), QuizDetailResponse.class);
+}
 
-    /** POST /api/quizzes/{id}/submit */
-    public void submitQuiz(String token, long quizId, Map<Long, Long> answers, boolean autoSubmit)
-            throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        Map<String, Object> answerMap = new LinkedHashMap<>();
-        answers.forEach((qId, aId) -> answerMap.put(String.valueOf(qId), aId));
-        body.put("answers", answerMap);
-        if (autoSubmit) body.put("auto_submit", true);
-        HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/submit", token)
-                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
-        ok(resp);
-    }
+/** POST /api/quizzes/{id}/submit */
+public void submitQuiz(String token, long quizId, Map<Long, Long> answers, boolean autoSubmit)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    Map<String, Object> answerMap = new LinkedHashMap<>();
+    answers.forEach((qId, aId) -> answerMap.put(String.valueOf(qId), aId));
+    body.put("answers", answerMap);
+    if (autoSubmit) body.put("auto_submit", true);
+    HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/submit", token)
+            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+}
 
-    /** GET /api/quizzes/{id}/results — student: their own result */
-    public QuizResultDto myQuizResult(String token, long quizId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/results", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), QuizResultDto.class);
-    }
+/** GET /api/quizzes/{id}/results — student: their own result */
+public QuizResultDto myQuizResult(String token, long quizId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/results", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), QuizResultDto.class);
+}
 
-    /** GET /api/quizzes/{id}/all-results — lecturer: all student results */
-    public List<QuizResultDto> allQuizResults(String token, long quizId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/all-results", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), new TypeReference<List<QuizResultDto>>() {});
-    }
+/** GET /api/quizzes/{id}/all-results — lecturer: all student results */
+public List<QuizResultDto> allQuizResults(String token, long quizId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/all-results", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), new TypeReference<List<QuizResultDto>>() {});
+}
 
     // ---------------------------------------------------------------
     //  Low-level helpers
