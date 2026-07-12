@@ -59,9 +59,9 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     // Edit a reply
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])
     ->name('posts.edit');
-     // Update a reply   
+     // Update a reply
     Route::put('/posts/{post}', [PostController::class, 'update'])
-    ->name('posts.update'); 
+    ->name('posts.update');
 });
 
 // Quiz routes
@@ -74,10 +74,9 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
 });
 
 // Participation routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/participation', function () {
-        return view('participation.index');
-    })->name('participation.index');
+// Participation routes
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/participation', [StudentController::class, 'progress'])->name('participation.index');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->group(function () {

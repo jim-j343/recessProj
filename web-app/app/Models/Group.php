@@ -12,10 +12,9 @@ class Group extends Model
     protected $primaryKey = 'group_id';
 
     protected $fillable = [
-        'admin_id', 'name', 'description',
+        'admin_id', 'name', 'course_name', 'description',
         'inactivity_warning_days', 'blacklist_duration_days',
     ];
-
     public function topics()
     {
         return $this->hasMany(Topic::class, 'group_id', 'group_id');

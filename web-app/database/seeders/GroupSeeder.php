@@ -19,6 +19,7 @@ class GroupSeeder extends Seeder
         $groupA = Group::create([
             'admin_id'                => $admin->user_id,
             'name'                    => 'Computer Science Year 2',
+            'course_name'             => 'CS201: Database Systems',
             'description'             => 'Discussion group for Year 2 CS students.',
             'inactivity_warning_days' => 7,
             'blacklist_duration_days' => 30,
@@ -27,6 +28,7 @@ class GroupSeeder extends Seeder
         $groupB = Group::create([
             'admin_id'                => $admin->user_id,
             'name'                    => 'Software Engineering Year 3',
+            'course_name'             => 'SE301: Software Architecture',
             'description'             => 'Discussion group for Year 3 SE students.',
             'inactivity_warning_days' => 5,
             'blacklist_duration_days' => 14,

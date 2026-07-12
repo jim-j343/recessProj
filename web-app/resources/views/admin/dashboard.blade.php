@@ -26,49 +26,45 @@
                 </div>
             </div>
 
-            {{-- 2. NEW: Recess Brief Settings Row (Merged Here) --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Inactivity Warn & Blacklist Configurator (Requirement #4) --}}
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Automated Blacklist Engine</h3>
-                    <p class="text-xs text-gray-500 mb-4">Configure triggers for silent or non-communicative accounts.</p>
-
-                    <form class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700">Warning Count Before Penalty</label>
-                            <input type="number" class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm" value="2" readonly>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700">Days Before Warning</label>
-                                <input type="number" class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm" placeholder="e.g. 14">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700">Blacklist Duration (Days)</label>
-                                <input type="number" class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm" placeholder="e.g. 30">
-                            </div>
-                        </div>
-                        <button type="button" class="w-full bg-gray-900 text-white text-xs font-semibold py-2 rounded uppercase tracking-wide">
-                            Apply Compliance Rules
-                        </button>
-                    </form>
+            {{-- 2. Real per-group inactivity/blacklist settings —
+                 replaces the old "Automated Blacklist Engine" panel, which
+                 was a single global-looking form not wired to any group,
+                 and a fabricated "Communication Exclusions" toggle with no
+                 backing feature anywhere in the app. Per-group control of
+                 these belongs to each group's own admin (see Groups). --}}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900">Group Inactivity & Blacklist Settings</h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Each group sets its own thresholds. This is a read-only overview — group admins manage their own settings.
+                    </p>
                 </div>
-
-                {{-- Granular Subgroup Exclusions Panel (Requirement #3) --}}
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Communication Exclusions</h3>
-                    <p class="text-xs text-gray-500 mb-4">Set system baseline visibility properties for subgroup communications.</p>
-
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-800">Enable Target Exclusions</h4>
-                                <p class="text-xs text-gray-500">Allows users to isolate individuals from selective feeds.</p>
-                            </div>
-                            <input type="checkbox" checked class="rounded border-gray-300 text-indigo-600 shadow-sm">
-                        </div>
-                    </div>
-                </div>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Group</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Days Before Warning</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Blacklist Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($groupSettings as $group)
+                        <tr>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $group->name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $group->course_name ?? '—' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $group->memberships_count }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $group->inactivity_warning_days }} days</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ $group->blacklist_duration_days }} days</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-400">No groups exist yet.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
             {{-- 3. Existing Member table (Kept intact) --}}
@@ -105,3 +101,4 @@
         </div>
     </div>
 </x-app-layout>
+

@@ -59,8 +59,9 @@
                                 <th class="px-4 py-3">Latest Topic</th>
                                 <th class="px-4 py-3">Posts</th>
                                 <th class="px-4 py-3">Replies</th>
-                                <th class="px-4 py-3">Quality</th>
-                                <th class="px-4 py-3">Grade</th>
+                                <th class="px-4 py-3">Participation</th>
+                                <th class="px-4 py-3">Test Avg</th>
+                                <th class="px-4 py-3">Score</th>
                                 <th class="px-6 py-3">Remarks</th>
                             </tr>
                         </thead>
@@ -83,21 +84,23 @@
                                 <td class="px-4 py-4 text-gray-600">{{ $row->latestTopic ?? '—' }}</td>
                                 <td class="px-4 py-4 text-gray-600">{{ $row->postCount }}</td>
                                 <td class="px-4 py-4 text-gray-600">{{ $row->replyCount }}</td>
-                                <td class="px-4 py-4">
-                                    <span class="text-xs px-2 py-1 rounded-full font-medium
-                                        {{ $row->quality === 'High' ? 'bg-green-100 text-green-700' :
-                                           ($row->quality === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
-                                        {{ $row->quality }}
-                                    </span>
+                                <td class="px-4 py-4 text-gray-600">
+                                    {{ $row->participationPct }}%
+                                    <span class="text-xs text-gray-400">(reply-based, /10)</span>
+                                </td>
+                                <td class="px-4 py-4 text-gray-600">
+                                    @if($row->quizAvgPct !== null)
+                                        {{ $row->quizAvgPct }}%
+                                        <span class="text-xs text-gray-400">({{ $row->quizCount }} {{ Str::plural('quiz', $row->quizCount) }})</span>
+                                    @else
+                                        <span class="text-xs text-gray-400">No quizzes yet</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-4">
-                                    <select name="grades[{{ $row->student->user_id }}][grade]"
-                                        class="border-gray-300 rounded-lg text-sm w-20">
-                                        <option value="">—</option>
-                                        @foreach(['A','B','C','D','F'] as $g)
-                                            <option value="{{ $g }}">{{ $g }}</option>
-                                        @endforeach
-                                    </select>
+                                    <input type="number" name="grades[{{ $row->student->user_id }}][score]"
+                                        value="{{ $row->suggestedScore }}" min="0" max="100" step="0.1"
+                                        class="border-gray-300 rounded-lg text-sm w-20" />
+                                    <p class="text-xs text-gray-400 mt-0.5">Suggested — editable</p>
                                 </td>
                                 <td class="px-6 py-4">
                                     <input type="text" name="grades[{{ $row->student->user_id }}][remark]"
@@ -107,7 +110,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-10 text-center text-gray-400">
+                                <td colspan="8" class="px-6 py-10 text-center text-gray-400">
                                     No students found for this filter.
                                 </td>
                             </tr>
@@ -119,4 +122,3 @@
         </div>
     </div>
 </x-app-layout>
-
