@@ -8,6 +8,7 @@ use App\Models\Answer;
 use App\Models\Submission;
 use App\Models\SubmissionAnswer;
 use App\Models\GroupMembership;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,6 +67,17 @@ class QuizController extends Controller
                     'content'     => $answerText,
                     'is_correct'  => ($aIndex == $q['correct_answer']),
                 ]);
+            }
+        }
+
+        if ($quiz->is_published) {
+            $memberIds = GroupMembership::where('group_id', $quiz->group_id)
+                ->where('status', 'active')
+                ->where('user_id', '!=', Auth::id())
+                ->pluck('user_id');
+
+            foreach ($memberIds as $userId) {
+                Notification::notify($userId, 'quiz_announced');
             }
         }
 

@@ -10,6 +10,7 @@ use App\Models\GroupMembership;
 use App\Models\Blacklist;
 use App\Models\Warning;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,25 +18,30 @@ class AdminController extends Controller
 {
     // Main admin dashboard — high level overview stats
     public function dashboard()
-{
-    // 1. Fetch data using the exact variable names expected by your view
-    $totalMembers = \App\Models\User::count();
-    $activeToday  = \App\Models\User::where('status', 'active')->count();
-    $warned       = \App\Models\User::where('status', 'warned_once')->count(); // or 'warned' depending on your seed data
-    $blacklisted  = \App\Models\User::where('status', 'blacklisted')->count();
+    {
+        // 1. Fetch data using the exact variable names expected by your view
+        $totalMembers = \App\Models\User::count();
+        $activeToday  = \App\Models\User::where('status', 'active')->count();
 
-    // Fetch the members collection for the table at the bottom
-    $members = \App\Models\User::withCount('posts')->orderBy('username')->paginate(20);
+        // Warnings live in the 'warnings' table (Warning model), not as a
+        // user status — 'status' only allows active/blacklisted/suspended,
+        // so 'warned_once' never matches and always returned 0
+        $warned = \App\Models\User::whereHas('warnings', fn ($q) => $q->where('is_heeded', false))->count();
 
-    // 2. Pass them all using compact()
-    return view('admin.dashboard', compact(
-        'totalMembers',
-        'activeToday',
-        'warned',
-        'blacklisted',
-        'members'
-    ));
-}
+        $blacklisted  = \App\Models\User::where('status', 'blacklisted')->count();
+
+        // Fetch the members collection for the table at the bottom
+        $members = \App\Models\User::withCount('posts')->orderBy('username')->paginate(20);
+
+        // 2. Pass them all using compact()
+        return view('admin.dashboard', compact(
+            'totalMembers',
+            'activeToday',
+            'warned',
+            'blacklisted',
+            'members'
+        ));
+    }
 
     // List all members for admin management (requirement 7)
      public function members(Request $request)
@@ -130,6 +136,8 @@ class AdminController extends Controller
                 'expires_at'     => now()->addDays($validated['days']),
             ]);
         }
+
+        Notification::notify($user->user_id, 'blacklisted');
 
         return back()->with('success', "{$user->username} has been blacklisted for {$validated['days']} days.");
     }
