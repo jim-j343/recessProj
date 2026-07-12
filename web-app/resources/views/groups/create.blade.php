@@ -25,6 +25,15 @@
                             placeholder="e.g. Computer Science Year 2"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
                     </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Course / Unit *</label>
+                        <input type="text" name="course_name" value="{{ old('course_name') }}" required
+                            placeholder="e.g. CS301: Database Systems"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                        <p class="text-xs text-gray-400 mt-1">Lets students see which course this group is for before joining.</p>
+                    </div>
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
                         <textarea name="description" rows="3"
