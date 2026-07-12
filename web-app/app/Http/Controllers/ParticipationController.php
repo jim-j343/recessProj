@@ -9,6 +9,7 @@ use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ParticipationController extends Controller
 {
@@ -45,8 +46,23 @@ class ParticipationController extends Controller
 
         $students = $studentsQuery->orderBy('username')->get();
 
+        // parent_post_id is never set by any current UI flow (the reply bar
+        // only ever sends 'content'), so it can't be used to identify
+        // replies. Instead: the opening post of each topic (the one created
+        // alongside the topic itself) is the lowest post_id for that
+        // topic_id — everything else in scope counts as a reply.
+        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+            ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
+                $q->whereIn('group_id', $lecturerGroupIds);
+                if ($topicFilter) {
+                    $q->where('topic_id', $topicFilter);
+                }
+            })
+            ->groupBy('topic_id')
+            ->pluck('post_id');
+
         // Build per-student activity rows
-        $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter) {
+        $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter, $openingPostIds) {
             $postsQuery = Post::where('author_id', $student->user_id)
                 ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
                     $q->whereIn('group_id', $lecturerGroupIds);
@@ -56,7 +72,7 @@ class ParticipationController extends Controller
                 });
 
             $postCount  = (clone $postsQuery)->count();
-            $replyCount = (clone $postsQuery)->whereNotNull('parent_post_id')->count();
+            $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
 
             // Most recent topic they posted in (for display)
             $latestPost = (clone $postsQuery)->with('topic')->latest('created_at')->first();
