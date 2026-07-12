@@ -5,7 +5,6 @@ import forum.api.dto.QuizDetailResponse;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
-import forum.config.AppConstants;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -19,11 +18,8 @@ import javafx.util.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class QuizFocusModeController {
-
-    private static final Logger LOGGER = Logger.getLogger(QuizFocusModeController.class.getName());
 
     @FXML private Label       timerLabel;
     @FXML private ProgressBar progressBar;
@@ -61,9 +57,7 @@ public class QuizFocusModeController {
             long elapsed = java.time.Duration.between(start,
                     java.time.OffsetDateTime.now()).getSeconds();
             secondsLeft = Math.max(0, secondsLeft - elapsed);
-        } catch (Exception e) {
-            LOGGER.warning("Failed to parse quiz start time: " + detail.quiz.startTime + ". Using full duration.");
-        }
+        } catch (Exception ignored) {}
 
         startTimer();
         showQuestion(0);
@@ -146,13 +140,7 @@ public class QuizFocusModeController {
                 Platform.runLater(SceneManager::goQuizResults);
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-                LOGGER.severe("Failed to submit quiz: " + e.getMessage());
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to submit quiz. Please try again.");
-                    alert.setTitle("Submission Error");
-                    alert.showAndWait();
-                    SceneManager.goStudentDashboard();
-                });
+                Platform.runLater(SceneManager::goStudentDashboard);
             }
         }, "submit-quiz");
         t.setDaemon(true);

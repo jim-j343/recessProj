@@ -114,7 +114,7 @@ Route::middleware(['auth', 'role:lecturer'])->group(function () {
         $topicCount = \App\Models\Topic::where('creator_id', auth()->id())->count();
         return view('lecturer.dashboard', compact('quizzes', 'quizCount', 'groupCount', 'topicCount'));
     })->name('lecturer.dashboard');
-    Route::get('/participation/grade-json', function () {
+Route::get('/participation/grade-json', function () {
     $controller = new \App\Http\Controllers\ParticipationController();
     return $controller->gradeJson(request());
 })->name('participation.grade.json');

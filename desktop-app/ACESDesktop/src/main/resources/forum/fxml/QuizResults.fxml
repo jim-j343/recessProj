@@ -3,23 +3,17 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Quiz Results — mirrors web quiz/results.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.QuizResultsController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link,active"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="My Progress" styleClass="nav-link"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Alex Rivers"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <Label fx:id="userNameLabel" styleClass="subtle"/>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Quiz Results" styleClass="page-title"/>
@@ -34,40 +28,43 @@
 
                     <!-- Score card -->
                     <VBox styleClass="card" alignment="CENTER" spacing="4">
-                        <Label text="17 / 20" style="-fx-text-fill:#16a34a; -fx-font-size:48px; -fx-font-weight:bold;"/>
-                        <Label text="Advanced Macroeconomics Midterm" styleClass="muted"/>
-                        <Label text="Submitted 2 hours ago" styleClass="subtle"/>
+                        <Label fx:id="scoreLabel"
+                               style="-fx-text-fill:#16a34a; -fx-font-size:48px;
+                                      -fx-font-weight:bold;"/>
+                        <Label fx:id="quizTitleLabel" styleClass="muted"/>
+                        <Label fx:id="submittedLabel" styleClass="subtle"/>
+
                         <HBox spacing="16" alignment="CENTER">
                             <VBox.margin><Insets top="16"/></VBox.margin>
-                            <VBox alignment="CENTER" spacing="2" style="-fx-background-color:#f0fdf4; -fx-background-radius:8; -fx-padding:12 24 12 24;"><Label text="14" style="-fx-text-fill:#16a34a; -fx-font-size:20px; -fx-font-weight:bold;"/><Label text="Correct" styleClass="subtle"/></VBox>
-                            <VBox alignment="CENTER" spacing="2" style="-fx-background-color:#fef2f2; -fx-background-radius:8; -fx-padding:12 24 12 24;"><Label text="6" style="-fx-text-fill:#dc2626; -fx-font-size:20px; -fx-font-weight:bold;"/><Label text="Incorrect" styleClass="subtle"/></VBox>
-                            <VBox alignment="CENTER" spacing="2" style="-fx-background-color:#f9fafb; -fx-background-radius:8; -fx-padding:12 24 12 24;"><Label text="60m" style="-fx-text-fill:#374151; -fx-font-size:20px; -fx-font-weight:bold;"/><Label text="Duration" styleClass="subtle"/></VBox>
-                        </HBox>
-                    </VBox>
-
-                    <!-- Breakdown -->
-                    <VBox styleClass="card" spacing="0">
-                        <Label text="Question Breakdown" styleClass="card-title"><VBox.margin><Insets bottom="12"/></VBox.margin></Label>
-                        <HBox spacing="12" alignment="TOP_LEFT"><padding><Insets top="10" bottom="10"/></padding>
-                            <Label text="✓" style="-fx-text-fill:#22c55e; -fx-font-size:16px;"/>
-                            <VBox HBox.hgrow="ALWAYS">
-                                <Label text="1. What is the primary driver of demand-pull inflation?" styleClass="label-strong" wrapText="true"/>
-                                <Label text="✓ Aggregate demand exceeding supply" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
+                            <VBox fx:id="correctBox" alignment="CENTER" spacing="2"
+                                  style="-fx-background-color:#f0fdf4; -fx-background-radius:8;
+                                         -fx-padding:12 24 12 24;">
+                                <Label fx:id="correctLabel"
+                                       style="-fx-text-fill:#16a34a; -fx-font-size:20px;
+                                              -fx-font-weight:bold;"/>
+                                <Label text="Correct" styleClass="subtle"/>
                             </VBox>
-                        </HBox>
-                        <Region styleClass="divider" prefHeight="1"/>
-                        <HBox spacing="12" alignment="TOP_LEFT"><padding><Insets top="10" bottom="10"/></padding>
-                            <Label text="✗" style="-fx-text-fill:#ef4444; -fx-font-size:16px;"/>
-                            <VBox HBox.hgrow="ALWAYS">
-                                <Label text="2. Which policy tool is set by the central bank?" styleClass="label-strong" wrapText="true"/>
-                                <Label text="✓ The base interest rate" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
-                                <Label text="   Government spending" styleClass="subtle"/>
+                            <VBox fx:id="incorrectBox" alignment="CENTER" spacing="2"
+                                  style="-fx-background-color:#fef2f2; -fx-background-radius:8;
+                                         -fx-padding:12 24 12 24;">
+                                <Label fx:id="incorrectLabel"
+                                       style="-fx-text-fill:#dc2626; -fx-font-size:20px;
+                                              -fx-font-weight:bold;"/>
+                                <Label text="Incorrect" styleClass="subtle"/>
+                            </VBox>
+                            <VBox alignment="CENTER" spacing="2"
+                                  style="-fx-background-color:#f9fafb; -fx-background-radius:8;
+                                         -fx-padding:12 24 12 24;">
+                                <Label fx:id="autoLabel"
+                                       style="-fx-font-size:14px; -fx-font-weight:bold;"/>
+                                <Label text="Submission" styleClass="subtle"/>
                             </VBox>
                         </HBox>
                     </VBox>
 
                     <HBox alignment="CENTER">
-                        <Button text="Back to Dashboard" styleClass="btn,btn-primary"/>
+                        <Button text="Back to Dashboard" styleClass="btn,btn-primary"
+                                onAction="#onDashboard"/>
                     </HBox>
                 </VBox>
             </VBox>

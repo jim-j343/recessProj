@@ -3,7 +3,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Participation Grading — mirrors web participation/grade.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.ParticipationGradingController"
             stylesheets="@../css/aces.css" styleClass="root"
@@ -12,22 +11,17 @@
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="New Topic" styleClass="nav-link"/>
-                <Label text="Quiz Center" styleClass="nav-link"/>
-                <Label text="Grading" styleClass="nav-link,active"/>
+                <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading"     styleClass="nav-link,active"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label fx:id="userNameLabel" text="Dr. K. Owen"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <Label fx:id="userNameLabel" styleClass="subtle"/>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="📝 Participation Grading" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Hyperlink text="← Back to Dashboard" styleClass="muted"/>
+                <Hyperlink text="← Back to Dashboard" onAction="#onDashboard" styleClass="muted"/>
             </HBox>
         </VBox>
     </top>
@@ -37,18 +31,8 @@
             <VBox alignment="TOP_CENTER">
                 <VBox spacing="24" maxWidth="1120">
 
-                    <!-- Filters -->
-                    <HBox styleClass="card" spacing="16" alignment="BOTTOM_LEFT">
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Filter by Topic" styleClass="field-label"/>
-                            <ComboBox promptText="All Topics" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Filter by Student" styleClass="field-label"/>
-                            <TextField promptText="Search student name..."/>
-                        </VBox>
-                        <Button text="Filter" styleClass="btn,btn-primary"/>
-                    </HBox>
+                    <Label fx:id="statusLabel" styleClass="muted"
+                           managed="false" visible="false"/>
 
                     <!-- Grading table -->
                     <VBox styleClass="card" spacing="0">
@@ -56,22 +40,27 @@
                             <padding><Insets bottom="16"/></padding>
                             <Label text="Student Forum Participation" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Hyperlink text="💾 Save All Grades" onAction="#onSaveGrades" styleClass="btn-ghost" style="-fx-text-fill:#4f46e5; -fx-font-weight:600;"/>
+                            <Button text="💾 Save All Grades"
+                                    styleClass="btn,btn-primary"
+                                    onAction="#onSaveGrades"/>
                         </HBox>
-                        <Label fx:id="statusLabel" managed="false" visible="false" styleClass="muted"/>
-                        <TableView fx:id="gradesTable" prefHeight="360">
+
+                        <TableView fx:id="gradesTable" prefHeight="480">
                             <columns>
-                                <TableColumn fx:id="colStudent" text="STUDENT" prefWidth="200"/>
-                                <TableColumn fx:id="colGroup"   text="GROUP" prefWidth="200"/>
-                                <TableColumn fx:id="colPosts"   text="POSTS" prefWidth="90"/>
-                                <TableColumn fx:id="colReplies" text="REPLIES" prefWidth="90"/>
-                                <TableColumn fx:id="colQuality" text="QUALITY" prefWidth="120"/>
-                                <TableColumn fx:id="colGrade"   text="GRADE" prefWidth="100"/>
-                                <TableColumn fx:id="colRemarks" text="REMARKS" prefWidth="180"/>
+                                <TableColumn fx:id="colStudent"  text="STUDENT"      prefWidth="180"/>
+                                <TableColumn fx:id="colGroup"    text="GROUP"        prefWidth="180"/>
+                                <TableColumn fx:id="colPosts"    text="POSTS"        prefWidth="80"/>
+                                <TableColumn fx:id="colReplies"  text="REPLIES"      prefWidth="80"/>
+                                <TableColumn fx:id="colQuality"  text="QUALITY"      prefWidth="100"/>
+                                <TableColumn fx:id="colGrade"    text="GRADE"        prefWidth="120"/>
+                                <TableColumn fx:id="colRemarks"  text="REMARKS"      prefWidth="200"/>
                             </columns>
-                            <placeholder><Label text="No students found for this filter." styleClass="muted"/></placeholder>
+                            <placeholder>
+                                <Label text="No students in your groups yet." styleClass="muted"/>
+                            </placeholder>
                         </TableView>
                     </VBox>
+
                 </VBox>
             </VBox>
         </ScrollPane>
