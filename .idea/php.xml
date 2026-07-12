@@ -119,6 +119,13 @@
       <path value="$PROJECT_DIR$/web-app/vendor/guzzlehttp/promises" />
       <path value="$PROJECT_DIR$/web-app/vendor/nunomaduro/termwind" />
       <path value="$PROJECT_DIR$/web-app/vendor/laravel/sanctum" />
+      <path value="$PROJECT_DIR$/web-app/vendor/barryvdh/laravel-dompdf" />
+      <path value="$PROJECT_DIR$/web-app/vendor/thecodingmachine/safe" />
+      <path value="$PROJECT_DIR$/web-app/vendor/masterminds/html5" />
+      <path value="$PROJECT_DIR$/web-app/vendor/dompdf/dompdf" />
+      <path value="$PROJECT_DIR$/web-app/vendor/dompdf/php-font-lib" />
+      <path value="$PROJECT_DIR$/web-app/vendor/dompdf/php-svg-lib" />
+      <path value="$PROJECT_DIR$/web-app/vendor/sabberworm/php-css-parser" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.3" />
