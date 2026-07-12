@@ -183,4 +183,50 @@ class ParticipationController extends Controller
 
         return back()->with('success', "Saved grades for {$saved} student(s).");
     }
+
+    public function gradeJson(Request $request): \Illuminate\Http\JsonResponse
+{
+    $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
+        ->where('status', 'active')
+        ->pluck('group_id');
+
+    $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
+        ->where('status', 'active')
+        ->pluck('user_id');
+
+    $students = User::whereIn('user_id', $studentIds)
+        ->where('system_role', 'student')
+        ->orderBy('username')->get();
+
+    $rows = $students->map(function ($student) use ($lecturerGroupIds) {
+        $postsQuery = Post::where('author_id', $student->user_id)
+            ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
+
+        $postCount  = (clone $postsQuery)->count();
+        $replyCount = (clone $postsQuery)->whereNotNull('parent_post_id')->count();
+        $quality    = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
+
+        $groupId = GroupMembership::where('user_id', $student->user_id)
+            ->whereIn('group_id', $lecturerGroupIds)->value('group_id');
+
+        $groupName = $groupId
+            ? \App\Models\Group::where('group_id', $groupId)->value('name')
+            : '—';
+
+        $existing = ParticipationScore::where('user_id', $student->user_id)
+            ->latest('created_at')->first();
+
+        return [
+            'user_id'        => $student->user_id,
+            'username'       => $student->username,
+            'group_name'     => $groupName,
+            'post_count'     => $postCount,
+            'reply_count'    => $replyCount,
+            'quality'        => $quality,
+            'existing_grade' => $existing ? $existing->criteria : null,
+        ];
+    });
+
+    return response()->json($rows->values());
+}
 }
