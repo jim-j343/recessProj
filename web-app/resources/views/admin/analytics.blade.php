@@ -8,16 +8,6 @@
                     <h1 class="text-2xl font-bold text-gray-900">Academic Insights</h1>
                     <p class="text-sm text-gray-400 mt-1">Real-time performance metrics for the current semester.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <select class="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-900">
-                        <option>Advanced Calculus II</option>
-                        <option>Computer Science 101</option>
-                        <option>Macroeconomics</option>
-                    </select>
-                    <button class="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-700 transition-colors">
-                        Last 7 Days
-                    </button>
-                </div>
             </div>
 
             {{-- MEMBER STATS ROW (SDD: per-group activity reports) --}}
@@ -79,35 +69,48 @@
                     </div>
                 </div>
 
-                {{-- System Status — no real telemetry source exists yet (no uptime/sync
-                     monitoring service is wired into the app), so these three cards stay
-                     as visual placeholders rather than being backed by fake precision. --}}
+                {{-- Group Average Performance — real mean quiz score per
+                     group, replacing the old fake "99.8% System Sync" style
+                     placeholder cards --}}
                 <div class="space-y-4">
                     <div class="bg-white border border-gray-200 rounded-lg p-5">
                         <div class="flex justify-between items-center mb-3">
-                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">System Sync</p>
-                            <span class="text-xs text-green-600 font-bold uppercase bg-green-50 px-2 py-0.5 rounded-full">Operational</span>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Group Average Performance</p>
                         </div>
-                        <p class="text-3xl font-bold text-gray-900">99.8%</p>
-                        <div class="w-full bg-gray-100 rounded-full h-1.5 mt-3">
-                            <div class="bg-gray-900 h-1.5 rounded-full" style="width: 99.8%"></div>
+                        @forelse($groupPerformance as $row)
+                        <div class="mb-3 last:mb-0">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span class="font-medium">{{ $row['name'] }}</span>
+                                <span class="font-bold text-gray-900">{{ $row['avgPct'] }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                <div class="bg-gray-900 h-1.5 rounded-full" style="width: {{ $row['avgPct'] }}%"></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-0.5">{{ $row['count'] }} completed {{ Str::plural('quiz', $row['count']) }}</p>
                         </div>
+                        @empty
+                        <p class="text-xs text-gray-400">No completed quizzes yet.</p>
+                        @endforelse
                     </div>
+
                     <div class="bg-white border border-gray-200 rounded-lg p-5">
                         <div class="flex justify-between items-center mb-3">
-                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Offline Reliability</p>
-                            <span class="text-xs text-gray-600 font-bold uppercase bg-gray-100 px-2 py-0.5 rounded-full">Stable</span>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Group Activity (Last 7 Days)</p>
                         </div>
-                        <p class="text-2xl font-bold text-gray-900">Active</p>
-                        <p class="text-xs text-gray-400 mt-2">Local caching active for 4.2k users</p>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-lg p-5">
-                        <div class="flex justify-between items-center mb-3">
-                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Quiz Sessions</p>
-                            <span class="text-xs text-yellow-700 font-bold uppercase bg-yellow-50 px-2 py-0.5 rounded-full">Scheduled</span>
+                        @php $activityPeak = max(1, $groupActivity->max('count')); @endphp
+                        @forelse($groupActivity as $row)
+                        <div class="mb-3 last:mb-0">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span class="font-medium">{{ $row['name'] }}</span>
+                                <span class="font-bold text-gray-900">{{ $row['count'] }} {{ Str::plural('post', $row['count']) }}</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: {{ ($row['count'] / $activityPeak) * 100 }}%"></div>
+                            </div>
                         </div>
-                        <p class="text-3xl font-bold text-gray-900">3</p>
-                        <p class="text-xs text-gray-400 mt-2">Next: Week 3 Quiz · 30 Jun</p>
+                        @empty
+                        <p class="text-xs text-gray-400">No groups yet.</p>
+                        @endforelse
                     </div>
                 </div>
 
