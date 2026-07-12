@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
             TopicSeeder::class,
             PostSeeder::class,
             ModerationSeeder::class,
+            QuizSeeder::class,
+            ParticipationScoreSeeder::class,
+            NotificationSeeder::class,
         ]);
     }
 }

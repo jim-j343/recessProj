@@ -195,7 +195,7 @@
                                 @endif
                             </p>
                         </div>
-                        <span class="text-sm font-bold text-gray-900">{{ $submission->score }}%</span>
+                        <span class="text-sm font-bold text-gray-900">{{ $submission->scorePct }}%</span>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400">No graded quizzes yet — results will appear here once a quiz is marked.</p>

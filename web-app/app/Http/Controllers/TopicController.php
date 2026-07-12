@@ -7,6 +7,8 @@ use App\Models\Post;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class TopicController extends Controller
 {
@@ -86,14 +88,24 @@ class TopicController extends Controller
     }
 
     // Show one topic
+    // Show one topic
     public function show(Topic $topic)
     {
-        $posts = $topic->posts()
+        $allPosts = $topic->posts()
             ->with('author')
             ->orderBy('created_at')
             ->get();
 
-        $firstPost = $posts->whereNull('parent_post_id')->first();
+        // The topic's opening post (created alongside the topic itself) is
+        // shown separately as the "original post" card — everything else
+        // is a reply. parent_post_id exists in the schema for true threaded
+        // replies, but no UI sets it yet, so the opening post is identified
+        // as whichever post came first instead.
+        $firstPost = $allPosts->whereNull('parent_post_id')->first() ?? $allPosts->first();
+
+        $posts = $firstPost
+            ? $allPosts->reject(fn ($post) => $post->post_id === $firstPost->post_id)->values()
+            : $allPosts;
 
         return view('forum.show', compact(
             'topic',
@@ -217,21 +229,23 @@ class TopicController extends Controller
     }
 
     // Export topic
+    // Export topic as a downloadable PDF
     public function exportPdf(Topic $topic)
     {
         $posts = $topic->posts()
-            ->with('austhor')
+            ->with('author')
             ->orderBy('created_at')
             ->get();
 
-        $html = "<h1>{$topic->title}</h1>";
-        $html .= "<p>Category: {$topic->category}</p><hr>";
+        $firstPost = $posts->whereNull('parent_post_id')->first() ?? $posts->first();
 
-        foreach ($posts as $post) {
-            $html .= "<p><strong>{$post->author->username}</strong>: {$post->content}</p>";
-        }
+        $replies = $firstPost
+            ? $posts->reject(fn ($post) => $post->post_id === $firstPost->post_id)->values()
+            : $posts;
 
-        return response($html)
-            ->header('Content-Type', 'text/html');
+        $pdf = Pdf::loadView('exports.topic-pdf', compact('topic', 'firstPost', 'replies'));
+
+        return $pdf->download(Str::slug($topic->title) . '.pdf');
     }
 }
+
