@@ -97,13 +97,11 @@ public class ParticipationGradingController {
         Thread worker = new Thread(() -> {
             try {
                 // Call the web participation grade endpoint via API
-                String baseUrl = forum.config.DatabaseConfig.API_BASE_URL;
-                String apiUrl = baseUrl.endsWith("/api") ? baseUrl.substring(0, baseUrl.length() - 4) : baseUrl;
-                String gradeJsonUrl = apiUrl + "/participation/grade-json";
-
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
-                HttpRequest req = HttpRequest.newBuilder(URI.create(gradeJsonUrl))
+                HttpRequest req = HttpRequest.newBuilder(
+                                URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                        .replace("/api", "") + "/participation/grade-json"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .GET().build();
@@ -116,6 +114,14 @@ public class ParticipationGradingController {
                     List<GradeRow> result = new ArrayList<>();
                     for (JsonNode node : root) {
                         GradeRow row = new GradeRow();
+                        row.userId    = node.get("user_id").asLong();
+                        row.username  = node.get("username").asText();
+                        row.groupName = node.has("group_name") ? node.get("group_name").asText() : "—";
+                        row.posts     = node.get("post_count").asInt();
+                        row.replies   = node.get("reply_count").asInt();
+                        row.quality   = node.get("quality").asText();
+                        row.grade     = node.has("existing_grade") ? node.get("existing_grade").asText("") : "";
+                        row.remarks   = "";
                         if (node.has("user_id")) row.userId = node.get("user_id").asLong();
                         if (node.has("username")) row.username = node.get("username").asText();
                         if (node.has("group_name")) row.groupName = node.get("group_name").asText();
@@ -162,6 +168,11 @@ public class ParticipationGradingController {
                 }
                 json.append("}}");
 
+                HttpClient http = HttpClient.newBuilder()
+                        .connectTimeout(Duration.ofSeconds(8)).build();
+                HttpRequest req = HttpRequest.newBuilder(
+                                URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                        .replace("/api", "") + "/participation/grade"))
                 String baseUrl = forum.config.DatabaseConfig.API_BASE_URL;
                 String apiUrl = baseUrl.endsWith("/api") ? baseUrl.substring(0, baseUrl.length() - 4) : baseUrl;
                 String gradeUrl = apiUrl + "/participation/grade";
