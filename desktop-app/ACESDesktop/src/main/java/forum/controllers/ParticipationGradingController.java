@@ -122,6 +122,16 @@ public class ParticipationGradingController {
                         row.quality   = node.get("quality").asText();
                         row.grade     = node.has("existing_grade") ? node.get("existing_grade").asText("") : "";
                         row.remarks   = "";
+                        if (node.has("user_id")) row.userId = node.get("user_id").asLong();
+                        if (node.has("username")) row.username = node.get("username").asText();
+                        if (node.has("group_name")) row.groupName = node.get("group_name").asText();
+                        else row.groupName = "—";
+                        if (node.has("post_count")) row.posts = node.get("post_count").asInt();
+                        if (node.has("reply_count")) row.replies = node.get("reply_count").asInt();
+                        if (node.has("quality")) row.quality = node.get("quality").asText();
+                        if (node.has("existing_grade")) row.grade = node.get("existing_grade").asText("");
+                        else row.grade = "";
+                        row.remarks = "";
                         result.add(row);
                     }
                     Platform.runLater(() -> rows.setAll(result));
@@ -163,6 +173,13 @@ public class ParticipationGradingController {
                 HttpRequest req = HttpRequest.newBuilder(
                                 URI.create(forum.config.DatabaseConfig.API_BASE_URL
                                         .replace("/api", "") + "/participation/grade"))
+                String baseUrl = forum.config.DatabaseConfig.API_BASE_URL;
+                String apiUrl = baseUrl.endsWith("/api") ? baseUrl.substring(0, baseUrl.length() - 4) : baseUrl;
+                String gradeUrl = apiUrl + "/participation/grade";
+
+                HttpClient http = HttpClient.newBuilder()
+                        .connectTimeout(Duration.ofSeconds(8)).build();
+                HttpRequest req = HttpRequest.newBuilder(URI.create(gradeUrl))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json")
