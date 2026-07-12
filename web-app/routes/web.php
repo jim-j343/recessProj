@@ -56,6 +56,12 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    // Edit a reply
+    Route::get('/posts/{post}/edit', [PostController::class, 'edit'])
+    ->name('posts.edit');
+     // Update a reply   
+    Route::put('/posts/{post}', [PostController::class, 'update'])
+    ->name('posts.update'); 
 });
 
 // Quiz routes
