@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\ActivityLog;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,6 +27,19 @@ class PostController extends Controller
         ]);
 
         $topic = Topic::find($topicId);
+
+        // Notify whoever should hear about this reply: the post it's
+        // directly replying to, or otherwise the person who started the
+        // topic. Never notify someone about their own reply.
+        if ($validated['parent_post_id'] ?? null) {
+            $parentPost = Post::find($validated['parent_post_id']);
+            if ($parentPost && $parentPost->author_id !== Auth::id()) {
+                Notification::notify($parentPost->author_id, 'reply', $post->post_id, (int) $topicId);
+            }
+        } elseif ($topic && $topic->creator_id !== Auth::id()) {
+            Notification::notify($topic->creator_id, 'reply', $post->post_id, (int) $topicId);
+        }
+
         ActivityLog::create([
             'user_id'     => Auth::id(),
             'group_id'    => $topic?->group_id,
