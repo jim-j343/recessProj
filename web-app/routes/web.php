@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/privacy', fn () => view('legal.privacy'))->name('privacy');
+Route::get('/support', fn () => view('legal.support'))->name('support');
+
 // Dynamic authenticated dashboard director
 Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
     $role = $request->user()->system_role;
@@ -27,7 +30,11 @@ Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
         return redirect()->route('student.dashboard');
     }
 
-    return view('dashboard');
+    // system_role is a non-nullable enum limited to student|lecturer|system_admin,
+    // so every authenticated user is caught by one of the branches above.
+    // This is just a defensive fallback — send them somewhere real rather than
+    // an all-mock page.
+    return redirect()->route('login');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // User Profile routes
