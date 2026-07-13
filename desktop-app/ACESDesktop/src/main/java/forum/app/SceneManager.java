@@ -48,7 +48,13 @@ public final class SceneManager {
     // Named nav helpers keep controllers clean
     public static void goStudentDashboard()   { show("StudentDashboard",    "Smart Discussion Forum — Student"); }
     public static void goLecturerDashboard()  { show("LecturerDashboard",   "Smart Discussion Forum — Lecturer"); }
-    public static void goGroups()             { show("GroupsIndex",          "Smart Discussion Forum — Groups"); }
+    public static void goGroups() {
+        if (Session.currentUser() != null && Session.currentUser().getRole() == forum.models.Role.SYSTEM_ADMIN) {
+            show("AdminGroupsIndex", "Smart Discussion Forum — Admin Groups");
+        } else {
+            show("GroupsIndex", "Smart Discussion Forum — Groups");
+        }
+    }
     public static void goGroupShow()          { show("GroupShow",            "Smart Discussion Forum — Group"); }
     public static void goForumDashboard()     { show("ForumDashboard",       "Smart Discussion Forum — Forum"); }
     public static void goTopicCreation()      { show("TopicCreation",        "Smart Discussion Forum — New Topic"); }
@@ -56,4 +62,14 @@ public final class SceneManager {
     public static void goQuizResults()        { show("QuizResults",          "Smart Discussion Forum — Results"); }
     public static void goQuizManagement()     { show("QuizManagement",       "Smart Discussion Forum — Create Quiz"); }
     public static void goParticipationGrading(){ show("ParticipationGrading","Smart Discussion Forum — Grading"); }
+    public static void goAdminDashboard()     { show("AdminDashboard",       "Smart Discussion Forum — Admin"); }
+    public static void goAdminAnalytics()     { show("AdminAnalytics",       "Smart Discussion Forum — Analytics"); }
+    public static void goAdminMembers()       { show("ComplianceMonitoring", "Smart Discussion Forum — Members"); }
+    public static void goProfile() {
+        if (Session.currentUser() != null && Session.currentUser().getRole() == forum.models.Role.SYSTEM_ADMIN) {
+            show("AdminProfileEdit", "Smart Discussion Forum — Admin Profile");
+        } else {
+            show("ProfileEdit", "Smart Discussion Forum — Profile");
+        }
+    }
 }

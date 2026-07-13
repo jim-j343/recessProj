@@ -1,5 +1,6 @@
 package forum.controllers;
 
+import forum.api.ApiClient;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
@@ -13,21 +14,23 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-/**
- * Forum Dashboard — offline-first.
- * Renders topics from the local cache immediately, then runs a background
- * sync (push queued rows + pull server topics) and re-renders.
- */
 public class ForumDashboardController {
 
-    @FXML private VBox discussionList;
+    @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
-    @FXML private Label userMetaLabel;
+    
+    @FXML private VBox myGroupsBox;
+    @FXML private TextField searchField;
+    @FXML private VBox discussionList;
+    @FXML private VBox unansweredBox;
 
     private final TopicDao topicDao = new TopicDao();
 
@@ -35,19 +38,22 @@ public class ForumDashboardController {
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
+            String initials = u.displayName().length() >= 2
+                    ? u.displayName().substring(0, 2).toUpperCase()
+                    : u.displayName().toUpperCase();
+            if (avatarLabel != null) avatarLabel.setText(initials);
             if (userNameLabel != null) userNameLabel.setText(u.displayName());
-            if (userMetaLabel != null && u.getRole() != null)
-                userMetaLabel.setText(u.getRole().label());
         }
-        renderTopics(topicDao.listRecent(10));   // instant, from cache
-        syncInBackground();                       // push/pull, then refresh
+
+        renderTopics(topicDao.listRecent(15));
+        fetchMyGroups();
+        syncInBackground();
     }
 
-    /** Push pending rows + pull server topics off the UI thread, then re-render. */
     private void syncInBackground() {
         Thread worker = new Thread(() -> {
             new SyncService().syncNow();
-            List<Topic> fresh = topicDao.listRecent(10);
+            List<Topic> fresh = topicDao.listRecent(15);
             Platform.runLater(() -> renderTopics(fresh));
         }, "aces-forum-sync");
         worker.setDaemon(true);
@@ -63,35 +69,117 @@ public class ForumDashboardController {
             discussionList.getChildren().add(empty);
             return;
         }
-        boolean first = true;
+
         for (Topic t : topics) {
-            if (!first) {
-                Region divider = new Region();
-                divider.getStyleClass().add("divider");
-                divider.setMinHeight(1);
-                VBox.setMargin(divider, new Insets(12, 0, 12, 0));
-                discussionList.getChildren().add(divider);
+            VBox card = new VBox(8);
+            card.getStyleClass().add("card-flat");
+            card.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand;");
+            
+            HBox header = new HBox(12);
+            Label av = new Label(initials(t.getAuthorName()));
+            av.getStyleClass().addAll("avatar", "avatar-soft");
+            av.setMinSize(36, 36);
+
+            VBox text = new VBox(2);
+            Label title = new Label(t.getTitle());
+            title.getStyleClass().add("label-strong");
+            title.setWrapText(true);
+
+            text.getChildren().addAll(title);
+
+            HBox.setHgrow(text, Priority.ALWAYS);
+            header.getChildren().addAll(av, text);
+
+            HBox footer = new HBox(8);
+            if (t.getCategory() != null && !t.getCategory().isBlank()) {
+                Label tag = new Label("#" + t.getCategory());
+                tag.setStyle("-fx-text-fill: #4f46e5; -fx-font-size: 11px; -fx-font-weight: bold;");
+                footer.getChildren().add(tag);
             }
-            discussionList.getChildren().add(row(t));
-            first = false;
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            
+            Label meta = new Label("Posted by " + safe(t.getAuthorName()) + "  ·  💬 " + t.getReplyCount());
+            meta.getStyleClass().add("subtle");
+            meta.setStyle("-fx-font-size: 11px;");
+            
+            footer.getChildren().addAll(spacer, meta);
+
+            card.getChildren().addAll(header, footer);
+            card.setOnMouseClicked(e -> openTopic(t));
+
+            discussionList.getChildren().add(card);
         }
     }
 
-    private VBox row(Topic t) {
-        Label title = new Label(t.getTitle());
-        title.getStyleClass().add("h-sm");
-        title.setWrapText(true);
+    private void fetchMyGroups() {
+        String token = Session.authToken();
+        if (token == null) return;
+        Thread worker = new Thread(() -> {
+            try {
+                List<forum.api.dto.GroupDto> groups = new ApiClient().listGroups(token);
+                Platform.runLater(() -> renderSidebarGroups(groups));
+            } catch (Exception e) {
+                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            }
+        }, "fetch-my-groups");
+        worker.setDaemon(true);
+        worker.start();
+    }
 
-        String meta = "by " + safe(t.getAuthorName())
-                + "  ·  " + t.getReplyCount() + " replies"
-                + (t.getCategory() != null && !t.getCategory().isBlank() ? "  ·  " + t.getCategory() : "");
-        Label metaLabel = new Label(meta);
-        metaLabel.getStyleClass().add("muted");
+    private void renderSidebarGroups(List<forum.api.dto.GroupDto> groups) {
+        if (myGroupsBox != null) {
+            myGroupsBox.getChildren().clear();
+            if (groups == null || groups.isEmpty()) {
+                Label l = new Label("No active groups");
+                l.getStyleClass().add("muted");
+                myGroupsBox.getChildren().add(l);
+            } else {
+                for (forum.api.dto.GroupDto g : groups) {
+                    if ("active".equals(g.myStatus) || "admin".equals(g.myRole)) {
+                        Label gl = groupLink("📁 " + g.name);
+                        gl.setOnMouseClicked(e -> {
+                            ViewState.setSelectedGroup(g);
+                            SceneManager.goGroupShow();
+                        });
+                        myGroupsBox.getChildren().add(gl);
+                    }
+                }
+            }
+        }
 
-        VBox box = new VBox(6, title, metaLabel);
-        box.setPadding(new Insets(6, 0, 6, 0));
-        box.setStyle("-fx-cursor: hand;");
-        box.setOnMouseClicked(e -> openTopic(t));
+        if (unansweredBox != null) {
+            unansweredBox.getChildren().clear();
+            unansweredBox.getChildren().add(unansweredLink("How to handle race conditions in distributed systems?", "URGENT", "8m ago"));
+            unansweredBox.getChildren().add(unansweredLink("WebAssembly vs JS for high-perf computation?", null, "Trending · 2h ago"));
+        }
+    }
+
+    private Label groupLink(String text) {
+        Label l = new Label(text);
+        l.setStyle("-fx-text-fill: #2563eb; -fx-font-size: 13px; -fx-padding: 4 8; -fx-cursor: hand;");
+        return l;
+    }
+
+    private VBox unansweredLink(String title, String badge, String time) {
+        VBox box = new VBox(4);
+        box.setStyle("-fx-border-color: transparent transparent #f3f4f6 transparent; -fx-border-width: 1; -fx-padding: 0 0 8 0;");
+        Label t = new Label(title);
+        t.setStyle("-fx-font-size: 12px; -fx-font-weight: 500; -fx-text-fill: #1f2937;");
+        t.setWrapText(true);
+        
+        HBox meta = new HBox(8);
+        if (badge != null) {
+            Label b = new Label(badge);
+            b.getStyleClass().addAll("badge", "badge-danger");
+            b.setStyle("-fx-font-size: 9px; -fx-padding: 2 4;");
+            meta.getChildren().add(b);
+        }
+        Label timeL = new Label(time);
+        timeL.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af;");
+        meta.getChildren().add(timeL);
+
+        box.getChildren().addAll(t, meta);
         return box;
     }
 
@@ -100,16 +188,17 @@ public class ForumDashboardController {
         SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
     }
 
-    @FXML
-    private void onNewThread() {
-        SceneManager.show("TopicCreation", "Smart Discussion Forum — New Topic");
+    @FXML private void onDashboard() {
+        User u = Session.currentUser();
+        if (u != null) SceneManager.showHomeFor(u.getRole());
     }
+    @FXML private void onGroups() { SceneManager.goGroups(); }
+    @FXML private void onNewThread() { SceneManager.show("TopicCreation", "Smart Discussion Forum — New Topic"); }
+    @FXML private void onProfile() { SceneManager.goProfile(); }
 
-    @FXML
-    private void onLogout() {
+    @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
-        // best-effort server-side revoke, off the UI thread
         Thread t = new Thread(() -> new AuthService().logout(token), "aces-logout");
         t.setDaemon(true);
         t.start();
@@ -117,4 +206,10 @@ public class ForumDashboardController {
     }
 
     private String safe(String s) { return s == null ? "Unknown" : s; }
+    
+    private String initials(String name) {
+        if (name == null || name.isBlank()) return "??";
+        String n = name.trim();
+        return n.length() >= 2 ? n.substring(0, 2).toUpperCase() : n.toUpperCase();
+    }
 }

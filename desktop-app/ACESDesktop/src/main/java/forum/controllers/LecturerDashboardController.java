@@ -119,6 +119,8 @@ public class LecturerDashboardController {
     @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
     @FXML private void onGrading()    { SceneManager.goParticipationGrading(); }
 
+    @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
+
     @FXML
     private void onLogout() {
         String token = Session.authToken();

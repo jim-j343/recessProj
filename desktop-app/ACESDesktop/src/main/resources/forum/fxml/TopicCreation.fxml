@@ -12,17 +12,24 @@
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onCancel"/>
-                <Label text="Groups" styleClass="nav-link"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
                 <Label text="New Topic" styleClass="nav-link,active"/>
-                <Label text="Quiz Center" styleClass="nav-link"/>
-                <Label text="Grading" styleClass="nav-link"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading" styleClass="nav-link" onMouseClicked="#onGrading"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="DK" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Dr. K. Owen"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Create New Topic" styleClass="page-title"/>
@@ -47,7 +54,7 @@
                         </VBox>
                         <VBox spacing="6">
                             <Label text="Group *" styleClass="field-label"/>
-                            <ComboBox promptText="-- Select a group --" maxWidth="Infinity"/>
+                            <ComboBox fx:id="groupCombo" promptText="-- Select a group --" maxWidth="Infinity"/>
                         </VBox>
                         <VBox spacing="6">
                             <Label text="Description" styleClass="field-label"/>

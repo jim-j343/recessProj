@@ -31,6 +31,7 @@ public class TopicCreationController {
 
     @FXML private TextField titleField;
     @FXML private ComboBox<String> categoryCombo;
+    @FXML private ComboBox<forum.api.dto.GroupDto> groupCombo;
     @FXML private TextArea descriptionArea;
     @FXML private Label errorLabel;
 
@@ -44,6 +45,30 @@ public class TopicCreationController {
         if (categoryCombo != null && categoryCombo.getItems().isEmpty()) {
             categoryCombo.getItems().addAll("General", "Programming", "Mathematics", "Science", "Announcements");
         }
+        
+        if (groupCombo != null) {
+            groupCombo.setConverter(new javafx.util.StringConverter<>() {
+                @Override public String toString(forum.api.dto.GroupDto g) { return g == null ? "" : g.name; }
+                @Override public forum.api.dto.GroupDto fromString(String string) { return null; }
+            });
+            loadGroups();
+        }
+    }
+
+    private void loadGroups() {
+        String token = Session.authToken();
+        if (token == null) return;
+        Thread t = new Thread(() -> {
+            try {
+                java.util.List<forum.api.dto.GroupDto> groups = api.listGroups(token);
+                Platform.runLater(() -> {
+                    groupCombo.getItems().setAll(groups);
+                    if (!groups.isEmpty()) groupCombo.getSelectionModel().selectFirst();
+                });
+            } catch (Exception e) {}
+        });
+        t.setDaemon(true);
+        t.start();
     }
 
     @FXML
@@ -51,6 +76,12 @@ public class TopicCreationController {
         clearError();
         String title = titleField == null ? "" : titleField.getText();
         if (title == null || title.isBlank()) { showError("Please enter a topic title."); return; }
+        
+        forum.api.dto.GroupDto selectedGroup = groupCombo != null ? groupCombo.getValue() : null;
+        if (selectedGroup == null) { showError("Please select a group."); return; }
+        
+        long groupId = selectedGroup.groupId;
+        
         String content = descriptionArea == null ? "" : descriptionArea.getText();
         if (content == null || content.isBlank()) { showError("Please enter a description."); return; }
         String category = (categoryCombo != null && categoryCombo.getValue() != null)
@@ -64,7 +95,7 @@ public class TopicCreationController {
             // 1. Online — publish to the server.
             if (token != null && !token.isBlank()) {
                 try {
-                    TopicDto dto = api.createTopic(token, DEFAULT_GROUP_ID, title.trim(), category, content.trim());
+                    TopicDto dto = api.createTopic(token, groupId, title.trim(), category, content.trim());
                     topicDao.upsertFromServer(dto);
                     Topic cached = topicDao.findById(dto.topic_id);
                     Topic result = (cached != null) ? cached : fromDto(dto);
@@ -73,13 +104,13 @@ public class TopicCreationController {
                 } catch (ApiException rejected) {
                     Platform.runLater(() -> showError(rejected.getMessage()));
                     return;
-                } catch (IOException | InterruptedException offline) {
+                } catch (java.io.IOException | InterruptedException offline) {
                     if (offline instanceof InterruptedException) Thread.currentThread().interrupt();
                     // fall through to offline creation
                 }
             }
             // 2. Offline — create locally, queued for sync.
-            Topic t = topicDao.create(DEFAULT_GROUP_ID, creatorId, title.trim(), category);
+            Topic t = topicDao.create(groupId, creatorId, title.trim(), category);
             if (t == null) { Platform.runLater(() -> showError("Could not publish the topic.")); return; }
             postDao.createLocalOnly(t.getTopicId(), creatorId, null, content.trim());
             Platform.runLater(() -> openDetail(t));
@@ -105,10 +136,14 @@ public class TopicCreationController {
         return t;
     }
 
-    @FXML
-    private void onCancel() {
-        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
+    @FXML private void onCancel() { SceneManager.goForumDashboard(); }
+    @FXML private void onDashboard() {
+        User u = Session.currentUser();
+        if (u != null) SceneManager.showHomeFor(u.getRole());
     }
+    @FXML private void onGroups() { SceneManager.goGroups(); }
+    @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
+    @FXML private void onGrading() { SceneManager.goParticipationGrading(); }
 
     private void showError(String msg) {
         if (errorLabel == null) return;

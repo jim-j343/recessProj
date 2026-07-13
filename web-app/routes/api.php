@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ForumController;
+use App\Http\Controllers\Api\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
@@ -44,5 +45,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/quizzes/{id}/submit', [QuizApiController::class, 'submit']);
     Route::get('/quizzes/{id}/results', [QuizApiController::class, 'myResult']);
     Route::get('/quizzes/{id}/all-results', [QuizApiController::class, 'allResults']);
+
+    Route::middleware('role:system_admin')->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/members', [AdminController::class, 'members']);
+        Route::get('/analytics', [AdminController::class, 'analytics']);
+        Route::post('/blacklist/{user}', [AdminController::class, 'blacklistMember']);
+        Route::post('/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist']);
+    });
 
 });
