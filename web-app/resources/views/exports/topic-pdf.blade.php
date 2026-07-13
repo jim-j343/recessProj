@@ -61,6 +61,22 @@
             margin-top: 4px;
             font-size: 11px;
         }
+        .post-attachment-image {
+            display: block;
+            max-width: 320px;
+            max-height: 240px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+        }
+        .post-attachment-file {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #444;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
         .replies-heading {
             font-size: 13px;
             font-weight: bold;
@@ -99,6 +115,14 @@
             <span class="post-author">{{ $firstPost->author->username ?? 'Unknown' }}</span>
             <span class="post-time">{{ $firstPost->created_at->format('d M Y, H:i') }}</span>
             <p class="post-content">{{ $firstPost->content }}</p>
+
+            @if($firstPost->attachment)
+                @if(str_starts_with($firstPost->attachment_type ?? '', 'image/'))
+                    <img class="post-attachment-image" src="{{ storage_path('app/public/'.$firstPost->attachment) }}">
+                @else
+                    <span class="post-attachment-file">📎 {{ $firstPost->attachment_name }}</span>
+                @endif
+            @endif
         </div>
     @endif
 
@@ -109,6 +133,14 @@
             <span class="post-author">{{ $reply->author->username ?? 'Unknown' }}</span>
             <span class="post-time">{{ $reply->created_at->format('d M Y, H:i') }}</span>
             <p class="post-content">{{ $reply->content }}</p>
+
+            @if($reply->attachment)
+                @if(str_starts_with($reply->attachment_type ?? '', 'image/'))
+                    <img class="post-attachment-image" src="{{ storage_path('app/public/'.$reply->attachment) }}">
+                @else
+                    <span class="post-attachment-file">📎 {{ $reply->attachment_name }}</span>
+                @endif
+            @endif
         </div>
     @empty
         <p style="color:#999; font-style: italic;">No replies yet.</p>
