@@ -129,6 +129,17 @@ use Illuminate\Support\Str;
     {{-- THREAD CONTENT --}}
     <main class="max-w-3xl mx-auto py-8 px-4 pb-32">
 
+        @if($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm">
+                <p class="font-semibold mb-1">Your reply couldn't be posted:</p>
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- ORIGINAL TOPIC POST --}}
         <div class="mb-6">
             <div class="bg-white rounded-xl border border-indigo-200 shadow-md overflow-hidden">
@@ -306,9 +317,12 @@ use Illuminate\Support\Str;
                 @csrf
 
                 <button type="button" onclick="document.getElementById('attachment-input').click()"
-                    class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+                    class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                     title="Attach a file">
-                    📎
+                    <svg viewBox="0 0 30 30" class="w-5 h-5" fill="currentColor">
+                        <path d="m 22.778176,294.87011 c -1.946455,-1.94646 -5.124615,-1.94645 -7.071068,0 l -0.707107,0.70711 -4.949747,4.94974 -2.8284274,2.82843 c -2.7299272,2.72993 -2.7299293,7.16957 0,9.8995 2.7299292,2.72992 7.1695674,2.72992 9.8994944,0 l 7.778175,-7.77818 -1.414213,-1.41421 -7.778175,7.77817 c -1.970919,1.97092 -5.100151,1.97092 -7.0710679,0 -1.9709166,-1.97091 -1.9709187,-5.10015 0,-7.07107 l 2.8284269,-2.82842 4.949748,-4.94975 0.707106,-0.70711 c 1.187445,-1.18744 3.055199,-1.18744 4.242641,0 1.187442,1.18744 1.187445,3.0552 0,4.24264 l -0.302454,0.30246 -5.3544,5.3544 -2.12132,2.12132 c -0.403971,0.40397 -1.010246,0.40397 -1.414214,0 -0.403968,-0.40397 -0.40397,-1.01025 0,-1.41422 l 7.475721,-7.47572 -1.414214,-1.41421 -7.475721,7.47572 c -1.1629781,1.16298 -1.1629802,3.07966 0,4.24264 1.162981,1.16298 3.079663,1.16298 4.242641,0 l 2.12132,-2.12132 5.354401,-5.3544 0.302454,-0.30245 c 1.946453,-1.94646 1.946455,-5.12462 0,-7.07107 z"
+                              transform="translate(0,-289.0625)"/>
+                    </svg>
                 </button>
                 <input type="file" id="attachment-input" name="attachment" class="hidden"
                     accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.ppt,.pptx,.zip"
@@ -326,10 +340,12 @@ use Illuminate\Support\Str;
                     onkeydown="handleReplyKeydown(event)"></textarea>
 
                 <button type="submit"
-                    class="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold
+                    class="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center
                            hover:bg-green-600 transition-colors shrink-0"
                     title="Send">
-                    ↩
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 -translate-x-px" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
                 </button>
             </form>
         </div>
