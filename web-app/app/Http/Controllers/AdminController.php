@@ -184,7 +184,7 @@ class AdminController extends Controller
                 'group_id'       => $groupId,
                 'reason'         => $validated['reason'],
                 'blacklisted_at' => now(),
-                'expires_at'     => now()->addDays($validated['days']),
+                'expires_at'     => now()->addDays((int) $validated['days']),
             ]);
         }
 
