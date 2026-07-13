@@ -25,9 +25,12 @@ import java.util.List;
  */
 public class ForumDashboardController {
 
-    @FXML private VBox discussionList;
-    @FXML private Label userNameLabel;
-    @FXML private Label userMetaLabel;
+    @FXML
+    private VBox discussionList;
+    @FXML
+    private Label userNameLabel;
+    @FXML
+    private Label userMetaLabel;
 
     private final TopicDao topicDao = new TopicDao();
 
@@ -35,12 +38,13 @@ public class ForumDashboardController {
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (userNameLabel != null)
+                userNameLabel.setText(u.displayName());
             if (userMetaLabel != null && u.getRole() != null)
                 userMetaLabel.setText(u.getRole().label());
         }
-        renderTopics(topicDao.listRecent(10));   // instant, from cache
-        syncInBackground();                       // push/pull, then refresh
+        renderTopics(topicDao.listRecent(10)); // instant, from cache
+        syncInBackground(); // push/pull, then refresh
     }
 
     /** Push pending rows + pull server topics off the UI thread, then re-render. */
@@ -55,7 +59,8 @@ public class ForumDashboardController {
     }
 
     private void renderTopics(List<Topic> topics) {
-        if (discussionList == null) return;
+        if (discussionList == null)
+            return;
         discussionList.getChildren().clear();
         if (topics.isEmpty()) {
             Label empty = new Label("No discussions yet. Start the first thread.");
@@ -116,5 +121,19 @@ public class ForumDashboardController {
         SceneManager.show("Login", "Smart Discussion Forum");
     }
 
-    private String safe(String s) { return s == null ? "Unknown" : s; }
+    private String safe(String s) {
+        return s == null ? "Unknown" : s;
+    }
+
+    @FXML
+    private void onDashboard() {
+        forum.models.User u = forum.app.Session.currentUser();
+        if (u != null)
+            SceneManager.showHomeFor(u.getRole());
+    }
+
+    @FXML
+    private void onGroups() {
+        SceneManager.goGroups();
+    }
 }
