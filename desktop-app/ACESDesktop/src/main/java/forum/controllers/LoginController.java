@@ -30,17 +30,47 @@ public class LoginController {
         if (errorLabel != null) errorLabel.setManaged(false);
     }
 
-    @FXML
-    private void onSignIn() {
-        clearError();
+@FXML
+private void onSignIn() {
+    clearError();
+    if (emailField != null) emailField.setDisable(true);
+    if (passwordField != null) passwordField.setDisable(false);
+
+    String email    = email();
+    String password = password();
+    Role   role     = selectedRole();
+
+    Thread worker = new Thread(() -> {
         try {
-            AuthService.Result result = authService.login(email(), password(), selectedRole());
-            Session.begin(result.user(), result.token());
-            SceneManager.showHomeFor(result.user().getRole());
+            System.out.println("[LOGIN] Attempting login for: " + email);
+            AuthService.Result result = authService.login(email, password, role);
+            System.out.println("[LOGIN] Success — user: " + result.user().displayName()
+                    + " role: " + result.user().getRole()
+                    + " token: " + result.token());
+            javafx.application.Platform.runLater(() -> {
+                Session.begin(result.user(), result.token());
+                SceneManager.showHomeFor(result.user().getRole());
+            });
         } catch (AuthService.AuthException e) {
-            showError(e.getMessage());
+            System.out.println("[LOGIN] AuthException: " + e.getMessage());
+            javafx.application.Platform.runLater(() -> {
+                showError(e.getMessage());
+                if (emailField != null) emailField.setDisable(false);
+                if (passwordField != null) passwordField.setDisable(false);
+            });
+        } catch (Exception e) {
+            System.out.println("[LOGIN] Unexpected exception: " + e.getMessage());
+            e.printStackTrace();
+            javafx.application.Platform.runLater(() -> {
+                showError("Unexpected error: " + e.getMessage());
+                if (emailField != null) emailField.setDisable(false);
+                if (passwordField != null) passwordField.setDisable(false);
+            });
         }
-    }
+    }, "aces-login");
+    worker.setDaemon(true);
+    worker.start();
+}
 
     @FXML
     private void onSignUp() {
