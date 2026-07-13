@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     Welcome back, {{ auth()->user()->username }} 👋
@@ -8,15 +8,15 @@
                 <p class="text-sm text-gray-500 mt-0.5">Here's where your progress, grades, and quizzes stand today.</p>
             </div>
             <a href="{{ route('forum.index') }}"
-               class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+               class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 self-start sm:self-auto">
                 Go to Forum
             </a>
         </div>
     </x-slot>
 
-    <div class="flex min-h-screen bg-gray-50">
+    <div class="flex flex-col lg:flex-row min-h-screen bg-gray-50">
         <!-- LEFT SIDEBAR -->
-        <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-4 shrink-0">
+        <div class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-gray-200 p-6 flex flex-col gap-4 shrink-0">
             <h2 class="text-xl font-bold text-gray-800">Student Portal</h2>
             <nav class="flex flex-col gap-2">
                 <a href="{{ route('forum.index') }}" class="flex items-center gap-2 bg-gray-100 text-gray-900 px-4 py-2 rounded font-medium">
@@ -42,7 +42,7 @@
         </div>
 
         <!-- MIDDLE PANE -->
-        <div class="flex-1 p-8 overflow-y-auto space-y-6">
+        <div class="flex-1 w-full p-4 sm:p-8 overflow-y-auto space-y-6">
 
             <!-- QUIZ NOTICE (Recess Requirement #10) -->
             @if($activeQuiz ?? null)
@@ -238,8 +238,7 @@
         </div>
 
         <!-- RIGHT SIDEBAR (Recess Requirement #11 & #12) -->
-        <div class="w-80 bg-white border-l border-gray-200 p-6 flex flex-col gap-6 shrink-0">
-            <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+            <div class="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-6 flex flex-col gap-6 shrink-0">            <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
                 <div class="flex items-center gap-2 mb-1">
                     <div class="w-7 h-7 rounded-md bg-indigo-100 flex items-center justify-center shrink-0">
                         <x-icon name="sparkles" class="w-4 h-4 text-indigo-600" />
@@ -247,7 +246,14 @@
                     <h4 class="font-bold text-indigo-900 text-sm">Recommended for You (ML)</h4>
                 </div>
                 <p class="text-xs text-indigo-700 mb-2">Based on past engagement profiles:</p>
-                <a href="#" class="text-xs font-semibold text-indigo-600 underline block"># Advanced Data Normalization</a>
+                @if($recommendedTopic)
+                    <a href="{{ route('topics.show', $recommendedTopic->topic_id) }}"
+                       class="text-xs font-semibold text-indigo-600 underline block">
+                        # {{ $recommendedTopic->title }}
+                    </a>
+                @else
+                    <p class="text-xs text-gray-400">No new recommendations yet — join a group to get started.</p>
+                @endif
             </div>
 
             <!-- RECENT ACTIVITY -->
