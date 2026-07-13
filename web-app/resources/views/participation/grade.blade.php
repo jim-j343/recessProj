@@ -52,6 +52,7 @@
                         </button>
                     </div>
 
+                    <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
@@ -117,6 +118,7 @@
                             @endforelse
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </form>
         </div>
