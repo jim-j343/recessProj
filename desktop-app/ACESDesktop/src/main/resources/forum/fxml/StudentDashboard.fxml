@@ -15,11 +15,18 @@
                 <Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
                 <Label text="Forum"     styleClass="nav-link"        onMouseClicked="#onForum"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label fx:id="userNameLabel"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <VBox spacing="2">

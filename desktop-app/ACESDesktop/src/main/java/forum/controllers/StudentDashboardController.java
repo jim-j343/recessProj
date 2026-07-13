@@ -182,6 +182,8 @@ public class StudentDashboardController {
         t.start();
     }
 
+    @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
+
     @FXML
     private void onLogout() {
         String token = Session.authToken();

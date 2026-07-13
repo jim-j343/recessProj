@@ -5,23 +5,52 @@
 
 <!-- Member Management — mirrors web admin/members.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.AdminMembersController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
+
     <top>
         <VBox>
+            <!-- Navigation bar -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="Members" styleClass="nav-link,active"/>
-                <Label text="Analytics" styleClass="nav-link"/>
+                <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
+                <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link,active"/>
+                <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="SJ" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Dr. Sarah Jenkins"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label text="3" styleClass="badge,badge-danger" style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;" StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                        <MenuItem text="System Maintenance at Midnight" styleClass="muted"/>
+                        <MenuItem text="New user signups waiting approval" styleClass="muted"/>
+                        <MenuItem text="Database backup successful" styleClass="muted"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Mark all as read"/>
+                    </items>
+                </MenuButton>
+
+                <!-- Profile Dropdown -->
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
+
+            <!-- Page header -->
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Member Management" styleClass="page-title"/>
             </HBox>
@@ -32,82 +61,30 @@
         <ScrollPane fitToWidth="true" styleClass="content">
             <VBox alignment="TOP_CENTER">
                 <VBox spacing="16" maxWidth="896">
-                    <Label text="Manage flagged accounts and issue warnings or restrictions." styleClass="muted"/>
+                    <Label text="Manage flagged accounts and issue warnings or restrictions."
+                           styleClass="muted"/>
 
-                    <!-- Search -->
-                    <TextField promptText="Search by username or email..." maxWidth="Infinity"/>
+                    <!-- Status feedback label -->
+                    <Label fx:id="statusLabel" text="" managed="false" visible="false"
+                           styleClass="muted" wrapText="true"/>
+
+                    <!-- Search field -->
+                    <TextField fx:id="searchField"
+                               promptText="Search by username or email…"
+                               maxWidth="1.7976931348623157E308"
+                               onKeyReleased="#onSearch"/>
 
                     <!-- Filter tabs -->
                     <HBox styleClass="segmented" alignment="CENTER_LEFT" spacing="8">
-                        <fx:define><ToggleGroup fx:id="filter"/></fx:define>
-                        <ToggleButton text="All"         toggleGroup="$filter" selected="true"/>
-                        <ToggleButton text="Blacklisted" toggleGroup="$filter"/>
-                        <ToggleButton text="Warning"     toggleGroup="$filter"/>
-                        <ToggleButton text="Active"      toggleGroup="$filter"/>
+                        <fx:define><ToggleGroup fx:id="filterGroup"/></fx:define>
+                        <ToggleButton fx:id="btnAll"         text="All"         toggleGroup="$filterGroup" selected="true"/>
+                        <ToggleButton fx:id="btnBlacklisted" text="Blacklisted" toggleGroup="$filterGroup"/>
+                        <ToggleButton fx:id="btnWarning"     text="Warning"     toggleGroup="$filterGroup"/>
+                        <ToggleButton fx:id="btnActive"      text="Active"      toggleGroup="$filterGroup"/>
                     </HBox>
 
-                    <!-- Expanded flagged member card -->
-                    <VBox styleClass="card" spacing="16">
-                        <HBox alignment="CENTER_LEFT" spacing="14">
-                            <Label text="JV" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
-                            <VBox spacing="2">
-                                <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <Label text="Julian Vance" styleClass="label-strong"/>
-                                    <Label text="⛔ Blacklisted" styleClass="badge,badge-danger"/>
-                                    <Label text="Student" styleClass="badge,badge-neutral"/>
-                                </HBox>
-                                <Label text="j.vance@university.ac.ug · 142 posts · last active 3 weeks ago" styleClass="subtle"/>
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label text="⌃" styleClass="subtle"/>
-                        </HBox>
-
-                        <Region styleClass="divider" prefHeight="1"/>
-
-                        <HBox styleClass="alert-danger" alignment="CENTER_LEFT" style="-fx-background-color:#fef2f2; -fx-border-color:#fecaca; -fx-border-width:1; -fx-background-radius:8; -fx-border-radius:8;">
-                            <VBox spacing="2">
-                                <Label text="ACCESS RESTRICTION" styleClass="eyebrow" style="-fx-text-fill:#b91c1c;"/>
-                                <Label text="6 days remaining" styleClass="alert-danger-text"/>
-                                <Label text="Reason: Academic Integrity Violation" style="-fx-text-fill:#dc2626; -fx-font-size:12px;"/>
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="Lift Blacklist" styleClass="btn,btn-outline" style="-fx-text-fill:#b91c1c; -fx-border-color:#fecaca;"/>
-                        </HBox>
-
-                        <VBox spacing="4">
-                            <Label text="WARNING HISTORY" styleClass="eyebrow"/>
-                            <Label text="Warning #1 — issued 12 Nov 2025, deadline 26 Nov 2025 · heeded ✓" styleClass="subtle"/>
-                            <Label text="Warning #2 — issued 03 Dec 2025, deadline 17 Dec 2025 · unheeded" styleClass="subtle"/>
-                        </VBox>
-                    </VBox>
-
-                    <!-- Collapsed rows -->
-                    <HBox styleClass="card" alignment="CENTER_LEFT" spacing="14">
-                        <Label text="ER" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
-                        <VBox spacing="2">
-                            <HBox alignment="CENTER_LEFT" spacing="8">
-                                <Label text="Elena Rodriguez" styleClass="label-strong"/>
-                                <Label text="⚠ Warning #1" styleClass="badge,badge-warning"/>
-                                <Label text="Student" styleClass="badge,badge-neutral"/>
-                            </HBox>
-                            <Label text="e.rodriguez@university.ac.ug · 58 posts · last active 2 days ago" styleClass="subtle"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="⌄" styleClass="subtle"/>
-                    </HBox>
-                    <HBox styleClass="card" alignment="CENTER_LEFT" spacing="14">
-                        <Label text="KA" styleClass="avatar-soft" minWidth="44" minHeight="44" style="-fx-background-color:#f3f4f6; -fx-text-fill:#374151; -fx-font-size:15px;"/>
-                        <VBox spacing="2">
-                            <HBox alignment="CENTER_LEFT" spacing="8">
-                                <Label text="Kaleb Aris" styleClass="label-strong"/>
-                                <Label text="Active" styleClass="badge,badge-success"/>
-                                <Label text="Lecturer" styleClass="badge,badge-neutral"/>
-                            </HBox>
-                            <Label text="k.aris@university.ac.ug · 210 posts · last active 4 hours ago" styleClass="subtle"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="⌄" styleClass="subtle"/>
-                    </HBox>
+                    <!-- Dynamic members list — populated by controller -->
+                    <VBox fx:id="membersListBox" spacing="0"/>
                 </VBox>
             </VBox>
         </ScrollPane>

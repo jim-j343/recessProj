@@ -1,5 +1,8 @@
 package forum.api;
 import forum.api.dto.GroupDto;
+import forum.api.dto.AdminAnalyticsDto;
+import forum.api.dto.AdminDashboardDto;
+import forum.api.dto.AdminMemberDto;
 import forum.api.dto.MemberDto;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
@@ -241,6 +244,53 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
 }
 
     // ---------------------------------------------------------------
+    //  Admin
+    // ---------------------------------------------------------------
+
+    public AdminDashboardDto adminDashboard(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/admin/dashboard", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), AdminDashboardDto.class);
+    }
+
+    public AdminAnalyticsDto adminAnalytics(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/admin/analytics", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), AdminAnalyticsDto.class);
+    }
+
+    public List<AdminMemberDto> adminMembers(String token, String filter, String search)
+            throws ApiException, IOException, InterruptedException {
+        String path = "/admin/members?filter=" + encode(filter == null ? "all" : filter);
+        if (search != null && !search.isBlank()) path += "&search=" + encode(search.trim());
+        HttpResponse<String> resp = send(request(path, token).GET().build());
+        ok(resp);
+        JsonNode root = mapper.readTree(resp.body());
+        return mapper.readValue(root.get("members").get("data").traverse(), new TypeReference<List<AdminMemberDto>>() {});
+    }
+
+    public AdminMemberDto blacklistMember(String token, long userId, String reason, int days)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("reason", reason);
+        body.put("days", days);
+        HttpResponse<String> resp = send(request("/admin/blacklist/" + userId, token)
+                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+        return mapper.treeToValue(mapper.readTree(resp.body()).get("member"), AdminMemberDto.class);
+    }
+
+    public AdminMemberDto liftBlacklist(String token, long userId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/admin/lift-blacklist/" + userId, token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+        return mapper.treeToValue(mapper.readTree(resp.body()).get("member"), AdminMemberDto.class);
+    }
+
+    // ---------------------------------------------------------------
     //  Low-level helpers
     // ---------------------------------------------------------------
 
@@ -259,6 +309,10 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
 
     private String json(Map<String, Object> body) throws IOException {
         return mapper.writeValueAsString(body);
+    }
+
+    private String encode(String value) {
+        return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     private void ok(HttpResponse<String> resp) throws ApiException {

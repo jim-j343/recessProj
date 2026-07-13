@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Discussion Forum — mirrors web forum/index.blade.php (top-nav layout) -->
+<!-- Discussion Forum — mirrors web dashboard.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.ForumDashboardController"
             stylesheets="@../css/aces.css" styleClass="root"
@@ -13,22 +13,22 @@
             <!-- NAV BAR -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
                 <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link,active"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="My Progress" styleClass="nav-link"/>
+                <Label text="Dashboard" onMouseClicked="#onDashboard" styleClass="nav-link"/>
+                <Label text="Groups" onMouseClicked="#onGroups" styleClass="nav-link"/>
+                <Label text="Forum" styleClass="nav-link,active"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
-                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label fx:id="userNameLabel" text="Signed in"/>
-                    <Label fx:id="userMetaLabel" text="Student" visible="false" managed="false"/>
-                    <Label text="Log out ▾" styleClass="subtle"/>
-                </HBox>
-            </HBox>
-            <!-- HEADER BAND -->
-            <HBox styleClass="page-header" alignment="CENTER_LEFT">
-                <Label text="Discussion Forum" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="+ New Topic" styleClass="btn,btn-primary" onAction="#onNewThread"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
         </VBox>
     </top>
@@ -36,18 +36,96 @@
     <center>
         <ScrollPane fitToWidth="true" styleClass="content">
             <VBox alignment="TOP_CENTER">
-                <VBox spacing="16" maxWidth="1152">
-                    <!-- Search bar card -->
-                    <VBox styleClass="card">
-                        <TextField promptText="Search topics..." maxWidth="Infinity"/>
+                <VBox spacing="16" maxWidth="1200">
+
+                    <!-- Top row: AI Recommendations -->
+                    <VBox styleClass="card" spacing="8">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="✦ AI Recommended Topics" styleClass="eyebrow"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Hyperlink text="View All" styleClass="subtle"/>
+                        </HBox>
+                        <HBox spacing="12">
+                            <VBox styleClass="card-flat" HBox.hgrow="ALWAYS">
+                                <Label text="NEW FOR YOU" styleClass="badge,badge-neutral"/>
+                                <Label text="Introduction to Machine Learning" styleClass="label-strong" wrapText="true"/>
+                            </VBox>
+                            <VBox styleClass="card-flat" HBox.hgrow="ALWAYS">
+                                <Label text="RECOMMENDED" styleClass="badge,badge-neutral"/>
+                                <Label text="Database Normalization Deep Dive" styleClass="label-strong" wrapText="true"/>
+                            </VBox>
+                            <VBox style="-fx-background-color:#111827; -fx-background-radius:8; -fx-padding:12;" HBox.hgrow="ALWAYS">
+                                <Label text="POPULAR" styleClass="badge,badge-neutral" style="-fx-text-fill:white; -fx-background-color:rgba(255,255,255,0.2);"/>
+                                <Label text="Software Engineering Principles" styleClass="label-strong" style="-fx-text-fill:white;" wrapText="true"/>
+                            </VBox>
+                        </HBox>
                     </VBox>
 
-                    <!-- Topic list (rows injected by controller) -->
-                    <VBox styleClass="card" spacing="0">
-                        <Label text="Recent Discussions" styleClass="card-title"/>
-                        <Region styleClass="divider" prefHeight="1"><VBox.margin><Insets top="14" bottom="6"/></VBox.margin></Region>
-                        <VBox fx:id="discussionList" spacing="0"/>
-                    </VBox>
+                    <!-- Main 3-column layout -->
+                    <HBox spacing="16">
+                        <!-- LEFT PANEL: Groups -->
+                        <VBox styleClass="card" prefWidth="220" minWidth="220" spacing="8">
+                            <Label text="MY GROUPS" styleClass="eyebrow"/>
+                            <VBox fx:id="myGroupsBox" spacing="4">
+                                <!-- Group links will be injected here -->
+                            </VBox>
+                        </VBox>
+
+                        <!-- CENTER PANEL: Forum list -->
+                        <VBox spacing="16" HBox.hgrow="ALWAYS">
+                            <!-- Search & filters -->
+                            <TextField fx:id="searchField" promptText="Search discussions by keyword..." styleClass="search-field"/>
+                            <FlowPane hgap="8" vgap="8">
+                                <Button text="All Topics" styleClass="btn,btn-dark"/>
+                                <Button text="#DataScience" styleClass="btn,btn-outline"/>
+                                <Button text="#AI" styleClass="btn,btn-outline"/>
+                                <Button text="#Databases" styleClass="btn,btn-outline"/>
+                            </FlowPane>
+                            
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Recent Discussions" styleClass="h-sm"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="+ New Thread" styleClass="btn,btn-primary" onAction="#onNewThread"/>
+                            </HBox>
+
+                            <!-- Topic list -->
+                            <VBox fx:id="discussionList" spacing="12"/>
+                        </VBox>
+
+                        <!-- RIGHT PANEL: Stats & Unanswered -->
+                        <VBox prefWidth="260" minWidth="260" spacing="16">
+                            
+                            <!-- User Statistics -->
+                            <VBox style="-fx-background-color:#111827; -fx-background-radius:8; -fx-padding:16;" spacing="12">
+                                <Label text="YOUR STATISTICS" styleClass="eyebrow" style="-fx-text-fill:white;"/>
+                                <HBox spacing="8">
+                                    <VBox style="-fx-background-color:rgba(255,255,255,0.1); -fx-background-radius:6; -fx-padding:8;" HBox.hgrow="ALWAYS">
+                                        <Label text="MARKS" styleClass="eyebrow" style="-fx-text-fill:#9ca3af;"/>
+                                        <Label text="124" style="-fx-text-fill:white; -fx-font-size:24px; -fx-font-weight:bold;"/>
+                                    </VBox>
+                                    <VBox style="-fx-background-color:rgba(255,255,255,0.1); -fx-background-radius:6; -fx-padding:8;" HBox.hgrow="ALWAYS">
+                                        <Label text="POSTS" styleClass="eyebrow" style="-fx-text-fill:#9ca3af;"/>
+                                        <Label text="8" style="-fx-text-fill:white; -fx-font-size:24px; -fx-font-weight:bold;"/>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Unanswered -->
+                            <VBox styleClass="card" spacing="12">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Unanswered" styleClass="label-strong"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="3 open" styleClass="badge,badge-danger"/>
+                                </HBox>
+                                <VBox fx:id="unansweredBox" spacing="8">
+                                    <!-- Injected lines -->
+                                </VBox>
+                                <Button text="Browse All Unanswered ↗" styleClass="btn,btn-outline" maxWidth="Infinity"/>
+                            </VBox>
+                        </VBox>
+
+                    </HBox>
+
                 </VBox>
             </VBox>
         </ScrollPane>

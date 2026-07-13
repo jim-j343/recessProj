@@ -5,6 +5,7 @@
 
 <!-- Profile — mirrors web profile/edit.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.ProfileController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
@@ -15,11 +16,18 @@
                 <Label text="Groups" styleClass="nav-link"/>
                 <Label text="My Progress" styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8">
-                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label text="Alex Rivers"/>
-                    <Label text="▾" styleClass="subtle"/>
-                </HBox>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Profile" styleClass="page-title"/>

@@ -157,6 +157,16 @@ public class GroupsIndexController {
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
     @FXML private void onForum()     { SceneManager.goForumDashboard(); }
+    @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
+    @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onLogout()    {
+        String token = Session.authToken();
+        Session.end();
+        new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
+        SceneManager.show("Login", "Smart Discussion Forum");
+    }
 
     private void showStatus(String msg) {
         statusLabel.setText(msg);

@@ -24,6 +24,7 @@ import java.util.*;
 
 public class QuizManagementController {
 
+    @FXML private Label    avatarLabel;
     @FXML private Label    userNameLabel;
     @FXML private Label    statusLabel;
     @FXML private TextField titleField;
@@ -39,7 +40,13 @@ public class QuizManagementController {
     @FXML
     private void initialize() {
         User u = Session.currentUser();
-        if (u != null) userNameLabel.setText(u.displayName());
+        if (u != null) {
+            userNameLabel.setText(u.displayName());
+            if (avatarLabel != null) {
+                String name = u.displayName().trim();
+                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
+            }
+        }
         loadGroups();
         onAddQuestion(); // start with one question
     }
@@ -171,6 +178,13 @@ public class QuizManagementController {
     @FXML private void onDashboard() { SceneManager.goLecturerDashboard(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onLogout()    {
+        String token = Session.authToken();
+        Session.end();
+        new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
+        SceneManager.show("Login", "Smart Discussion Forum");
+    }
 
     private void showStatus(String msg) {
         statusLabel.setText(msg);
