@@ -12,10 +12,15 @@
         <VBox>
             <!-- NAV BAR -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <Label text="Smart Discussion Forum" styleClass="brand"/>
-                <Label text="Dashboard" styleClass="nav-link,active"/>
-                <Label text="Groups" styleClass="nav-link"/>
-                <Label text="My Progress" styleClass="nav-link"/>
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+<Label text="Dashboard" styleClass="nav-link,active" onMouseClicked="#onDashboard"/>
+<Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
+<Label text="My Progress" styleClass="nav-link"      onMouseClicked="#onDashboard"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
                     <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
