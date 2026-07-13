@@ -69,7 +69,7 @@ public class StudentDashboardController {
                 // stats
                 int total     = quizzes.size();
                 int completed = 0;
-                resultsBox.getChildren().clear();
+                Platform.runLater(() -> resultsBox.getChildren().clear());
 
                 for (QuizDto q : quizzes) {
                     try {
