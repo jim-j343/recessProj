@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Profile — mirrors web profile/edit.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.ProfileController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
+                <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
+                <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label text="3" styleClass="badge,badge-danger" style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;" StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                        <MenuItem text="System Maintenance at Midnight" styleClass="muted"/>
+                        <MenuItem text="New user signups waiting approval" styleClass="muted"/>
+                        <MenuItem text="Database backup successful" styleClass="muted"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Mark all as read"/>
+                    </items>
+                </MenuButton>
+
+                <!-- Profile Dropdown -->
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile"/>
+                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Profile" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Profile information -->
+                    <VBox styleClass="card" spacing="16">
+                        <VBox spacing="2">
+                            <Label text="Profile Information" styleClass="h-md"/>
+                            <Label text="Update your account's profile information and email address." styleClass="subtle"/>
+                        </VBox>
+                        <VBox spacing="6" maxWidth="576">
+                            <Label text="Username" styleClass="field-label"/>
+                            <TextField text="Alex Rivers"/>
+                        </VBox>
+                        <VBox spacing="6" maxWidth="576">
+                            <Label text="Email" styleClass="field-label"/>
+                            <TextField text="a.rivers@university.ac.ug"/>
+                        </VBox>
+                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                    </VBox>
+
+                    <!-- Update password -->
+                    <VBox styleClass="card" spacing="16">
+                        <VBox spacing="2">
+                            <Label text="Update Password" styleClass="h-md"/>
+                            <Label text="Ensure your account is using a long, random password to stay secure." styleClass="subtle"/>
+                        </VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="Current Password" styleClass="field-label"/><PasswordField/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="New Password" styleClass="field-label"/><PasswordField/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="Confirm Password" styleClass="field-label"/><PasswordField/></VBox>
+                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                    </VBox>
+
+                    <!-- Delete account -->
+                    <VBox styleClass="card" spacing="16">
+                        <VBox spacing="2">
+                            <Label text="Delete Account" styleClass="h-md"/>
+                            <Label text="Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data you wish to retain." styleClass="subtle" wrapText="true" maxWidth="576"/>
+                        </VBox>
+                        <Button text="DELETE ACCOUNT" styleClass="btn,btn-danger"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
