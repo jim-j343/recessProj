@@ -134,13 +134,13 @@
         <div class="border-t border-gray-100 px-8 py-4 flex justify-between text-xs text-gray-400 flex-shrink-0">
             <span>Smart Discussion Forum</span>
             <div class="flex gap-4">
-                <a href="#" class="hover:text-gray-600">Privacy Policy</a>
+                <a href="{{ route('privacy') }}" class="hover:text-gray-600">Privacy Policy</a>
                 <button type="button" x-data=""
                     x-on:click.prevent="$dispatch('open-modal', 'rules')"
                     class="hover:text-gray-600">
                     Platform Rules
                 </button>
-                <a href="#" class="hover:text-gray-600">Support</a>
+                <a href="{{ route('support') }}" class="hover:text-gray-600">Support</a>
             </div>
             <span>© 2026 Smart Discussion Forum. All rights reserved.</span>
         </div>

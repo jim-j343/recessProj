@@ -119,6 +119,17 @@ class StudentController extends Controller
             ->latest('created_at')
             ->first();
 
+        // ---- "Recommended for You" — replaces the fixed, dead-linked
+        // placeholder card with a real pick: the most-replied-to topic in the
+        // student's groups that they haven't posted in themselves ----
+        $postedTopicIds = Post::where('author_id', $user->user_id)->pluck('topic_id');
+
+        $recommendedTopic = Topic::whereIn('group_id', $groupIds)
+            ->whereNotIn('topic_id', $postedTopicIds)
+            ->withCount('posts')
+            ->orderByDesc('posts_count')
+            ->first();
+
         return view('student.dashboard', compact(
             'topicCount',
             'postCount',
@@ -135,7 +146,8 @@ class StudentController extends Controller
             'latestWarning',
             'recentActivity',
             'overallScore',
-            'latestTopic'
+            'latestTopic',
+            'recommendedTopic'
         ));
     }
 
