@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ForumController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\NotificationApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
@@ -24,6 +25,11 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user',    [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Notifications
+    Route::get('/notifications',                        [NotificationApiController::class, 'index']);
+    Route::post('/notifications/read-all',              [NotificationApiController::class, 'markAllRead']);
+    Route::post('/notifications/{id}/read',             [NotificationApiController::class, 'markRead']);
 
     // Forum (topics + posts)
     Route::get('/topics',                 [ForumController::class, 'index']);

@@ -4,6 +4,7 @@ import forum.api.dto.AdminAnalyticsDto;
 import forum.api.dto.AdminDashboardDto;
 import forum.api.dto.AdminMemberDto;
 import forum.api.dto.MemberDto;
+import forum.api.dto.NotificationDto;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
@@ -88,6 +89,34 @@ public class ApiClient {
         } catch (Exception ignored) {
             // logging out is best-effort; the local session is cleared regardless
         }
+    }
+
+    // ---------------------------------------------------------------
+    //  Notifications
+    // ---------------------------------------------------------------
+
+    /** GET /api/notifications — unread count + latest unread messages. */
+    public NotificationDto fetchNotifications(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), NotificationDto.class);
+    }
+
+    /** POST /api/notifications/read-all — mark every notification as read. */
+    public void markAllNotificationsRead(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/read-all", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+    }
+
+    /** POST /api/notifications/{id}/read — mark a single notification as read. */
+    public void markNotificationRead(String token, long notificationId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/" + notificationId + "/read", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
     }
 
     // ---------------------------------------------------------------

@@ -13,7 +13,7 @@ class GroupApiController extends Controller
     /** GET /api/groups */
     public function index(Request $request): JsonResponse
     {
-        $groups = Group::withCount('memberships')->latest()->get()
+        $groups = Group::withCount(['memberships', 'topics'])->with('admin')->latest()->get()
             ->map(fn($g) => $this->shape($g, $request->user()->user_id));
         return response()->json($groups);
     }
@@ -105,7 +105,9 @@ class GroupApiController extends Controller
             'name'        => $g->name,
             'description' => $g->description,
             'admin_id'    => (int) $g->admin_id,
+            'admin_name'  => $g->admin?->username ?? 'Unknown',
             'member_count'=> (int) ($g->memberships_count ?? 0),
+            'topics_count'=> (int) ($g->topics_count ?? 0),
             'my_status'   => $membership?->status,
             'my_role'     => $membership?->role,
         ];

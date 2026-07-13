@@ -18,19 +18,20 @@
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <MenuButton styleClass="btn-ghost" text="">
+
+                <!-- Notification bell — populated dynamically from backend -->
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
                         <StackPane>
                             <Label text="🔔" style="-fx-font-size: 16px;"/>
-                            <Label text="3" styleClass="badge,badge-danger" style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;" StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
                         </StackPane>
                     </graphic>
                     <items>
-                        <MenuItem text="System Maintenance at Midnight" styleClass="muted"/>
-                        <MenuItem text="New user signups waiting approval" styleClass="muted"/>
-                        <MenuItem text="Database backup successful" styleClass="muted"/>
-                        <SeparatorMenuItem/>
-                        <MenuItem text="Mark all as read"/>
+                        <!-- Items populated by NavbarHelper.loadNotifications() -->
                     </items>
                 </MenuButton>
 
@@ -38,13 +39,13 @@
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
-                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
                             <Label fx:id="userNameLabel" text="Signed in"/>
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="Profile" onAction="#onProfile"/>
-                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
                     </items>
                 </MenuButton>
             </HBox>
@@ -58,52 +59,51 @@
 
     <center>
         <ScrollPane fitToWidth="true" styleClass="content">
-            <VBox alignment="TOP_CENTER">
-                <VBox spacing="32" maxWidth="1120">
+            <VBox alignment="TOP_CENTER" style="-fx-padding: 0;">
+                <VBox spacing="24" maxWidth="1120" style="-fx-padding: 32 0 32 0;">
 
                     <!-- Status feedback -->
                     <Label fx:id="statusLabel" text="" managed="false" visible="false"
                            styleClass="muted" wrapText="true"/>
 
                     <!-- ── Stat cards ──────────────────────────────── -->
-                    <HBox spacing="24">
-                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                    <HBox spacing="16">
+                        <VBox styleClass="card" alignment="CENTER" spacing="6" HBox.hgrow="ALWAYS">
                             <Label fx:id="totalMembersLabel" text="—"
-                                   style="-fx-text-fill:#4f46e5; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                                   style="-fx-text-fill:#4f46e5; -fx-font-size:32px; -fx-font-weight:bold;"/>
                             <Label text="Total Members" styleClass="muted"/>
                         </VBox>
-                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="card" alignment="CENTER" spacing="6" HBox.hgrow="ALWAYS">
                             <Label fx:id="activeTodayLabel" text="—"
-                                   style="-fx-text-fill:#16a34a; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                                   style="-fx-text-fill:#16a34a; -fx-font-size:32px; -fx-font-weight:bold;"/>
                             <Label text="Active Today" styleClass="muted"/>
                         </VBox>
-                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="card" alignment="CENTER" spacing="6" HBox.hgrow="ALWAYS">
                             <Label fx:id="warnedLabel" text="—"
-                                   style="-fx-text-fill:#ca8a04; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                                   style="-fx-text-fill:#ca8a04; -fx-font-size:32px; -fx-font-weight:bold;"/>
                             <Label text="Members Warned" styleClass="muted"/>
                         </VBox>
-                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="card" alignment="CENTER" spacing="6" HBox.hgrow="ALWAYS">
                             <Label fx:id="blacklistedLabel" text="—"
-                                   style="-fx-text-fill:#dc2626; -fx-font-size:30px; -fx-font-weight:bold;"/>
+                                   style="-fx-text-fill:#dc2626; -fx-font-size:32px; -fx-font-weight:bold;"/>
                             <Label text="Blacklisted" styleClass="muted"/>
                         </VBox>
                     </HBox>
 
                     <!-- ── Group inactivity / blacklist settings table ── -->
-                    <VBox styleClass="card" spacing="16">
+                    <VBox styleClass="card" spacing="12">
                         <VBox spacing="4">
                             <Label text="Group Inactivity &amp; Blacklist Settings" styleClass="h-md"/>
                             <Label text="Each group sets its own thresholds. This is a read-only overview — group admins manage their own settings."
                                    styleClass="muted" wrapText="true"/>
                         </VBox>
-                        <!-- TableView mirrors the web HTML table -->
-                        <TableView fx:id="groupSettingsTable" prefHeight="200">
+                        <TableView fx:id="groupSettingsTable" prefHeight="180">
                             <columns>
-                                <TableColumn fx:id="colGroup"      text="GROUP"              prefWidth="200"/>
-                                <TableColumn fx:id="colCourse"     text="COURSE"             prefWidth="200"/>
-                                <TableColumn fx:id="colMembers"    text="MEMBERS"            prefWidth="100"/>
-                                <TableColumn fx:id="colWarnDays"   text="DAYS BEFORE WARNING" prefWidth="190"/>
-                                <TableColumn fx:id="colBlkDays"    text="BLACKLIST DURATION" prefWidth="190"/>
+                                <TableColumn fx:id="colGroup"      text="GROUP"               prefWidth="220"/>
+                                <TableColumn fx:id="colCourse"     text="COURSE"              prefWidth="220"/>
+                                <TableColumn fx:id="colMembers"    text="MEMBERS"             prefWidth="110"/>
+                                <TableColumn fx:id="colWarnDays"   text="DAYS BEFORE WARNING" prefWidth="200"/>
+                                <TableColumn fx:id="colBlkDays"    text="BLACKLIST DURATION"  styleClass="indigo-col" prefWidth="180"/>
                             </columns>
                             <placeholder><Label text="No groups exist yet." styleClass="muted"/></placeholder>
                         </TableView>
@@ -117,12 +117,12 @@
                             <Button text="Manage Members" styleClass="btn,btn-outline"
                                     onAction="#onMembers"/>
                         </HBox>
-                        <TableView fx:id="membersTable" prefHeight="260">
+                        <TableView fx:id="membersTable" prefHeight="320">
                             <columns>
-                                <TableColumn fx:id="colMember"     text="MEMBER"      prefWidth="320"/>
+                                <TableColumn fx:id="colMember"     text="MEMBER"      prefWidth="300"/>
                                 <TableColumn fx:id="colLastActive" text="LAST ACTIVE" prefWidth="200"/>
-                                <TableColumn fx:id="colPosts"      text="POSTS"       prefWidth="100"/>
-                                <TableColumn fx:id="colStatus"     text="STATUS"      prefWidth="200"/>
+                                <TableColumn fx:id="colPosts"      text="POSTS"       prefWidth="120"/>
+                                <TableColumn fx:id="colStatus"     text="STATUS"      prefWidth="160"/>
                             </columns>
                             <placeholder><Label text="No members to display." styleClass="muted"/></placeholder>
                         </TableView>
