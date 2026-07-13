@@ -39,6 +39,7 @@
                         Each group sets its own thresholds. This is a read-only overview — group admins manage their own settings.
                     </p>
                 </div>
+                <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -65,10 +66,12 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
             </div>
 
             {{-- 3. Existing Member table (Kept intact) --}}
             <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -93,12 +96,12 @@
                                 </span>
                             </td>
                         </tr>
-                        @endforeach
+                       @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
         </div>
     </div>
 </x-app-layout>
-
