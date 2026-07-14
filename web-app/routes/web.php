@@ -10,6 +10,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ParticipationController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GroupInvitationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,6 +50,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+});
+
+// Group invitation responses — the invited person's own actions
+Route::middleware('auth')->group(function () {
+    Route::post('/invitations/{invitation}/accept', [GroupInvitationController::class, 'accept'])->name('invitations.accept');
+    Route::post('/invitations/{invitation}/decline', [GroupInvitationController::class, 'decline'])->name('invitations.decline');
 });
 
 // Forum routes
@@ -98,6 +105,8 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    Route::post('/groups/{group}/members/{user}/remove', [GroupController::class, 'removeMember'])->name('groups.members.remove');
+    Route::post('/groups/{group}/invite', [GroupController::class, 'invite'])->name('groups.invite');
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 
@@ -134,6 +143,8 @@ Route::middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/admin/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
     Route::post('/admin/blacklist/{user}', [AdminController::class, 'blacklistMember'])->name('admin.blacklist');
     Route::post('/admin/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist'])->name('admin.liftBlacklist');
+    Route::get('/admin/removals', [AdminController::class, 'removals'])->name('admin.removals');
+    Route::post('/admin/removals/{removal}/review', [AdminController::class, 'markRemovalReviewed'])->name('admin.removals.review');
 });
 
 require __DIR__.'/auth.php';
