@@ -85,9 +85,6 @@ class ParticipationController extends Controller
             $postCount  = (clone $postsQuery)->count();
             $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
 
-            // Most recent topic they posted in (for display)
-            $latestPost = (clone $postsQuery)->with('topic')->latest('created_at')->first();
-
             // Participation: replies scaled to a mark out of 10, then to a %
             $participationScore = min($replyCount, self::REPLIES_FOR_FULL_MARKS);
             $participationPct   = $participationScore * (100 / self::REPLIES_FOR_FULL_MARKS);
@@ -125,7 +122,6 @@ class ParticipationController extends Controller
                 'student'           => $student,
                 'postCount'         => $postCount,
                 'replyCount'        => $replyCount,
-                'latestTopic'       => $latestPost?->topic?->title,
                 'participationPct'  => round($participationPct, 1),
                 'quizAvgPct'        => $quizAvgPct,
                 'quizCount'         => $quizCount,
@@ -185,53 +181,53 @@ class ParticipationController extends Controller
     }
 
     public function gradeJson(Request $request): \Illuminate\Http\JsonResponse
-{
-    $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
-        ->where('status', 'active')
-        ->pluck('group_id');
+    {
+        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->pluck('group_id');
 
-    $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
-        ->where('status', 'active')
-        ->pluck('user_id');
+        $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
+            ->where('status', 'active')
+            ->pluck('user_id');
 
-    $students = User::whereIn('user_id', $studentIds)
-        ->where('system_role', 'student')
-        ->orderBy('username')->get();
+        $students = User::whereIn('user_id', $studentIds)
+            ->where('system_role', 'student')
+            ->orderBy('username')->get();
 
-    $rows = $students->map(function ($student) use ($lecturerGroupIds) {
-        $postsQuery = Post::where('author_id', $student->user_id)
-            ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
+        $rows = $students->map(function ($student) use ($lecturerGroupIds) {
+            $postsQuery = Post::where('author_id', $student->user_id)
+                ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
 
-        $postCount  = (clone $postsQuery)->count();
-        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
-            ->groupBy('topic_id')
-            ->pluck('post_id');
+            $postCount  = (clone $postsQuery)->count();
+            $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+                ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
+                ->groupBy('topic_id')
+                ->pluck('post_id');
 
-        $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
-        $quality    = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
+            $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
+            $quality    = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
 
-        $groupId = GroupMembership::where('user_id', $student->user_id)
-            ->whereIn('group_id', $lecturerGroupIds)->value('group_id');
+            $groupId = GroupMembership::where('user_id', $student->user_id)
+                ->whereIn('group_id', $lecturerGroupIds)->value('group_id');
 
-        $groupName = $groupId
-            ? \App\Models\Group::where('group_id', $groupId)->value('name')
-            : '—';
+            $groupName = $groupId
+                ? \App\Models\Group::where('group_id', $groupId)->value('name')
+                : '—';
 
-        $existing = ParticipationScore::where('user_id', $student->user_id)
-            ->latest('created_at')->first();
+            $existing = ParticipationScore::where('user_id', $student->user_id)
+                ->latest('created_at')->first();
 
-        return [
-            'user_id'        => $student->user_id,
-            'username'       => $student->username,
-            'group_name'     => $groupName,
-            'post_count'     => $postCount,
-            'reply_count'    => $replyCount,
-            'quality'        => $quality,
-            'existing_grade' => $existing ? $existing->criteria : null,
-        ];
-    });
+            return [
+                'user_id'        => $student->user_id,
+                'username'       => $student->username,
+                'group_name'     => $groupName,
+                'post_count'     => $postCount,
+                'reply_count'    => $replyCount,
+                'quality'        => $quality,
+                'existing_grade' => $existing ? $existing->criteria : null,
+            ];
+        });
 
-    return response()->json($rows->values());
-}
+        return response()->json($rows->values());
+    }
 }
