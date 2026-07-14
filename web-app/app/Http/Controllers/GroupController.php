@@ -29,6 +29,7 @@ class GroupController extends Controller
     {
         $validated = $request->validate([
             'name'                    => ['required', 'string', 'max:120', 'unique:groups,name'],
+            'course_name'             => ['required', 'string', 'max:150'],
             'description'             => ['nullable', 'string', 'max:500'],
             'inactivity_warning_days' => ['required', 'integer', 'min:1'],
             'blacklist_duration_days' => ['required', 'integer', 'min:1'],
@@ -37,6 +38,7 @@ class GroupController extends Controller
         $group = Group::create([
             'admin_id'                => Auth::id(),
             'name'                    => $validated['name'],
+            'course_name'             => $validated['course_name'],
             'description'             => $validated['description'] ?? null,
             'inactivity_warning_days' => $validated['inactivity_warning_days'],
             'blacklist_duration_days' => $validated['blacklist_duration_days'],

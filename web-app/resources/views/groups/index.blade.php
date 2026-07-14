@@ -28,7 +28,12 @@
                 @foreach($groups as $group)
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
                     <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-lg font-bold text-gray-900">{{ $group->name }}</h3>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">{{ $group->name }}</h3>
+                            @if($group->course_name)
+                                <p class="text-xs font-semibold text-indigo-600 mt-0.5">{{ $group->course_name }}</p>
+                            @endif
+                        </div>
                         <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-medium">
                             {{ $group->memberships_count }} members
                         </span>

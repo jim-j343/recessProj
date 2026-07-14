@@ -41,8 +41,9 @@ class PostSeeder extends Seeder
                 'is_synced'      => true,
             ]);
 
-            // Add 2-4 replies per topic
-            $replyCount = rand(2, 4);
+            // Add 3-7 replies per topic — enough range to show varied
+            // participation percentages once the reply-based score is applied
+            $replyCount = rand(3, 7);
             $previousPost = $firstPost;
 
             for ($i = 0; $i < $replyCount; $i++) {

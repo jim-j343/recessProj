@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.GroupShowController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"    styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="Forum"     styleClass="nav-link" onMouseClicked="#onForum"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Notification bell — populated dynamically from backend -->
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                        <!-- Items populated by NavbarHelper.loadNotifications() -->
+                    </items>
+                </MenuButton>
+
+                <!-- Profile Dropdown -->
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label fx:id="groupNameLabel"  styleClass="page-title"/>
+                    <Label fx:id="groupDescLabel"  styleClass="subtle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <HBox spacing="8">
+                    <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
+                    <Button fx:id="manageMembersBtn" text="Manage Members"
+                            styleClass="btn,btn-secondary"
+                            onAction="#onManageMembers"
+                            managed="false" visible="false"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Stats -->
+                    <HBox spacing="16">
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label fx:id="memberCountLabel" text="—"
+                                   style="-fx-text-fill:#4f46e5; -fx-font-size:24px; -fx-font-weight:bold;"/>
+                            <Label text="Members" styleClass="subtle"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label fx:id="myRoleLabel" text="—"
+                                   style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+                            <Label text="Your role" styleClass="subtle"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label fx:id="myStatusLabel" text="—"
+                                   style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+                            <Label text="Your status" styleClass="subtle"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Members list -->
+                    <VBox styleClass="card" spacing="0">
+                        <Label text="Active Members" styleClass="card-title">
+                            <VBox.margin><Insets bottom="12"/></VBox.margin>
+                        </Label>
+                        <VBox fx:id="membersBox" spacing="0"/>
+                        <Label fx:id="pendingNote" styleClass="subtle"
+                               managed="false" visible="false"/>
+                    </VBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

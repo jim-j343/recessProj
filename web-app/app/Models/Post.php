@@ -17,6 +17,9 @@ class Post extends Model
         'author_id',
         'parent_post_id',
         'content',
+        'attachment',
+        'attachment_type',
+        'attachment_name',
         'is_flagged',
         'is_synced',
     ];

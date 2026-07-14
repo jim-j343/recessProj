@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.GroupsIndexController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"    styleClass="nav-link,active"/>
+                <Label text="Forum"     styleClass="nav-link" onMouseClicked="#onForum"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Discussion Groups" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="newGroupBtn" text="+ New Group"
+                        styleClass="btn,btn-primary"
+                        onAction="#onNewGroup"
+                        managed="false" visible="false"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <Label fx:id="statusLabel" styleClass="muted" managed="false" visible="false"/>
+                <FlowPane fx:id="groupsPane" hgap="24" vgap="24"
+                          prefWrapLength="1120" maxWidth="1120"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

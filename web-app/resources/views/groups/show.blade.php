@@ -5,6 +5,9 @@
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ $group->name }}
                 </h2>
+                @if($group->course_name)
+                    <p class="text-sm font-semibold text-indigo-600 mt-0.5">{{ $group->course_name }}</p>
+                @endif
                 <p class="text-sm text-gray-500 mt-1">{{ $group->description }}</p>
             </div>
             <div class="flex gap-2">

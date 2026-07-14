@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Create New Group — mirrors web groups/create.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.GroupCreateController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups" styleClass="nav-link,active" onMouseClicked="#onGroups"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Create New Group" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox maxWidth="672">
+                    <Label fx:id="statusLabel" styleClass="muted" managed="false" visible="false" wrapText="true"/>
+                    <VBox styleClass="card" spacing="16">
+                        <VBox spacing="6">
+                            <Label text="Group Name *" styleClass="field-label"/>
+                            <TextField fx:id="nameField" promptText="e.g. Computer Science Year 2"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Description (optional)" styleClass="field-label"/>
+                            <TextArea fx:id="descField" promptText="What is this group about?" prefRowCount="3" wrapText="true"/>
+                        </VBox>
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Days before warning *" styleClass="field-label"/>
+                                <TextField fx:id="warnDaysField" text="7"/>
+                                <Label text="Days of inactivity before warning" styleClass="subtle"/>
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Blacklist duration (days) *" styleClass="field-label"/>
+                                <TextField fx:id="blkDaysField" text="30"/>
+                                <Label text="How long blacklisted members are banned" styleClass="subtle"/>
+                            </VBox>
+                        </HBox>
+                        <HBox alignment="CENTER_RIGHT" spacing="16">
+                            <Hyperlink text="Cancel" onAction="#onCancel" styleClass="muted"/>
+                            <Button fx:id="submitBtn" text="Create Group" styleClass="btn,btn-primary" onAction="#onSubmit"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

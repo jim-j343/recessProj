@@ -2,59 +2,83 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.SVGPath?>
 <?import forum.ui.RevealPasswordField?>
 <?import forum.ui.IconTextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<!-- ACES - Login  (UI only, no controller logic yet) -->
-<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-           stylesheets="@../css/aces.css" styleClass="root,auth" style="-fx-background-color: white;"
-           prefWidth="900" prefHeight="640">
+<!-- Login screen — mirrors web auth/login.blade.php (centered Breeze card) -->
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.LoginController"
+           stylesheets="@../css/aces.css" styleClass="root,auth-canvas"
+           prefWidth="900" prefHeight="680">
+    <!-- role ToggleGroup retained for controller wiring; role is resolved from the account -->
     <fx:define>
         <ToggleGroup fx:id="role"/>
     </fx:define>
-    <VBox alignment="TOP_CENTER" maxWidth="420" spacing="20">
-        <padding><Insets top="40" right="16" bottom="40" left="16"/></padding>
 
-        <VBox alignment="CENTER" spacing="6">
-            <ImageView fitWidth="52" fitHeight="52" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-            <Label text="ACES" styleClass="display"/>
-        </VBox>
+    <VBox alignment="CENTER" maxWidth="448" spacing="0">
+        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
-        <VBox styleClass="auth-surface" spacing="16" maxWidth="420">
-            <HBox styleClass="segmented" alignment="CENTER" spacing="0">
-                <ToggleButton text="Student"  toggleGroup="$role" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ToggleButton text="Lecturer" toggleGroup="$role" selected="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ToggleButton text="Admin"    toggleGroup="$role" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            </HBox>
+        <VBox styleClass="auth-card" spacing="0" maxWidth="448">
 
+<!-- Branding -->
+<VBox alignment="CENTER" spacing="4">
+    <padding><Insets bottom="24"/></padding>
+    <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
+        <VBox.margin><Insets bottom="12"/></VBox.margin>
+        <image>
+            <Image url="@../images/aces-logo.png"/>
+        </image>
+    </ImageView>
+    <Label text="ACES" styleClass="display"/>
+    <Label text="Sign in to continue to your account" styleClass="muted"/>
+</VBox>
+
+            <!-- Email -->
             <VBox spacing="6">
-                <Label text="Email Address" styleClass="field-label"/>
-                <IconTextField fx:id="emailField" icon="mail" promptText="your.email@example.com" maxWidth="Infinity"/>
+                <VBox.margin><Insets bottom="16"/></VBox.margin>
+                <Label text="Email address" styleClass="field-label"/>
+                <IconTextField fx:id="emailField" icon="mail" promptText="j.doe@university.ac.ug" maxWidth="Infinity"/>
             </VBox>
 
+            <!-- Password -->
             <VBox spacing="6">
-                <Label text="Password" styleClass="field-label"/>
+                <VBox.margin><Insets bottom="16"/></VBox.margin>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Password" styleClass="field-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Hyperlink text="Forgot password?" styleClass="subtle"/>
+                </HBox>
                 <RevealPasswordField fx:id="passwordField" promptText="Enter your password" maxWidth="Infinity"/>
             </VBox>
 
+            <!-- Remember me -->
             <HBox alignment="CENTER_LEFT">
-                <CheckBox fx:id="rememberMe" text="Remember me"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Hyperlink text="Forgot Password?"/>
+                <padding><Insets bottom="20"/></padding>
+                <CheckBox fx:id="rememberMe" text="Keep me signed in"/>
             </HBox>
 
-            <Button fx:id="signInButton" text="Sign In" styleClass="btn,btn-primary" maxWidth="Infinity"/>
+            <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;">
+                <VBox.margin><Insets bottom="10"/></VBox.margin>
+            </Label>
 
+            <!-- Submit -->
+            <Button fx:id="signInButton" text="SIGN IN" styleClass="btn,btn-dark" maxWidth="Infinity" onAction="#onSignIn"/>
+
+            <!-- Divider -->
+            <HBox alignment="CENTER" spacing="12">
+                <padding><Insets top="20" bottom="20"/></padding>
+                <Region styleClass="divider-or" HBox.hgrow="ALWAYS"/>
+                <Label text="or" styleClass="subtle"/>
+                <Region styleClass="divider-or" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <!-- Register link -->
             <HBox alignment="CENTER" spacing="4">
-                <Label text="Don't have an account?" styleClass="muted"/>
-                <Hyperlink fx:id="signUpLink" text="Sign Up"/>
+                <Label text="New to the forum?" styleClass="muted"/>
+                <Hyperlink fx:id="signUpLink" text="Create an account" onAction="#onSignUp"/>
             </HBox>
         </VBox>
-
-        <HBox alignment="CENTER" spacing="4">
-            <Label text="Need help accessing your account?" styleClass="muted"/>
-            <Hyperlink text="Contact Administrator"/>
-        </HBox>
     </VBox>
 </StackPane>

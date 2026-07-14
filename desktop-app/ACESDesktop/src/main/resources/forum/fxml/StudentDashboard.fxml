@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.StudentDashboardController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+                <Label text="Dashboard" styleClass="nav-link,active" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
+                <Label text="Forum"     styleClass="nav-link"        onMouseClicked="#onForum"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label fx:id="welcomeLabel" styleClass="page-title"/>
+                    <Label text="Here's where your progress, grades, and quizzes stand today." styleClass="subtle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Quiz alert -->
+                    <HBox fx:id="quizAlertBox" styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12">
+                        <Label fx:id="quizAlertIcon" style="-fx-text-fill:#4b5563; -fx-font-size:18px;"/>
+                        <VBox>
+                            <Label fx:id="quizAlertTitle" styleClass="label-strong"/>
+                            <Label fx:id="quizAlertSub"   styleClass="subtle"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="takeQuizBtn" text="Take Quiz"
+                                styleClass="btn,btn-primary"
+                                onAction="#onTakeQuiz"
+                                managed="false" visible="false"/>
+                    </HBox>
+
+                    <!-- Stats -->
+                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT" styleClass="eyebrow"/>
+                    <HBox spacing="16">
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="QUIZ PROGRESS" styleClass="eyebrow"/>
+                            <Label fx:id="quizProgressLabel" text="—" styleClass="metric-value"/>
+                            <ProgressBar fx:id="quizProgressBar" progress="0" maxWidth="Infinity"/>
+                            <Label fx:id="quizProgressSub" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
+                            <Label fx:id="participationLabel" text="—" styleClass="metric-value"/>
+                            <Label styleClass="subtle" text="Based on posts and replies"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
+                            <Label fx:id="standingLabel" styleClass="badge,badge-success" text="Active"/>
+                            <Label fx:id="standingSub" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Recent quiz results -->
+                    <VBox styleClass="card" spacing="0">
+                        <HBox alignment="CENTER_LEFT">
+                            <padding><Insets bottom="12"/></padding>
+                            <Label text="Recent Quiz Results" styleClass="card-title"/>
+                        </HBox>
+                        <VBox fx:id="resultsBox" spacing="0"/>
+                        <Label fx:id="noResultsLabel" text="No quiz results yet." styleClass="muted"
+                               managed="false" visible="false"/>
+                    </VBox>
+
+                    <!-- Logout -->
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout"/>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
