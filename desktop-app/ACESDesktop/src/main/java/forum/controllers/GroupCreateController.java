@@ -5,6 +5,7 @@ import forum.api.ApiException;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -30,7 +31,7 @@ public class GroupCreateController {
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            avatarLabel.setText(initials(u.displayName()));
+            avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
         }
     }
@@ -98,8 +99,9 @@ public class GroupCreateController {
         statusLabel.setVisible(visible);
     }
 
-    private String initials(String name) {
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
         if (name == null || name.isBlank()) return "?";
-        return name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase();
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

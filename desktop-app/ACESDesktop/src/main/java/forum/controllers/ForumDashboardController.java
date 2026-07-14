@@ -9,6 +9,8 @@ import forum.models.Topic;
 import forum.models.User;
 import forum.services.AuthService;
 import forum.services.SyncService;
+import forum.util.NavbarHelper;
+import javafx.scene.control.MenuButton;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -33,15 +35,13 @@ public class ForumDashboardController {
     @FXML private VBox unansweredBox;
 
     private final TopicDao topicDao = new TopicDao();
+    private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            String initials = u.displayName().length() >= 2
-                    ? u.displayName().substring(0, 2).toUpperCase()
-                    : u.displayName().toUpperCase();
-            if (avatarLabel != null) avatarLabel.setText(initials);
+            if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
             if (userNameLabel != null) userNameLabel.setText(u.displayName());
         }
 
@@ -76,7 +76,7 @@ public class ForumDashboardController {
             card.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand;");
             
             HBox header = new HBox(12);
-            Label av = new Label(initials(t.getAuthorName()));
+            Label av = new Label(initial(t.getAuthorName()));
             av.getStyleClass().addAll("avatar", "avatar-soft");
             av.setMinSize(36, 36);
 
@@ -206,10 +206,10 @@ public class ForumDashboardController {
     }
 
     private String safe(String s) { return s == null ? "Unknown" : s; }
-    
-    private String initials(String name) {
-        if (name == null || name.isBlank()) return "??";
-        String n = name.trim();
-        return n.length() >= 2 ? n.substring(0, 2).toUpperCase() : n.toUpperCase();
+
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

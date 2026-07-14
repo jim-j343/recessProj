@@ -23,7 +23,7 @@
 <Label text="My Progress" styleClass="nav-link"      onMouseClicked="#onDashboard"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
-                    <Label text="AR" styleClass="avatar" minWidth="32" minHeight="32"/>
+                    <Label fx:id="avatarLabel" text="?" styleClass="avatar" minWidth="32" minHeight="32"/>
                     <Label fx:id="userNameLabel" text="Signed in"/>
                     <Label fx:id="userMetaLabel" text="Student" visible="false" managed="false"/>
                     <Label text="Log out ▾" styleClass="subtle"/>

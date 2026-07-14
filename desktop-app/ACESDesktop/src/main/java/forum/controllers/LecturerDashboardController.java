@@ -8,6 +8,7 @@ import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -35,10 +36,7 @@ public class LecturerDashboardController {
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            String initials = u.displayName().length() >= 2
-                    ? u.displayName().substring(0, 2).toUpperCase()
-                    : u.displayName().toUpperCase();
-            avatarLabel.setText(initials);
+            avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
         }
         loadInBackground();
@@ -127,5 +125,11 @@ public class LecturerDashboardController {
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "Smart Discussion Forum");
+    }
+
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

@@ -9,6 +9,7 @@ import forum.app.Session;
 import forum.app.ViewState;
 import forum.models.Role;
 import forum.models.User;
+import forum.util.NavbarHelper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import javafx.application.Platform;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -25,8 +27,10 @@ import java.util.List;
 
 public class GroupShowController {
 
-    @FXML private Label  avatarLabel;
-    @FXML private Label  userNameLabel;
+    @FXML private Label      avatarLabel;
+    @FXML private Label      userNameLabel;
+    @FXML private MenuButton notifButton;
+    @FXML private Label      notifBadge;
     @FXML private Label  groupNameLabel;
     @FXML private Label  groupDescLabel;
     @FXML private Label  memberCountLabel;
@@ -44,11 +48,9 @@ public class GroupShowController {
         User u = Session.currentUser();
         if (u != null) {
             userNameLabel.setText(u.displayName());
-            if (avatarLabel != null) {
-                String name = u.displayName().trim();
-                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
-            }
+            if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
         }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
 
         group = ViewState.getSelectedGroup();
         if (group == null) { SceneManager.goGroups(); return; }
@@ -192,6 +194,12 @@ public class GroupShowController {
     private String capitalize(String s) {
         if (s == null || s.isEmpty()) return s;
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 
     private record MemberRow(long userId, String username, String role, String status) {}
