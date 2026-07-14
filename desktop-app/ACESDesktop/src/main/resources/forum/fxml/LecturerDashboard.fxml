@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.LecturerDashboardController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+                <Label text="Dashboard"   styleClass="nav-link,active"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Lecturer Dashboard" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ New Quiz" styleClass="btn,btn-primary" onAction="#onQuizCenter"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Stats -->
+                    <HBox spacing="16">
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="quizCountLabel"
+                                   style="-fx-text-fill:#4f46e5; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Quizzes created" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="groupCountLabel"
+                                   style="-fx-text-fill:#16a34a; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Groups joined" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="topicCountLabel"
+                                   style="-fx-text-fill:#374151; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Topics created" styleClass="muted"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="24">
+                        <!-- My quizzes -->
+                        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT">
+                                <padding><Insets bottom="12"/></padding>
+                                <Label text="My Quizzes" styleClass="card-title"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Hyperlink text="+ New" onAction="#onQuizCenter" styleClass="subtle"/>
+                            </HBox>
+                            <VBox fx:id="quizListBox" spacing="0"/>
+                            <Label fx:id="noQuizzesLabel" text="No quizzes yet. Create your first one."
+                                   styleClass="muted" managed="false" visible="false"/>
+                        </VBox>
+
+                        <!-- Quick actions -->
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <Label text="Quick Actions" styleClass="card-title"/>
+                            <Button text="📝  Create a new quiz"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onQuizCenter"/>
+                            <Button text="💬  Post a new topic"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onNewTopic"/>
+                            <Button text="👁  View forum"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onForum"/>
+                            <Button text="🏆  Award participation marks"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onGrading"/>
+                            <Button text="👥  Manage groups"
+                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
+                                    onAction="#onGroups"/>
+                            <Region VBox.vgrow="ALWAYS"/>
+                            <Button text="Log Out" styleClass="btn,btn-ghost"
+                                    maxWidth="Infinity" onAction="#onLogout"/>
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

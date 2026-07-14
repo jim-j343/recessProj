@@ -28,11 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return match($request->user()->role) {
-            'admin'    => redirect()->route('admin.dashboard'),
-            'lecturer' => redirect()->route('lecturer.dashboard'),
-             default    => redirect()->route('dashboard'),
-};
+        $request->user()->update(['last_active_at' => now()]);
+
+        return match($request->user()->system_role) {
+            'system_admin' => redirect()->route('admin.dashboard'),
+            'lecturer'     => redirect()->route('lecturer.dashboard'),
+            default        => redirect()->route('dashboard'),
+        };
     }
 
     /**

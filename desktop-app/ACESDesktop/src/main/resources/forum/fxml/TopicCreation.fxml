@@ -2,86 +2,72 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES · Create Learning Topic  (UI only) -->
+<!-- Create New Topic — mirrors web forum/create.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.TopicCreationController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Lecturer Workspace" styleClass="brand-sub"/></VBox>
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic" styleClass="nav-link,active"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading" styleClass="nav-link" onMouseClicked="#onGrading"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
-            <Button text="Dashboard"  styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="My Courses"  styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="Discussions" styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
-                <Label text="DK" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox><Label text="Dr. K. Owen" styleClass="label-strong"/><Label text="Lecturer" styleClass="brand-sub"/></VBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Create New Topic" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Back to Forum" styleClass="btn,btn-secondary" onAction="#onCancel"/>
             </HBox>
         </VBox>
-    </left>
+    </top>
+
     <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
-                <Label text="My Courses" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="⛭ Last autosaved at 14:32" styleClass="muted"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24" maxWidth="820">
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox maxWidth="896">
                     <VBox styleClass="card" spacing="16">
-                        <HBox alignment="CENTER_LEFT" spacing="12">
-                            <Label text="＋" styleClass="brand-logo" minWidth="40" minHeight="40"/>
-                            <VBox><Label text="Create New Learning Topic" styleClass="h-md"/><Label text="Configure your lecture content and AI classification" styleClass="muted"/></VBox>
-                        </HBox>
-
-                        <HBox spacing="16">
-                            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label text="Topic Title" styleClass="field-label"/>
-                                <TextField promptText="e.g. Introduction to Wave-Particle Duality"/>
-                            </VBox>
-                            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                <Label text="Category" styleClass="field-label"/>
-                                <ComboBox promptText="Core Curriculum" maxWidth="Infinity"/>
-                            </VBox>
-                        </HBox>
-
                         <VBox spacing="6">
-                            <Label text="Description &amp; Key Objectives" styleClass="field-label"/>
-                            <TextArea promptText="Start typing your lesson description here…" prefRowCount="6" wrapText="true"/>
+                            <Label text="Topic Title" styleClass="field-label"/>
+                            <TextField fx:id="titleField" promptText="Enter a clear, descriptive title..."/>
                         </VBox>
-
-                        <VBox styleClass="tag-panel" spacing="12">
-                            <HBox alignment="CENTER_LEFT">
-                                <Label text="✦ AI-SUGGESTED CLASSIFICATION TAGS" styleClass="eyebrow"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Hyperlink text="REGENERATE"/>
-                            </HBox>
-                            <FlowPane hgap="8" vgap="8">
-                                <Label text="Quantum Mechanics ✕" styleClass="chip"/>
-                                <Label text="Theoretical Physics ✕" styleClass="chip"/>
-                                <Label text="Undergraduate ✕" styleClass="chip"/>
-                                <Label text="Spring 2026 ✕" styleClass="chip"/>
-                                <Label text="＋ Custom Tag" styleClass="chip,chip-dashed"/>
-                            </FlowPane>
+                        <VBox spacing="6">
+                            <Label text="Category (optional)" styleClass="field-label"/>
+                            <ComboBox fx:id="categoryCombo" promptText="-- Select a category --" maxWidth="Infinity"/>
                         </VBox>
-
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="☁ Draft synced to local cache" styleClass="muted"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <HBox spacing="8">
-                                <Button text="Save Draft" styleClass="btn,btn-secondary"/>
-                                <Button text="✦ Publish Topic" styleClass="btn,btn-accent"/>
-                            </HBox>
+                        <VBox spacing="6">
+                            <Label text="Group *" styleClass="field-label"/>
+                            <ComboBox fx:id="groupCombo" promptText="-- Select a group --" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Description" styleClass="field-label"/>
+                            <TextArea fx:id="descriptionArea" promptText="Describe your topic in detail..." prefRowCount="8" wrapText="true"/>
+                        </VBox>
+                        <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;"/>
+                        <HBox alignment="CENTER_RIGHT" spacing="16">
+                            <Hyperlink text="Cancel" onAction="#onCancel" styleClass="muted"/>
+                            <Button text="Post Topic" styleClass="btn,btn-primary" onAction="#onPublish"/>
                         </HBox>
                     </VBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

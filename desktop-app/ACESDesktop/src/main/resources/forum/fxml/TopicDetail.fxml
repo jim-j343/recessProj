@@ -2,86 +2,41 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES · Topic Detail / Threaded Discussion  (UI only) -->
+<!-- Topic Detail — mirrors web forum/show.blade.php (thread + sticky reply bar) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/aces.css" styleClass="root"
+            fx:controller="forum.controllers.TopicDetailController"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color:#f9fafb;"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Academic Portal" styleClass="brand-sub"/></VBox>
-            </HBox>
-            <Button text="Dashboard"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Discussions" styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Button text="My Courses"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center" styleClass="nav-item" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
-                <Label text="AR" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox><Label text="Alex Rivera" styleClass="label-strong"/><Label text="Student · Level 4" styleClass="brand-sub"/></VBox>
-            </HBox>
-        </VBox>
-    </left>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:0 0 1 0; -fx-padding:12 24 12 24;">
+            <Hyperlink text="← Back" onAction="#onBack" styleClass="muted"/>
+            <Label fx:id="topicTitleLabel" text="Topic" styleClass="label-strong"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline"/>
+            <Button text="↗ Share" styleClass="btn-sm,btn-outline"/>
+        </HBox>
+    </top>
+
     <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="12">
-                <Hyperlink text="← Back"/>
-                <Label text="Why are we still using Webpack in 2026?" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="🔖" styleClass="btn,btn-secondary"/>
-                <Button text="⋯" styleClass="btn,btn-secondary"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="16" maxWidth="820">
-                    <!-- Original post -->
-                    <VBox styleClass="card" spacing="12">
-                        <HBox alignment="CENTER_LEFT" spacing="12">
-                            <Label text="SC" styleClass="brand-logo" minWidth="40" minHeight="40"/>
-                            <VBox><HBox spacing="6" alignment="CENTER_LEFT"><Label text="Sarah Chen" styleClass="label-strong"/><Label text="Author" styleClass="badge,badge-accent"/></HBox><Label text="2h ago" styleClass="muted"/></VBox>
-                        </HBox>
-                        <Label wrapText="true" styleClass="body" text="With Vite, Esbuild, and Turbopack offering near-instant cold starts and lightning-fast HMR, why is the industry still so tied to Webpack? Is it just inertia, or are there complex enterprise use cases that these newer tools still haven't solved?"/>
-                        <HBox spacing="6"><Label text="#WebDev" styleClass="chip"/><Label text="#BuildTools" styleClass="chip"/><Label text="#Frontend" styleClass="chip"/></HBox>
-                        <Separator styleClass="divider"/>
-                        <HBox spacing="20"><Label text="👍 124" styleClass="muted"/><Label text="💬 42 replies" styleClass="muted"/><Label text="🔗 Share" styleClass="muted"/></HBox>
-                    </VBox>
-
-                    <HBox alignment="CENTER_LEFT">
-                        <Label text="42 Replies" styleClass="h-sm"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <HBox styleClass="segmented" spacing="0">
-                            <fx:define><ToggleGroup fx:id="sort"/></fx:define>
-                            <ToggleButton text="Top" toggleGroup="$sort" selected="true"/>
-                            <ToggleButton text="Newest" toggleGroup="$sort"/>
-                        </HBox>
-                    </HBox>
-
-                    <!-- Reply with nested child -->
-                    <VBox styleClass="card" spacing="8">
-                        <HBox spacing="10" alignment="CENTER_LEFT"><Label text="DM" styleClass="brand-logo" minWidth="28" minHeight="28"/><Label text="David Müller" styleClass="label-strong"/><Label text="· 1h ago" styleClass="muted"/></HBox>
-                        <Label wrapText="true" styleClass="body" text="Plugin ecosystem. If you have a custom build pipeline developed over 5 years with 20+ specialized plugins, migrating to Vite isn't a weekend project. Enterprise stability > HMR speed for many."/>
-                        <HBox spacing="16"><Label text="👍 58" styleClass="muted"/><Hyperlink text="Reply"/></HBox>
-                        <VBox styleClass="reply-nested" spacing="6">
-                            <HBox spacing="10" alignment="CENTER_LEFT"><Label text="AR" styleClass="brand-logo" minWidth="28" minHeight="28"/><Label text="Alex Rivera" styleClass="label-strong"/><Label text="· 45m ago" styleClass="muted"/></HBox>
-                            <Label wrapText="true" styleClass="body" text="This. We tried migrating a legacy monorepo and hit a wall with some obscure federated module requirements that Vite didn't quite handle the same way."/>
-                        </VBox>
-                    </VBox>
-
-                    <VBox styleClass="card" spacing="8">
-                        <HBox spacing="10" alignment="CENTER_LEFT"><Label text="JW" styleClass="brand-logo" minWidth="28" minHeight="28"/><Label text="Jessica Wu" styleClass="label-strong"/><Label text="· 30m ago" styleClass="muted"/></HBox>
-                        <Label wrapText="true" styleClass="body" text="I think the &quot;inertia&quot; argument is getting weaker. New projects almost exclusively start with Vite now. Webpack is becoming the COBOL of the frontend — around forever in legacy, but the innovation has moved on."/>
-                        <HBox spacing="16"><Label text="👍 33" styleClass="muted"/><Hyperlink text="Reply"/></HBox>
-                    </VBox>
-
-                    <!-- Composer -->
-                    <HBox styleClass="card" spacing="8" alignment="CENTER_LEFT">
-                        <TextField promptText="Add to the conversation…" HBox.hgrow="ALWAYS"/>
-                        <Button text="Reply →" styleClass="btn,btn-primary"/>
-                    </HBox>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="768">
+                    <Label fx:id="repliesCountLabel" text="Replies" styleClass="h-sm"/>
+                    <VBox fx:id="postList" spacing="16"/>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
+
+    <!-- STICKY REPLY BAR -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0; -fx-padding:12 24 12 24;">
+            <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
+                <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
+                <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
+            </HBox>
+        </HBox>
+    </bottom>
 </BorderPane>

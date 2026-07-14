@@ -2,78 +2,85 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.*?>
 
-<!-- ACES · Participation Grading  (UI only) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.ParticipationGradingController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
-    <left>
-        <VBox styleClass="sidebar" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets bottom="24" left="8"/></padding>
-                <ImageView fitWidth="34" fitHeight="34" preserveRatio="true"><image><Image url="@../images/aces-logo.png"/></image></ImageView>
-                <VBox><Label text="ACES" styleClass="brand-name"/><Label text="Lecturer Workspace" styleClass="brand-sub"/></VBox>
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
+    </javafx.scene.image.ImageView>
+    <Label text="ACES" styleClass="brand"/>
+</HBox>
+                <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading"     styleClass="nav-link,active"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label text="🔔" style="-fx-font-size: 16px; -fx-text-fill: #9ca3af;"/>
+                            <Region minWidth="12"/>
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
             </HBox>
-            <Button text="Dashboard"    styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="My Courses"    styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Quiz Center"   styleClass="nav-item" maxWidth="Infinity"/>
-            <Button text="Participation" styleClass="nav-item,active" maxWidth="Infinity"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER_LEFT" spacing="10"><padding><Insets top="12"/></padding>
-                <Label text="DK" styleClass="brand-logo" minWidth="34" minHeight="34"/>
-                <VBox><Label text="Dr. K. Owen" styleClass="label-strong"/><Label text="Lecturer" styleClass="brand-sub"/></VBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="📝 Participation Grading" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Hyperlink text="← Back to Dashboard" onAction="#onDashboard" styleClass="muted"/>
             </HBox>
         </VBox>
-    </left>
+    </top>
+
     <center>
-        <VBox>
-            <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="16">
-                <Label text="Participation Grading" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <TextField promptText="Search students…" prefWidth="260"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" styleClass="content">
-                <VBox spacing="24" maxWidth="1080">
-                    <VBox spacing="2">
-                        <Label text="Participation Grading" styleClass="h-lg"/>
-                        <Label text="CS302: Interaction Design · Spring 2026" styleClass="muted"/>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <Label fx:id="statusLabel" styleClass="muted"
+                           managed="false" visible="false"/>
+
+                    <!-- Grading table -->
+                    <VBox styleClass="card" spacing="0">
+                        <HBox alignment="CENTER_LEFT">
+                            <padding><Insets bottom="16"/></padding>
+                            <Label text="Student Forum Participation" styleClass="card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="💾 Save All Grades"
+                                    styleClass="btn,btn-primary"
+                                    onAction="#onSaveGrades"/>
+                        </HBox>
+
+                        <TableView fx:id="gradesTable" prefHeight="480">
+                            <columns>
+                                <TableColumn fx:id="colStudent"  text="STUDENT"      prefWidth="180"/>
+                                <TableColumn fx:id="colGroup"    text="GROUP"        prefWidth="180"/>
+                                <TableColumn fx:id="colPosts"    text="POSTS"        prefWidth="80"/>
+                                <TableColumn fx:id="colReplies"  text="REPLIES"      prefWidth="80"/>
+                                <TableColumn fx:id="colQuality"  text="QUALITY"      prefWidth="100"/>
+                                <TableColumn fx:id="colGrade"    text="GRADE"        prefWidth="120"/>
+                                <TableColumn fx:id="colRemarks"  text="REMARKS"      prefWidth="200"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="No students in your groups yet." styleClass="muted"/>
+                            </placeholder>
+                        </TableView>
                     </VBox>
 
-                    <HBox spacing="16">
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="AVG. PARTICIPATION" styleClass="eyebrow"/>
-                            <Label text="84%" styleClass="metric-value"/>
-                            <Label text="Top 5% of all cohorts" styleClass="muted"/>
-                        </VBox>
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="AI RELEVANCE" styleClass="eyebrow"/>
-                            <Label text="4.2 / 5.0" styleClass="metric-value"/>
-                            <Label text="Weighted content quality" styleClass="muted"/>
-                        </VBox>
-                        <VBox styleClass="card" spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="PENDING GRADES" styleClass="eyebrow"/>
-                            <Label text="08" styleClass="metric-value"/>
-                            <Label text="Students awaiting review" styleClass="muted"/>
-                        </VBox>
-                    </HBox>
-
-                    <TableView fx:id="gradesTable" prefHeight="320">
-                        <columns>
-                            <TableColumn fx:id="colStudent"   text="Student" prefWidth="260"/>
-                            <TableColumn fx:id="colPosts"     text="Posts" prefWidth="120"/>
-                            <TableColumn fx:id="colRelevance" text="AI Relevance" prefWidth="160"/>
-                            <TableColumn fx:id="colPeer"      text="Peer Score" prefWidth="160"/>
-                            <TableColumn fx:id="colMark"      text="Mark" prefWidth="140"/>
-                        </columns>
-                        <placeholder><Label text="No students to display."/></placeholder>
-                    </TableView>
-
-                    <HBox spacing="12">
-                        <Button text="✔ Submit All Grades" styleClass="btn,btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                        <Button text="⬇ Export CSV Report" styleClass="btn,btn-secondary"/>
-                    </HBox>
                 </VBox>
-            </ScrollPane>
-        </VBox>
+            </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

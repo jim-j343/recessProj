@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.GroupsIndexController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link,active"/>
+                <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
+                <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <!-- Notification bell -->
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                        <!-- Items populated by NavbarHelper.loadNotifications() -->
+                    </items>
+                </MenuButton>
+
+                <!-- Profile Dropdown -->
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Discussion Groups" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="newGroupBtn" text="+ New Group"
+                        styleClass="btn,btn-primary"
+                        onAction="#onNewGroup"
+                        managed="false" visible="false"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER" style="-fx-padding: 0;">
+                <Label fx:id="statusLabel" styleClass="muted" managed="false" visible="false"
+                       style="-fx-padding: 32 0 0 0;"/>
+                <FlowPane fx:id="groupsPane" hgap="24" vgap="24"
+                          prefWrapLength="1120" maxWidth="1120"
+                          style="-fx-padding: 32 0 32 0;"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
