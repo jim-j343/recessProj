@@ -60,10 +60,6 @@
                             <Label text="Real-time performance metrics for the current semester." styleClass="muted"/>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <HBox spacing="12" alignment="CENTER_RIGHT">
-                            <ComboBox promptText="Advanced Calculus II"/>
-                            <Button text="Last 7 Days" styleClass="btn,btn-dark"/>
-                        </HBox>
                     </HBox>
 
                     <!-- Stat cards -->
@@ -71,7 +67,6 @@
                         <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
                             <Label text="TOTAL MEMBERS" styleClass="eyebrow"/>
                             <Label fx:id="totalMembersLabel" text="-" styleClass="metric-value"/>
-                            <Label text="Live update" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
                         <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
                             <Label text="ACTIVE THIS WEEK" styleClass="eyebrow"/>
@@ -79,14 +74,12 @@
                             <Label fx:id="activeThisWeekMetaLabel" text="-" styleClass="subtle"/>
                         </VBox>
                         <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
-                            <Label text="WARNINGS ISSUED" styleClass="eyebrow"/>
+                            <Label text="WARNINGS THIS WEEK" styleClass="eyebrow"/>
                             <Label fx:id="warningsThisWeekLabel" text="-" styleClass="metric-value"/>
-                            <Label text="Live update" style="-fx-text-fill:#ca8a04; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
                         <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
-                            <Label text="BLACKLISTED" styleClass="eyebrow"/>
+                            <Label text="ACTIVE BLACKLISTS" styleClass="eyebrow"/>
                             <Label fx:id="activeBlacklistsLabel" text="-" styleClass="metric-value"/>
-                            <Label text="Active restrictions" style="-fx-text-fill:#ef4444; -fx-font-size:12px; -fx-font-weight:600;"/>
                         </VBox>
                     </HBox>
 

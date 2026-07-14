@@ -56,6 +56,7 @@ public final class SceneManager {
         }
     }
     public static void goGroupShow()          { show("GroupShow",            "Smart Discussion Forum — Group"); }
+    public static void goNotifications()      { show("NotificationsIndex",   "Smart Discussion Forum — Notifications"); }
     public static void goForumDashboard()     { show("ForumDashboard",       "Smart Discussion Forum — Forum"); }
     public static void goTopicCreation()      { show("TopicCreation",        "Smart Discussion Forum — New Topic"); }
     public static void goQuizFocusMode()      { show("QuizFocusMode",        "Smart Discussion Forum — Quiz"); }

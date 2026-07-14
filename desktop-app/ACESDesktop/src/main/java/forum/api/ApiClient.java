@@ -103,6 +103,14 @@ public class ApiClient {
         return mapper.readValue(resp.body(), NotificationDto.class);
     }
 
+    /** GET /api/notifications/all — unread count + ALL notifications. */
+    public NotificationDto fetchAllNotifications(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/all", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), NotificationDto.class);
+    }
+
     /** POST /api/notifications/read-all — mark every notification as read. */
     public void markAllNotificationsRead(String token)
             throws ApiException, IOException, InterruptedException {
