@@ -28,6 +28,8 @@
         'share' => '<circle cx="6" cy="12" r="2" /><circle cx="18" cy="6" r="2" /><circle cx="18" cy="18" r="2" /><path d="M7.7 10.9l8.6-4.5" /><path d="M7.7 13.1l8.6 4.5" />',
 
         'clock' => '<circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" />',
+
+        'users' => '<circle cx="9" cy="8" r="3" /><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5" /><circle cx="17" cy="9" r="2.3" /><path d="M15.5 19c.3-2.2 1.8-4 3.8-4.6" />',
     ];
 @endphp
 

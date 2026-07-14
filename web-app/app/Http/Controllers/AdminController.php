@@ -17,6 +17,7 @@ use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\GroupRemoval;
 
 class AdminController extends Controller
 {
@@ -204,5 +205,36 @@ class AdminController extends Controller
             ->update(['lifted_by' => Auth::id(), 'expires_at' => now()]);
 
         return back()->with('success', "{$user->username}'s blacklist has been lifted.");
+    }
+
+    // Review queue for group-admin member removals — group admins can
+    // remove people but not blacklist them, so every removal lands here
+    // for a system admin to look at
+    public function removals(Request $request)
+    {
+        $filter = $request->query('filter', 'unreviewed');
+
+        $query = GroupRemoval::with(['group', 'removedUser', 'removedBy', 'reviewedBy']);
+
+        if ($filter === 'unreviewed') {
+            $query->where('reviewed', false);
+        } elseif ($filter === 'reviewed') {
+            $query->where('reviewed', true);
+        }
+
+        $removals = $query->latest('created_at')->paginate(15)->withQueryString();
+
+        return view('admin.removals', compact('removals', 'filter'));
+    }
+
+    public function markRemovalReviewed(GroupRemoval $removal)
+    {
+        $removal->update([
+            'reviewed'    => true,
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Removal marked as reviewed.');
     }
 }
