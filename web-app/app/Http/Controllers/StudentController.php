@@ -89,13 +89,21 @@ class StudentController extends Controller
         $quizzesTotal = $quizzes->count();
         $quizProgress = $quizzesTotal > 0 ? (int) round(($quizzesCompleted / $quizzesTotal) * 100) : 0;
 
-        // ---- Participation (feeds "General Assessment") ----
-        $participationScores = ParticipationScore::where('user_id', $user->user_id)
-            ->whereIn('group_id', $groupIds)
-            ->get();
+        // ---- Participation — computed live from current reply activity,
+        // same formula used in the lecturer's grading table and the
+        // progress page, so this number is never stale ----
+        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->groupBy('topic_id')
+            ->pluck('post_id');
 
-        $participationTotal = round($participationScores->sum('score'), 1);
-        $participationAvg = $participationScores->count() ? round($participationScores->avg('score'), 1) : null;
+        $liveReplyCount = Post::where('author_id', $user->user_id)
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->whereNotIn('post_id', $openingPostIds)
+            ->count();
+
+        $participationAvg = min($liveReplyCount, 10) * 10;
+        $participationTotal = $participationAvg;
 
         // ---- Compliance / community standing ----
         $latestWarning = Warning::where('user_id', $user->user_id)

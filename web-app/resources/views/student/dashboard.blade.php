@@ -135,10 +135,10 @@
                         </div>
                         <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold">Participation Score</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">
-                            {{ $participationAvg !== null ? $participationAvg : '—' }}
+                            {{ $participationAvg }}%
                         </p>
                         <p class="text-xs text-gray-400 mt-1">
-                            {{ $participationTotal ?? 0 }} total pts across all criteria
+                            Live — based on your current replies
                         </p>
                     </div>
 

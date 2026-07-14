@@ -57,8 +57,6 @@
                         <thead>
                             <tr class="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
                                 <th class="px-6 py-3">Student</th>
-                                <th class="px-4 py-3">Latest Topic</th>
-                                <th class="px-4 py-3">Posts</th>
                                 <th class="px-4 py-3">Replies</th>
                                 <th class="px-4 py-3">Participation</th>
                                 <th class="px-4 py-3">Test Avg</th>
@@ -82,8 +80,6 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 text-gray-600">{{ $row->latestTopic ?? '—' }}</td>
-                                <td class="px-4 py-4 text-gray-600">{{ $row->postCount }}</td>
                                 <td class="px-4 py-4 text-gray-600">{{ $row->replyCount }}</td>
                                 <td class="px-4 py-4 text-gray-600">
                                     {{ $row->participationPct }}%
@@ -111,7 +107,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-10 text-center text-gray-400">
+                                <td colspan="6" class="px-6 py-10 text-center text-gray-400">
                                     No students found for this filter.
                                 </td>
                             </tr>
