@@ -385,4 +385,51 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
         }
         return "Request failed (HTTP " + sc + ").";
     }
+
+    // ── Profile ───────────────────────────────────────────────────────────────
+
+    /**
+     * PATCH /api/profile — update the signed-in user's username.
+     */
+    public void updateProfile(String token, String newUsername)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("username", newUsername);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(base + "/profile"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+    }
+
+    /**
+     * PATCH /api/profile/password — change the signed-in user's password.
+     */
+    public void updatePassword(String token, String currentPassword,
+                               String newPassword, String confirmPassword)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("current_password", currentPassword);
+        body.put("password", newPassword);
+        body.put("password_confirmation", confirmPassword);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(base + "/profile/password"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+    }
 }

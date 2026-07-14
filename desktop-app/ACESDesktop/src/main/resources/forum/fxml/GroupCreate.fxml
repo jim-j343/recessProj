@@ -18,13 +18,13 @@
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
-                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
                             <Label fx:id="userNameLabel" text="Signed in"/>
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="Profile" onAction="#onProfile"/>
-                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
                     </items>
                 </MenuButton>
             </HBox>

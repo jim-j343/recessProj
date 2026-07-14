@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ForumController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\NotificationApiController;
+use App\Http\Controllers\Api\ProfileApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
@@ -25,6 +26,10 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user',    [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Profile
+    Route::patch('/profile',          [ProfileApiController::class, 'update']);
+    Route::patch('/profile/password', [ProfileApiController::class, 'updatePassword']);
 
     // Notifications
     Route::get('/notifications',                        [NotificationApiController::class, 'index']);

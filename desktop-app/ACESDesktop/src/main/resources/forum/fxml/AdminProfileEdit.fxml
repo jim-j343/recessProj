@@ -67,13 +67,17 @@
                         </VBox>
                         <VBox spacing="6" maxWidth="576">
                             <Label text="Username" styleClass="field-label"/>
-                            <TextField text="Alex Rivers"/>
+                            <TextField fx:id="usernameField" promptText="Username"/>
                         </VBox>
                         <VBox spacing="6" maxWidth="576">
                             <Label text="Email" styleClass="field-label"/>
-                            <TextField text="a.rivers@university.ac.ug"/>
+                            <TextField fx:id="emailField" promptText="Email" editable="false"
+                                       style="-fx-opacity: 0.7;"/>
                         </VBox>
-                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button text="SAVE" styleClass="btn,btn-dark" onAction="#onSaveProfile"/>
+                            <Label fx:id="saveStatusLabel" text="" styleClass="subtle" managed="false" visible="false"/>
+                        </HBox>
                     </VBox>
 
                     <!-- Update password -->
@@ -82,10 +86,13 @@
                             <Label text="Update Password" styleClass="h-md"/>
                             <Label text="Ensure your account is using a long, random password to stay secure." styleClass="subtle"/>
                         </VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="Current Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="New Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="Confirm Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                        <VBox spacing="6" maxWidth="576"><Label text="Current Password" styleClass="field-label"/><PasswordField fx:id="currentPasswordField"/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="New Password" styleClass="field-label"/><PasswordField fx:id="newPasswordField"/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="Confirm Password" styleClass="field-label"/><PasswordField fx:id="confirmPasswordField"/></VBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button text="SAVE" styleClass="btn,btn-dark" onAction="#onSavePassword"/>
+                            <Label fx:id="passwordStatusLabel" text="" styleClass="subtle" managed="false" visible="false"/>
+                        </HBox>
                     </VBox>
 
                     <!-- Delete account -->
