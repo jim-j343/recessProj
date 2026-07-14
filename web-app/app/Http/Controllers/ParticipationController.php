@@ -203,7 +203,12 @@ class ParticipationController extends Controller
             ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
 
         $postCount  = (clone $postsQuery)->count();
-        $replyCount = (clone $postsQuery)->whereNotNull('parent_post_id')->count();
+        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
+            ->groupBy('topic_id')
+            ->pluck('post_id');
+
+        $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
         $quality    = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
 
         $groupId = GroupMembership::where('user_id', $student->user_id)

@@ -48,6 +48,7 @@ class Notification extends Model
     /**
      * Icon name for the shared <x-icon> component.
      */
+
     public function icon(): string
     {
         return match ($this->type) {
@@ -55,6 +56,7 @@ class Notification extends Model
             'warning'          => 'alert-triangle',
             'blacklisted'      => 'shield-check',
             'quiz_announced'   => 'quiz',
+            'group_invite'     => 'users',
             default            => 'bell',
         };
     }
@@ -63,9 +65,11 @@ class Notification extends Model
      * Human-readable message.
      *
      * 'reply' and 'mention' link to a real topic/post via this table's
-     * columns, so we can build a specific message. 'warning', 'blacklisted'
-     * and 'quiz_announced' have no linked row in this schema, so they fall
-     * back to a generic message for their type.
+     * columns, so we can build a specific message. 'warning', 'blacklisted',
+     * 'quiz_announced' and 'group_invite' have no linked row in this schema,
+     * so they fall back to a generic message for their type — the real
+     * detail for group invites lives in the group_invitations table and
+     * the banner on the Groups page, not here.
      */
     public function message(): string
     {
@@ -79,6 +83,7 @@ class Notification extends Model
             'warning'        => 'You have received an inactivity warning',
             'blacklisted'    => 'Your account has been blacklisted',
             'quiz_announced' => 'A new quiz has been announced in one of your groups',
+            'group_invite'   => 'You have a pending group invitation',
             default          => 'You have a new notification',
         };
     }
@@ -92,13 +97,12 @@ class Notification extends Model
             return route('topics.show', $this->topic_id);
         }
 
+        if ($this->type === 'group_invite') {
+            return route('groups.index');
+        }
+
         return route('dashboard');
     }
-
-    /**
-     * Convenience helper for creating a notification from anywhere in the
-     * app, e.g. Notification::notify($userId, 'reply', $post->post_id, $topic->topic_id);
-     */
     public static function notify(int $userId, string $type, ?int $postId = null, ?int $topicId = null): self
     {
         return static::create([

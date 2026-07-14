@@ -140,6 +140,12 @@ use Illuminate\Support\Str;
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4 text-sm font-semibold">
+                {{ session('error') }}
+            </div>
+        @endif
+
         {{-- ORIGINAL TOPIC POST --}}
         <div class="mb-6">
             <div class="bg-white rounded-xl border border-indigo-200 shadow-md overflow-hidden">

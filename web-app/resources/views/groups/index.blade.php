@@ -2,12 +2,10 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Discussion Groups</h2>
-            @if(auth()->user()->system_role === 'system_admin')
-                <a href="{{ route('groups.create') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
-                    + New Group
-                </a>
-            @endif
+            <a href="{{ route('groups.create') }}"
+               class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                + New Group
+            </a>
         </div>
     </x-slot>
 
@@ -16,6 +14,41 @@
 
             @if(session('success'))
                 <div class="mb-4 bg-green-100 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="mb-4 bg-red-100 text-red-700 px-4 py-3 rounded">{{ session('error') }}</div>
+            @endif
+
+            {{-- Pending invitations for this user --}}
+            @if($pendingInvitations->isNotEmpty())
+                <div class="space-y-3 mb-6">
+                    @foreach($pendingInvitations as $invitation)
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+                            <p class="text-sm text-indigo-800">
+                                <span class="font-semibold">{{ $invitation->invitedBy->username ?? 'Someone' }}</span>
+                                invited you to join
+                                <span class="font-semibold">{{ $invitation->group->name ?? 'a group' }}</span>
+                                @if($invitation->group && $invitation->group->course_name)
+                                    <span class="text-indigo-600">({{ $invitation->group->course_name }})</span>
+                                @endif
+                            </p>
+                            <div class="flex gap-2 shrink-0">
+                                <form method="POST" action="{{ route('invitations.accept', $invitation->invitation_id) }}">
+                                    @csrf
+                                    <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-indigo-700">
+                                        Accept
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('invitations.decline', $invitation->invitation_id) }}">
+                                    @csrf
+                                    <button type="submit" class="bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded-md text-xs font-medium hover:bg-gray-50">
+                                        Decline
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
 
             @if($groups->isEmpty())
