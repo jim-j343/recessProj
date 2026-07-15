@@ -12,7 +12,7 @@
         <VBox>
             <!-- Navigation bar -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+                <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link,active"/>
                 <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
 
