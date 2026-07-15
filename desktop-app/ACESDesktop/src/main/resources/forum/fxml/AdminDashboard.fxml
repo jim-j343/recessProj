@@ -12,7 +12,7 @@
         <VBox>
             <!-- Navigation bar -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link,active"/>
                 <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
@@ -133,3 +133,4 @@
         </ScrollPane>
     </center>
 </BorderPane>
+

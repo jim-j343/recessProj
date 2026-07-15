@@ -9,8 +9,6 @@
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.RegisterController"
             stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white;"
             prefWidth="960" prefHeight="760">
-    <fx:define><ToggleGroup fx:id="role"/></fx:define>
-
     <!-- TOP NAV -->
     <top>
         <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:0 0 1 0; -fx-padding:16 32 16 32;">
@@ -49,39 +47,29 @@
                     <VBox spacing="6">
                         <VBox.margin><Insets bottom="16"/></VBox.margin>
                         <Label text="I am a..." styleClass="field-label"/>
-                        <HBox styleClass="segmented-role" alignment="CENTER" spacing="0">
-                            <ToggleButton text="Student"  toggleGroup="$role" selected="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                            <ToggleButton text="Lecturer" toggleGroup="$role" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                            <ToggleButton text="Admin"    toggleGroup="$role" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                        </HBox>
+                        <ComboBox fx:id="roleComboBox" promptText="Select your role" maxWidth="Infinity"/>
                     </VBox>
 
-                    <!-- Student number -->
+                    <!-- Password -->
                     <VBox spacing="6">
                         <VBox.margin><Insets bottom="16"/></VBox.margin>
-                        <Label text="Student Number (if applicable)" styleClass="field-label"/>
-                        <TextField promptText="e.g. 2300700123"/>
+                        <Label text="Password" styleClass="field-label"/>
+                        <RevealPasswordField fx:id="passwordField" maxWidth="Infinity"/>
                     </VBox>
 
-                    <!-- Password + confirm -->
-                    <HBox spacing="16">
+                    <!-- Confirm Password -->
+                    <VBox spacing="6">
                         <VBox.margin><Insets bottom="16"/></VBox.margin>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Password" styleClass="field-label"/>
-                            <RevealPasswordField fx:id="passwordField" promptText="Password" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="Confirm Password" styleClass="field-label"/>
-                            <RevealPasswordField fx:id="confirmField" promptText="Confirm password" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
+                        <Label text="Confirm Password" styleClass="field-label"/>
+                        <RevealPasswordField fx:id="confirmField" maxWidth="Infinity"/>
+                    </VBox>
 
                     <!-- Terms -->
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <VBox.margin><Insets top="4"/></VBox.margin>
                         <CheckBox fx:id="agreeTerms"/>
                         <Label text="I have read and accepted the" styleClass="muted"/>
-                        <Hyperlink text="Terms of Service"/>
+                        <Hyperlink text="Terms of Service" onAction="#onTerms"/>
                     </HBox>
 
                     <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;">

@@ -77,6 +77,11 @@ private void onSignIn() {
         SceneManager.show("Register", "ACES — Create Account");
     }
 
+    @FXML
+    private void onForgotPassword() {
+        SceneManager.show("ForgotPassword", "ACES — Forgot Password");
+    }
+
     private String email() {
         return emailField == null ? "" : emailField.getText();
     }

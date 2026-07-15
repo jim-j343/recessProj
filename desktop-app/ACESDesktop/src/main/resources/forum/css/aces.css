@@ -189,7 +189,7 @@
 
 /* ---------- Inputs ---------- */
 .field-label { -fx-font-size: 13px; -fx-font-weight: 500; -fx-text-fill: -ink-700; }
-.text-input, .text-field, .password-field, .text-area, .combo-box {
+.text-input, .text-field, .password-field, .text-area {
     -fx-background-color: -surface;
     -fx-border-color: -border-300;
     -fx-border-width: 1;
@@ -200,14 +200,67 @@
     -fx-prompt-text-fill: -ink-400;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 2, 0, 0, 1);
 }
-.text-field:focused, .password-field:focused, .text-area:focused, .combo-box:focused {
+.combo-box {
+    -fx-background-color: -surface;
+    -fx-border-color: -border-300;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 14px;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 2, 0, 0, 1);
+}
+.text-field:focused, .password-field:focused, .text-area:focused, .combo-box:focused, .combo-box:showing {
     -fx-border-color: -indigo-500;
     -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.35), 5, 0, 0, 0);
 }
 .text-area .content { -fx-background-color: -surface; }
-.combo-box .list-cell { -fx-text-fill: -ink-700; -fx-padding: 4 8 4 8; }
-.combo-box .arrow-button { -fx-background-color: transparent; }
-.combo-box .arrow { -fx-background-color: -ink-400; }
+
+/* ComboBox Button Cell */
+.combo-box > .list-cell {
+    -fx-text-fill: -ink;
+    -fx-padding: 9 12 9 12;
+    -fx-background-color: transparent;
+}
+.combo-box > .list-cell:empty {
+    -fx-text-fill: -ink-400; /* mimic prompt text color */
+}
+
+/* ComboBox Arrow */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 0;
+}
+.combo-box .arrow {
+    -fx-background-color: -ink-500;
+    -fx-shape: "M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z";
+    -fx-scale-shape: true;
+    -fx-min-width: 12;
+    -fx-min-height: 8;
+}
+
+/* ComboBox Popup styling */
+.combo-box-popup .list-view {
+    -fx-background-color: -surface;
+    -fx-border-color: -border-300;
+    -fx-border-width: 1;
+    -fx-background-radius: 0 0 6 6;
+    -fx-border-radius: 0 0 6 6;
+    -fx-padding: 0;
+}
+.combo-box-popup .list-cell {
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: -ink-700;
+    -fx-background-color: transparent;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: -bg-50;
+    -fx-text-fill: -ink-900;
+}
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #2563eb; /* Matches web indigo/blue selection */
+    -fx-text-fill: white;
+}
 
 /* ---------- Badges / chips ---------- */
 .chip {
