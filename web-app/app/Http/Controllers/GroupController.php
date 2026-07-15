@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Group;
-use App\Models\GroupInvitation;
 use App\Models\GroupMembership;
 use App\Models\GroupRemoval;
-use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,13 +20,7 @@ class GroupController extends Controller
             ->latest()
             ->get();
 
-        $pendingInvitations = GroupInvitation::where('invited_user_id', Auth::id())
-            ->where('status', 'pending')
-            ->with(['group', 'invitedBy'])
-            ->latest()
-            ->get();
-
-        return view('groups.index', compact('groups', 'pendingInvitations'));
+        return view('groups.index', compact('groups'));
     }
 
     public function create()
@@ -193,47 +185,6 @@ class GroupController extends Controller
         ]);
 
         return back()->with('success', "{$user->username} was removed from the group.");
-    }
-
-    public function invite(Request $request, Group $group)
-    {
-        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'username' => ['required', 'string', 'exists:users,username'],
-        ]);
-
-        $invitedUser = User::where('username', $validated['username'])->first();
-
-        if ($invitedUser->user_id === Auth::id()) {
-            return back()->with('error', 'You cannot invite yourself.');
-        }
-
-        if ($group->isMember($invitedUser->user_id)) {
-            return back()->with('error', "{$invitedUser->username} is already a member of this group.");
-        }
-
-        $alreadyPending = GroupInvitation::where('group_id', $group->group_id)
-            ->where('invited_user_id', $invitedUser->user_id)
-            ->where('status', 'pending')
-            ->exists();
-
-        if ($alreadyPending) {
-            return back()->with('error', "{$invitedUser->username} already has a pending invitation to this group.");
-        }
-
-        GroupInvitation::create([
-            'group_id'        => $group->group_id,
-            'invited_user_id' => $invitedUser->user_id,
-            'invited_by'      => Auth::id(),
-            'status'          => 'pending',
-        ]);
-
-        Notification::notify($invitedUser->user_id, 'group_invite');
-
-        return back()->with('success', "Invitation sent to {$invitedUser->username}.");
     }
 
     public function destroy(Group $group)
