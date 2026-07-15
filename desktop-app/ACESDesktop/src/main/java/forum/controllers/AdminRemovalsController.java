@@ -134,11 +134,10 @@ public class AdminRemovalsController {
         }).start();
     }
     
-    @FXML private void onDashboard() { SceneManager.show("AdminDashboard", "Dashboard"); }
-    @FXML private void onGroups() { SceneManager.show("AdminGroupsIndex", "Groups"); }
-
-    @FXML private void onMembers() { SceneManager.show("AdminMembers", "Members"); }
-    @FXML private void onAnalytics() { SceneManager.show("AdminAnalytics", "Analytics"); }
+    @FXML private void onDashboard() { SceneManager.goAdminDashboard(); }
+    @FXML private void onGroups() { SceneManager.goGroups(); }
+    @FXML private void onMembers() { SceneManager.goAdminMembers(); }
+    @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
     
     @FXML private void onProfile() { SceneManager.show("ProfileEdit", "Profile"); }
     

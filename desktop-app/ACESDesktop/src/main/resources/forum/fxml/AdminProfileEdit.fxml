@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Profile — mirrors web profile/edit.blade.php -->
+<!-- Profile â€” mirrors web profile/edit.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.ProfileController"
             stylesheets="@../css/aces.css" styleClass="root"
@@ -11,18 +11,23 @@
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                        <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                    </javafx.scene.image.ImageView>
+                    <Label text="Smart Discussion Forum" styleClass="brand"/>
+                </HBox>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
                 <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 
-                <!-- Notification bell — populated dynamically from backend -->
+                <!-- Notification bell â€” populated dynamically from backend -->
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
                         <StackPane>
-                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label text="ðŸ””" style="-fx-font-size: 16px;"/>
                             <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
                                    style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
                                    StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
@@ -43,8 +48,8 @@
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                        <MenuItem text="âœ“  Profile" onAction="#onProfile"/>
+                        <MenuItem text="â†’  Log Out" onAction="#onLogout"/>
                     </items>
                 </MenuButton>
             </HBox>
@@ -108,3 +113,4 @@
         </ScrollPane>
     </center>
 </BorderPane>
+
