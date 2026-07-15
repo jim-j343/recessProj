@@ -234,4 +234,51 @@ class AdminController extends Controller
             ] : null,
         ];
     }
+
+    public function removals(Request $request)
+    {
+        $filter = $request->query('filter', 'unreviewed');
+        $query = \App\Models\GroupRemoval::with(['group', 'removedUser', 'removedBy', 'reviewedBy']);
+
+        if ($filter === 'unreviewed') {
+            $query->where('reviewed', false);
+        } elseif ($filter === 'reviewed') {
+            $query->where('reviewed', true);
+        }
+
+        return response()->json([
+            'filter' => $filter,
+            'removals' => $query->latest('created_at')->get()->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'group_name' => $r->group ? $r->group->name : 'Unknown',
+                    'removed_user' => $r->removedUser ? $r->removedUser->username : 'Unknown',
+                    'removed_by' => $r->removedBy ? $r->removedBy->username : 'Unknown',
+                    'reason' => $r->reason,
+                    'reviewed' => (bool) $r->reviewed,
+                    'reviewed_by' => $r->reviewedBy ? $r->reviewedBy->username : null,
+                    'created_at' => $r->created_at ? $r->created_at->toISOString() : null,
+                    'created_at_human' => $r->created_at ? $r->created_at->diffForHumans() : null,
+                ];
+            })
+        ]);
+    }
+
+    public function markRemovalReviewed(\App\Models\GroupRemoval $removal)
+    {
+        $removal->update([
+            'reviewed'    => true,
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Removal marked as reviewed.',
+            'removal' => [
+                'id' => $removal->id,
+                'reviewed' => true,
+                'reviewed_by' => Auth::user()->username,
+            ]
+        ]);
+    }
 }

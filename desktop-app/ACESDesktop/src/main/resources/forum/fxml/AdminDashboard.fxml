@@ -15,8 +15,10 @@
                 <javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link,active"/>
                 <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
+
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
+                <Label text="Removals"   onMouseClicked="#onRemovals"   styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <!-- Notification bell — populated dynamically from backend -->

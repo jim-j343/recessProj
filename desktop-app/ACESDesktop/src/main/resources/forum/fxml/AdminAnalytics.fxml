@@ -13,8 +13,10 @@
             <Label text="Smart Discussion Forum" styleClass="brand"/>
             <Label text="Dashboard" onMouseClicked="#onDashboard" styleClass="nav-link"/>
             <Label text="Groups" onMouseClicked="#onGroups" styleClass="nav-link"/>
+
             <Label text="Members" onMouseClicked="#onMembers" styleClass="nav-link"/>
             <Label text="Analytics" onMouseClicked="#onAnalytics" styleClass="nav-link,active"/>
+            <Label text="Removals" onMouseClicked="#onRemovals" styleClass="nav-link"/>
             <Region HBox.hgrow="ALWAYS"/>
             <!-- Notification bell -->
             <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
