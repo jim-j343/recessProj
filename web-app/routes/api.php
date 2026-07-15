@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/topics',                [ForumController::class, 'store']);
     Route::get('/topics/{topic}',         [ForumController::class, 'show']);
     Route::post('/topics/{topic}/posts',  [ForumController::class, 'storePost']);
+    Route::get('/participation/grade-json', [\App\Http\Controllers\ParticipationController::class, 'gradeJson']);
+    Route::post('/participation/grade-json', [\App\Http\Controllers\ParticipationController::class, 'saveGrades']);
 
         // Groups
     Route::get('/groups', [GroupApiController::class, 'index']);
