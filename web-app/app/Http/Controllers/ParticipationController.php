@@ -182,7 +182,7 @@ class ParticipationController extends Controller
 
     public function gradeJson(Request $request): \Illuminate\Http\JsonResponse
     {
-        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
+        $lecturerGroupIds = GroupMembership::where('user_id', $request->user()->user_id)
             ->where('status', 'active')
             ->pluck('group_id');
 
@@ -229,5 +229,20 @@ class ParticipationController extends Controller
         });
 
         return response()->json($rows->values());
+    }
+    public function saveGrades(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $grades = $request->input('grades', []);
+        foreach ($grades as $userId => $data) {
+            \App\Models\ParticipationScore::updateOrCreate(
+                ['user_id' => (int) $userId],
+                [
+                    'criteria' => $data['grade'] ?? '',
+                    'remarks'  => $data['remark'] ?? '',
+                    'scored_by' => $request->user()->user_id,
+                ]
+            );
+        }
+        return response()->json(['message' => 'Grades saved.']);
     }
 }

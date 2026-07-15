@@ -107,8 +107,7 @@ public class ParticipationGradingController {
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
                 HttpRequest req = HttpRequest.newBuilder(
-                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                .replace("/api", "") + "/participation/grade-json"))
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .GET().build();
@@ -168,8 +167,7 @@ public class ParticipationGradingController {
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
                 HttpRequest req = HttpRequest.newBuilder(
-                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                .replace("/api", "") + "/participation/grade"))
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json"))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json")
