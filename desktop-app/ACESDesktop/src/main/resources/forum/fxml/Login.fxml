@@ -25,13 +25,12 @@
 <!-- Branding -->
 <VBox alignment="CENTER" spacing="4">
     <padding><Insets bottom="24"/></padding>
-    <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
+    <ImageView fitWidth="90" fitHeight="90" preserveRatio="true">
         <VBox.margin><Insets bottom="12"/></VBox.margin>
         <image>
-            <Image url="@../images/aces-logo.png"/>
+            <Image url="@../images/logo.jpg"/>
         </image>
     </ImageView>
-    <javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
     <Label text="Sign in to continue to your account" styleClass="muted"/>
 </VBox>
 

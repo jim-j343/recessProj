@@ -1,18 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import forum.ui.RevealPasswordField?>
 <?import forum.ui.IconTextField?>
 
-<!-- Register / Onboarding — mirrors web auth/register.blade.php (full-width) -->
+<!-- Register / Onboarding â€” mirrors web auth/register.blade.php (full-width) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.RegisterController"
             stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white;"
             prefWidth="960" prefHeight="760">
     <!-- TOP NAV -->
     <top>
         <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:0 0 1 0; -fx-padding:16 32 16 32;">
-            <Label text="Smart Discussion Forum" styleClass="brand"/>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                    <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                        <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                    </javafx.scene.image.ImageView>
+                    <Label text="Smart Discussion Forum" styleClass="brand"/>
+                </HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Hyperlink text="Help" styleClass="muted"/>
         </HBox>
@@ -94,7 +99,8 @@
         <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0; -fx-padding:14 32 14 32;">
             <Label text="Smart Discussion Forum" styleClass="subtle"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label text="© 2026 Smart Discussion Forum. All rights reserved." styleClass="subtle"/>
+            <Label text="Â© 2026 Smart Discussion Forum. All rights reserved." styleClass="subtle"/>
         </HBox>
     </bottom>
 </BorderPane>
+
