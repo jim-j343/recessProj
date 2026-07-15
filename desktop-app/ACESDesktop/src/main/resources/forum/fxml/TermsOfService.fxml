@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.TermsOfServiceController"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-border-width: 1;"
+            prefWidth="672" prefHeight="500">
+
+    <top>
+        <VBox style="-fx-border-color: #e5e7eb; -fx-border-width: 0 0 1 0; -fx-padding: 20 32 20 32;">
+            <Label text="Platform Rules and Terms of Service" style="-fx-font-weight: bold; -fx-text-fill: #1f2937; -fx-font-size: 16px;"/>
+            <Label text="Version 1.0.0 · Last Updated June 2026" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;">
+                <VBox.margin><Insets top="4"/></VBox.margin>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" style="-fx-background-color: transparent; -fx-padding: 24 32 24 32;">
+            <VBox spacing="24" style="-fx-background-color: transparent;">
+                
+                <VBox spacing="8">
+                    <Label text="1. Acceptable Use Policy" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    <Label text="Users of the Smart Discussion Forum are strictly prohibited from utilizing the system for any purpose other than authorized academic discussion and learning." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Label text="• All identity information provided must be verifiable through official university records.&#10;• Automated scripts or bot interactions are strictly prohibited.&#10;• Users are responsible for maintaining the confidentiality of their credentials.&#10;• Data scraping of internal content is a violation of this policy." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="2. Data Privacy &amp; Processing" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    <Label text="The Smart Discussion Forum processes submitted data under applicable data protection frameworks. Your identification and email are encrypted at rest." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Label text="• Data is stored for the duration of your academic tenure.&#10;• Personal data is never shared with third-party vendors.&#10;• System logs include IP address and interaction timestamps for security auditing." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="3. Academic Integrity" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    <Label text="All forum contributions must represent the student's own thoughts and ideas." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Label text="• Plagiarism or copying of other students' posts is prohibited.&#10;• Respectful and constructive engagement is required at all times.&#10;• Offensive, abusive, or discriminatory content will result in immediate account suspension." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="4. Quiz Conduct" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    <Label text="• Quiz sessions are timed and monitored.&#10;• Attempting to share quiz questions or answers is strictly prohibited.&#10;• Any form of cheating will result in a zero grade and disciplinary action." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                </VBox>
+
+                <VBox spacing="8">
+                    <Label text="5. Account Termination" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    <Label text="The administration reserves the right to suspend or permanently remove any account that violates these terms without prior notice." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" style="-fx-border-color: #e5e7eb; -fx-border-width: 1 0 0 0; -fx-background-color: #f9fafb; -fx-padding: 16 32 16 32; -fx-background-radius: 0 0 8 8;">
+            <Label text="Please read all terms before checking the box on the registration form." style="-fx-text-fill: #6b7280; -fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Close" onAction="#onClose" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-padding: 8 16 8 16; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

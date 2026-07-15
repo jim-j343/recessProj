@@ -10,12 +10,7 @@
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-<HBox alignment="CENTER_LEFT" spacing="8">
-    <javafx.scene.image.ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
-        <image><javafx.scene.image.Image url="@../images/aces-logo.png"/></image>
-    </javafx.scene.image.ImageView>
-    <Label text="ACES" styleClass="brand"/>
-</HBox>
+<javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard"   styleClass="nav-link,active"/>
                 <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
                 <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
