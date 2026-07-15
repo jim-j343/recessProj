@@ -66,6 +66,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/analytics', [AdminController::class, 'analytics']);
         Route::post('/blacklist/{user}', [AdminController::class, 'blacklistMember']);
         Route::post('/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist']);
+        Route::get('/removals', [AdminController::class, 'removals']);
+        Route::post('/removals/{removal}/review', [AdminController::class, 'markRemovalReviewed']);
     });
 
 });

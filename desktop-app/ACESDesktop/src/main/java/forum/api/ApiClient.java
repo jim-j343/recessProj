@@ -8,7 +8,8 @@ import forum.api.dto.NotificationDto;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
-
+import forum.api.dto.AdminRemovalDto;
+import forum.api.dto.AdminRemovalsResponseDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -325,6 +326,22 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
                 .POST(HttpRequest.BodyPublishers.noBody()).build());
         ok(resp);
         return mapper.treeToValue(mapper.readTree(resp.body()).get("member"), AdminMemberDto.class);
+    }
+
+    public AdminRemovalsResponseDto getRemovals(String token, String filter)
+            throws ApiException, IOException, InterruptedException {
+        String path = "/admin/removals";
+        if (filter != null && !filter.isBlank()) path += "?filter=" + encode(filter);
+        HttpResponse<String> resp = send(request(path, token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), AdminRemovalsResponseDto.class);
+    }
+
+    public void markRemovalReviewed(String token, long removalId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/admin/removals/" + removalId + "/review", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
     }
 
     // ---------------------------------------------------------------

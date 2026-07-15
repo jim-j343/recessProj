@@ -229,6 +229,8 @@ public class AdminAnalyticsController {
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
+    @FXML private void onRemovals() { SceneManager.goAdminRemovals(); }
+
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
     @FXML

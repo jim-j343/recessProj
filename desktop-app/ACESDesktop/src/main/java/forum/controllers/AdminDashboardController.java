@@ -235,6 +235,8 @@ public class AdminDashboardController {
     @FXML private void onMembers()    { SceneManager.goAdminMembers(); }
     @FXML private void onGroups()     { SceneManager.goGroups(); }
 
+    @FXML private void onRemovals()   { SceneManager.goAdminRemovals(); }
+
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
     @FXML

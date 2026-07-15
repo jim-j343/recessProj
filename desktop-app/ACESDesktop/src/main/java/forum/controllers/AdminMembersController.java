@@ -335,8 +335,10 @@ public class AdminMembersController {
 
     @FXML private void onDashboard() { SceneManager.goAdminDashboard(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onMembers()   { /* already here */ }
+    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+
+    @FXML private void onRemovals()  { SceneManager.goAdminRemovals(); }
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 

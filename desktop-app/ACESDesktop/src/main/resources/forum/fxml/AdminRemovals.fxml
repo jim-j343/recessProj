@@ -4,22 +4,23 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="forum.controllers.GroupsIndexController"
+            fx:controller="forum.controllers.AdminRemovalsController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
         <VBox>
+            <!-- Navigation bar -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <javafx.scene.image.ImageView fitWidth="40" fitHeight="40" preserveRatio="true">
+                    <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                </javafx.scene.image.ImageView>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
-                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link,active"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
 
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
-                <Label text="Removals"   onMouseClicked="#onRemovals"   styleClass="nav-link"/>
+                <Label text="Removals"   styleClass="nav-link,active"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                
-                <!-- Notification bell -->
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
                         <StackPane>
@@ -30,12 +31,7 @@
                                    managed="false" visible="false"/>
                         </StackPane>
                     </graphic>
-                    <items>
-                        <!-- Items populated by NavbarHelper.loadNotifications() -->
-                    </items>
                 </MenuButton>
-
-                <!-- Profile Dropdown -->
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
@@ -49,25 +45,38 @@
                     </items>
                 </MenuButton>
             </HBox>
+            <!-- Page header -->
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
-                <Label text="Discussion Groups" styleClass="page-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="newGroupBtn" text="+ New Group"
-                        styleClass="btn,btn-primary"
-                        onAction="#onNewGroup"
-                        managed="false" visible="false"/>
+                <Label text="Group Removal Reports" styleClass="page-title"/>
             </HBox>
         </VBox>
     </top>
-
     <center>
         <ScrollPane fitToWidth="true" styleClass="content">
             <VBox alignment="TOP_CENTER" style="-fx-padding: 0;">
-                <Label fx:id="statusLabel" styleClass="muted" managed="false" visible="false"
-                       style="-fx-padding: 32 0 0 0;"/>
-                <FlowPane fx:id="groupsPane" hgap="24" vgap="24"
-                          prefWrapLength="1120" maxWidth="1120"
-                          style="-fx-padding: 32 0 32 0;"/>
+                <VBox spacing="24" maxWidth="1120" style="-fx-padding: 32 0 32 0;">
+                    
+                    <Label fx:id="statusLabel" text="" managed="false" visible="false" styleClass="muted" wrapText="true"/>
+                    
+                    <HBox spacing="8" styleClass="segmented-blue">
+                        <ToggleButton fx:id="btnNeedsReview" text="Needs Review" selected="true"/>
+                        <ToggleButton fx:id="btnReviewed"    text="Reviewed"/>
+                        <ToggleButton fx:id="btnAll"         text="All"/>
+                    </HBox>
+                    
+                    <TableView fx:id="removalsTable" prefHeight="120">
+                        <columns>
+                            <TableColumn fx:id="colMember"   text="REMOVED MEMBER" prefWidth="200"/>
+                            <TableColumn fx:id="colGroup"    text="GROUP"          prefWidth="200"/>
+                            <TableColumn fx:id="colRemovedBy" text="REMOVED BY"    prefWidth="150"/>
+                            <TableColumn fx:id="colReason"   text="REASON"         prefWidth="300"/>
+                            <TableColumn fx:id="colWhen"     text="WHEN"           prefWidth="120"/>
+                            <TableColumn fx:id="colStatus"   text="STATUS"         prefWidth="100"/>
+                        </columns>
+                        <placeholder><Label text="No removal reports." styleClass="muted"/></placeholder>
+                    </TableView>
+                    
+                </VBox>
             </VBox>
         </ScrollPane>
     </center>
