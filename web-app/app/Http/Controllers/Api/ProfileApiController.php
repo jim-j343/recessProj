@@ -44,13 +44,13 @@ class ProfileApiController extends Controller
         $user = $request->user();
 
         // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (!Hash::check($request->current_password, $user->password_hash)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The current password is incorrect.'],
             ]);
         }
 
-        $user->password = Hash::make($request->password);
+        $user->password_hash = Hash::make($request->password);
         $user->save();
 
         return response()->json(['message' => 'Password updated successfully.']);

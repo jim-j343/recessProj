@@ -6,26 +6,26 @@
 <!-- Assessment Overview — mirrors web participation/index.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/aces.css" styleClass="root"
-            prefWidth="1280" prefHeight="820">
+            prefWidth="1280" prefHeight="820" fx:controller="forum.controllers.StudentAssessmentController">
     <top>
         <HBox styleClass="navbar" alignment="CENTER_LEFT">
             <Label text="Smart Discussion Forum" styleClass="brand"/>
-            <Label text="Dashboard" styleClass="nav-link"/>
-            <Label text="Groups" styleClass="nav-link"/>
+            <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
+            <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
             <Label text="My Progress" styleClass="nav-link,active"/>
             <Region HBox.hgrow="ALWAYS"/>
             <MenuButton styleClass="btn-ghost" text="">
-                    <graphic>
-                        <HBox alignment="CENTER_LEFT" spacing="8">
-                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
-                            <Label fx:id="userNameLabel" text="Signed in"/>
-                        </HBox>
-                    </graphic>
-                    <items>
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
-                    </items>
-                </MenuButton>
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                        <Label fx:id="userNameLabel" text="Signed in"/>
+                    </HBox>
+                </graphic>
+                <items>
+                    <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                    <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                </items>
+            </MenuButton>
         </HBox>
     </top>
 
@@ -74,36 +74,17 @@
 
                         <!-- Assessment history -->
                         <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
-                            <HBox alignment="CENTER_LEFT"><Label text="Assessment History" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/><Hyperlink text="Download All ↓" styleClass="subtle"/></HBox>
-                            <HBox alignment="CENTER_LEFT" spacing="12">
-                                <VBox HBox.hgrow="ALWAYS"><Label text="Advanced React Patterns" styleClass="label-strong"/><Label text="Completed Oct 14, 2024" styleClass="subtle"/></VBox>
-                                <Label text="92%" styleClass="label-strong"/>
-                                <Label text="+12%" styleClass="badge,badge-success"/>
-                            </HBox>
-                            <Region styleClass="divider" prefHeight="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="12">
-                                <VBox HBox.hgrow="ALWAYS"><Label text="Data Structures II" styleClass="label-strong"/><Label text="Completed Oct 08, 2024" styleClass="subtle"/></VBox>
-                                <Label text="85%" styleClass="label-strong"/>
-                                <Label text="+4%" styleClass="badge,badge-success"/>
-                            </HBox>
-                            <Region styleClass="divider" prefHeight="1"/>
-                            <HBox alignment="CENTER_LEFT" spacing="12">
-                                <VBox HBox.hgrow="ALWAYS"><Label text="System Architecture" styleClass="label-strong"/><Label text="Completed Sep 29, 2024" styleClass="subtle"/></VBox>
-                                <Label text="78%" styleClass="label-strong"/>
-                                <Label text="-2%" styleClass="badge,badge-danger"/>
-                            </HBox>
-                            <Label text="Showing 3 of 12 assessments" styleClass="subtle"/>
+                            <Label text="Assessment History" styleClass="card-title"/>
+                            <Label text="Your quiz results and participation scores will appear here."
+                                styleClass="subtle" wrapText="true"/>
                         </VBox>
                     </HBox>
 
                     <!-- Professor's insight -->
                     <VBox styleClass="card-dark" spacing="12">
                         <Label text="Professor's Insight" styleClass="eyebrow-invert"/>
-                        <Label text="&quot;Alex demonstrates exceptional mastery of front-end logic. For the final capstone, focus on optimizing the render cycles in the 'Advanced Patterns' module to achieve top-tier performance benchmarks.&quot;" styleClass="body-invert" wrapText="true"/>
-                        <HBox spacing="12">
-                            <Button text="SCHEDULE OFFICE HOURS" styleClass="btn" style="-fx-background-color:white; -fx-text-fill:#111827;"/>
-                            <Button text="VIEW CURATED RESOURCES" styleClass="btn,btn-ghost-invert"/>
-                        </HBox>
+                        <Label text="Your participation and engagement data will appear here once assessed by your lecturer."
+                            styleClass="body-invert" wrapText="true"/>
                     </VBox>
                 </VBox>
             </VBox>

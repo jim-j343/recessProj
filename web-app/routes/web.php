@@ -36,7 +36,7 @@ Route::get('/dashboard', function (\Illuminate\Http\Request $request) {
     // This is just a defensive fallback — send them somewhere real rather than
     // an all-mock page.
     return redirect()->route('login');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 // User Profile routes
 Route::middleware('auth')->group(function () {
