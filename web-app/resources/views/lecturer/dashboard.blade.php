@@ -61,19 +61,50 @@
                     <div class="space-y-3">
                         <a href="{{ route('quiz.create') }}"
                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-700">
-                            📝 Create a new quiz
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none"
+     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M16.862 4.487l1.651-1.652a2.121 2.121 0 113 3L10.582 16.767a4.5 4.5 0 01-1.897 1.13L6 18l.103-2.685a4.5 4.5 0 011.13-1.897L16.862 4.487z"/>
+</svg>
+
+<span>Create a new quiz</span>
                         </a>
                         <a href="{{ route('topics.create') }}"
                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-700">
-                            💬 Post a new topic
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600"
+     fill="none" viewBox="0 0 24 24"
+     stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8 10h8M8 14h5m-8 6l-4-4V5a2 2 0 012-2h14a2 2 0 012 2v11a2 2 0 01-2 2H7l-3 3z"/>
+</svg>
+
+<span>Post a new topic</span>
                         </a>
                         <a href="{{ route('forum.index') }}"
                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-700">
-                            👁 View forum
+                           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-600"
+     fill="none" viewBox="0 0 24 24"
+     stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.458 12C3.732 7.943 7.523 5 12 5
+             c4.478 0 8.268 2.943 9.542 7
+             -1.274 4.057-5.064 7-9.542 7
+             -4.477 0-8.268-2.943-9.542-7z"/>
+    <circle cx="12" cy="12" r="3"/>
+</svg>
+
+<span>View forum</span>
                         </a>
                         <a href="{{ route('participation.grade') }}"
                            class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-700">
-                            🏆 Award participation marks
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-500"
+     fill="none" viewBox="0 0 24 24"
+     stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4zm10 1h3a2 2 0 010 4h-3M7 5H4a2 2 0 000 4h3"/>
+</svg>
+
+<span>Award participation marks</span>
                         </a>
                     </div>
                 </div>
