@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\ActivityLog;
+use App\Models\GroupMembership;
 use App\Models\Notification;
+use App\Models\PostReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,12 +59,49 @@ class PostController extends Controller
             ->with('success', 'Reply posted!');
     }
 
-    // Flag a post as irrelevant (requirement 1)
-    public function flag(Post $post)
+    // Report a post to the system admin — only someone who shares the
+    // post's group can report it, matching the same scoping used
+    // throughout the group-admin tools
+    public function flag(Request $request, Post $post)
     {
+        $post->load('topic');
+        $groupId = $post->topic->group_id ?? null;
+
+        $isMember = $groupId && GroupMembership::where('user_id', Auth::id())
+            ->where('group_id', $groupId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isMember) {
+            abort(403);
+        }
+
+        if ($post->author_id === Auth::id()) {
+            return back()->with('error', 'You cannot report your own post.');
+        }
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        $alreadyReported = PostReport::where('post_id', $post->post_id)
+            ->where('reported_by', Auth::id())
+            ->exists();
+
+        if ($alreadyReported) {
+            return back()->with('error', 'You have already reported this post.');
+        }
+
+        PostReport::create([
+            'post_id'     => $post->post_id,
+            'reported_by' => Auth::id(),
+            'reason'      => $validated['reason'],
+            'reviewed'    => false,
+        ]);
+
         $post->update(['is_flagged' => true]);
 
-        return back()->with('success', 'Post flagged for review.');
+        return back()->with('success', 'Post reported. A system admin will review it.');
     }
 
     public function edit(Post $post)

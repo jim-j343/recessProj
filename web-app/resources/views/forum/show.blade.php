@@ -239,6 +239,15 @@ use Illuminate\Support\Str;
                                         <button type="submit" class="w-full text-left px-3 py-1.5 text-red-600 hover:bg-red-50">🗑️ Delete</button>
                                     </form>
                                 </div>
+                            @else
+                                {{-- Report trigger — same corner as the own-message
+                                     menu, always visible so it's easy to find --}}
+                                <button type="button" onclick="openReportModal({{ $post->post_id }})"
+                                    class="absolute top-1.5 right-1.5 w-5 h-5 flex items-center justify-center
+                                           rounded-full bg-black/10 hover:bg-black/20 text-gray-700 text-xs leading-none"
+                                    title="Report this post">
+                                    🚩
+                                </button>
                             @endif
 
                             @unless($isOwn)
@@ -308,6 +317,31 @@ use Illuminate\Support\Str;
 
     </main>
 
+    {{-- Report post modal --}}
+    <div id="report-post-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-gray-900">Report this post</h3>
+                <button onclick="closeReportModal()" class="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-3">
+                This sends a report to the system admin for review. It won't remove the post or notify its author.
+            </p>
+            <form id="report-post-form" method="POST" action="">
+                @csrf
+                <label class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                <textarea name="reason" rows="3" required placeholder="Why are you reporting this post?"
+                    class="w-full border-gray-300 rounded-md shadow-sm text-sm mb-3"></textarea>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeReportModal()" class="text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- STICKY REPLY BAR --}}
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10">
         <div class="max-w-3xl mx-auto">
@@ -372,6 +406,14 @@ use Illuminate\Support\Str;
             const preview = document.getElementById('attachment-preview');
             preview.classList.add('hidden');
             preview.classList.remove('flex');
+        }
+
+        function openReportModal(postId) {
+            document.getElementById('report-post-form').action = `/posts/${postId}/flag`;
+            document.getElementById('report-post-modal').classList.remove('hidden');
+        }
+        function closeReportModal() {
+            document.getElementById('report-post-modal').classList.add('hidden');
         }
 
         // Auto-grow the reply textarea as the user types, so the full
