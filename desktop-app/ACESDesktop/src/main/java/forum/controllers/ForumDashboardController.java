@@ -33,11 +33,17 @@ public class ForumDashboardController {
     @FXML private Label navNewTopic;
     @FXML private Label navQuizCenter;
     @FXML private Label navGrading;
+    @FXML private Label navMembers;
+    @FXML private Label navAnalytics;
+    @FXML private Label navModeration;
     
     @FXML private VBox myGroupsBox;
     @FXML private TextField searchField;
     @FXML private VBox discussionList;
     @FXML private VBox unansweredBox;
+
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
 
     private final TopicDao topicDao = new TopicDao();
     private final ApiClient api = new ApiClient();
@@ -61,6 +67,15 @@ public class ForumDashboardController {
                 navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
                 navGrading.setManaged(true); navGrading.setVisible(true);
             }
+            if (u.getRole() == forum.models.Role.SYSTEM_ADMIN && navMembers != null) {
+                navMembers.setManaged(true); navMembers.setVisible(true);
+                navAnalytics.setManaged(true); navAnalytics.setVisible(true);
+                navModeration.setManaged(true); navModeration.setVisible(true);
+            }
+        }
+
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
         renderTopics(topicDao.listRecent(15));
@@ -210,12 +225,14 @@ public class ForumDashboardController {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onGroups() { SceneManager.goGroups(); }
+    @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onNewTopic()  { SceneManager.goTopicCreation(); }
     @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
-    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
-    @FXML private void onNewThread() { SceneManager.show("TopicCreation", "ACES — New Topic"); }
-    @FXML private void onProfile() { SceneManager.goProfile(); }
+    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
+    @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+    @FXML private void onModeration() { SceneManager.goAdminModeration(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
 
     @FXML private void onLogout() {
         String token = Session.authToken();

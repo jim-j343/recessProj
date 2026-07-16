@@ -37,6 +37,29 @@ public final class SceneManager {
         }
     }
 
+    public static <T> T showAndGetController(String fxmlName, String title) {
+        if (stage == null) throw new IllegalStateException("SceneManager not initialised");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneManager.class.getResource("/forum/fxml/" + fxmlName + ".fxml"));
+            Parent root = loader.load();
+            Scene existing = stage.getScene();
+            if (existing == null) {
+                stage.setScene(new Scene(root));
+            } else {
+                existing.setRoot(root);
+            }
+            stage.setTitle(title);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+            stage.show();
+            return loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void showHomeFor(forum.models.Role role) {
         switch (role) {
             case LECTURER     -> show("LecturerDashboard", "ACES — Lecturer");
@@ -56,6 +79,14 @@ public final class SceneManager {
         }
     }
     public static void goGroupShow()          { show("GroupShow",            "ACES — Group"); }
+    public static void showGroup(long groupId) {
+        // Find group and set ViewState, or assume ViewState is already set
+        show("GroupShow", "ACES — Group");
+    }
+    public static void goGroupEdit(forum.api.dto.GroupDto group) {
+        forum.controllers.GroupEditController controller = showAndGetController("GroupEdit", "ACES — Edit Group");
+        if (controller != null) controller.setGroup(group);
+    }
     public static void goNotifications()      { show("NotificationsIndex",   "ACES — Notifications"); }
     public static void goForumDashboard()     { show("ForumDashboard",       "ACES — Forum"); }
     public static void goTopicCreation()      { show("TopicCreation",        "ACES — New Topic"); }

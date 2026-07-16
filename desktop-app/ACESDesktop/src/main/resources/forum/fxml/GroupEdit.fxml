@@ -3,9 +3,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Create New Group — mirrors web groups/create.blade.php -->
+<!-- Edit Group -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="forum.controllers.GroupCreateController"
+            fx:controller="forum.controllers.GroupEditController"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820">
     <top>
@@ -14,6 +14,13 @@
                 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link,active" onMouseClicked="#onGroups"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+                <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
+                <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
+                <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
+                <Label fx:id="navMembers" text="Members" styleClass="nav-link" onMouseClicked="#onMembers" managed="false" visible="false"/>
+                <Label fx:id="navAnalytics" text="Analytics" styleClass="nav-link" onMouseClicked="#onAnalytics" managed="false" visible="false"/>
+                <Label fx:id="navModeration" text="Moderation" styleClass="nav-link" onMouseClicked="#onModeration" managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
@@ -42,7 +49,7 @@
                 </MenuButton>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
-                <Label text="Create New Group" styleClass="page-title"/>
+                <Label text="Edit Group" styleClass="page-title"/>
             </HBox>
         </VBox>
     </top>
@@ -56,6 +63,10 @@
                         <VBox spacing="6">
                             <Label text="Group Name *" styleClass="field-label"/>
                             <TextField fx:id="nameField" promptText="e.g. Computer Science Year 2"/>
+                        </VBox>
+                        <VBox spacing="6">
+                            <Label text="Course Name *" styleClass="field-label"/>
+                            <TextField fx:id="courseField" promptText="e.g. CS201"/>
                         </VBox>
                         <VBox spacing="6">
                             <Label text="Description (optional)" styleClass="field-label"/>
@@ -75,7 +86,7 @@
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" spacing="16">
                             <Hyperlink text="Cancel" onAction="#onCancel" styleClass="muted"/>
-                            <Button fx:id="submitBtn" text="Create Group" styleClass="btn,btn-primary" onAction="#onSubmit"/>
+                            <Button fx:id="submitBtn" text="Save Changes" styleClass="btn,btn-primary" onAction="#onSubmit"/>
                         </HBox>
                     </VBox>
                 </VBox>
@@ -83,4 +94,3 @@
         </ScrollPane>
     </center>
 </BorderPane>
-

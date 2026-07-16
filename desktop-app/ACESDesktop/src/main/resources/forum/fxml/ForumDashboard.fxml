@@ -13,13 +13,29 @@
             <!-- NAV BAR -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
-<Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
-<Label text="Groups"    styleClass="nav-link" onMouseClicked="#onGroups"/>
-<Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
-<Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
-<Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
-<Label fx:id="navGrading"    text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+                <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
+                <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
+                <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
+                <Label fx:id="navMembers" text="Members" styleClass="nav-link" onMouseClicked="#onMembers" managed="false" visible="false"/>
+                <Label fx:id="navAnalytics" text="Analytics" styleClass="nav-link" onMouseClicked="#onAnalytics" managed="false" visible="false"/>
+                <Label fx:id="navModeration" text="Moderation" styleClass="nav-link" onMouseClicked="#onModeration" managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                    </items>
+                </MenuButton>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
                     <Label fx:id="avatarLabel" text="?" styleClass="avatar" minWidth="32" minHeight="32"/>
                     <Label fx:id="userNameLabel" text="Signed in"/>
@@ -31,7 +47,7 @@
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Discussion Forum" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="+ New Topic" styleClass="btn,btn-primary" onAction="#onNewThread"/>
+                <Button text="+ New Topic" styleClass="btn,btn-primary" onAction="#onNewTopic"/>
             </HBox>
         </VBox>
     </top>

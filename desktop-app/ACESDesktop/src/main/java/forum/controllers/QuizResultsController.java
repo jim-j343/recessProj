@@ -30,8 +30,8 @@ public class QuizResultsController {
         if (u != null) {
             userNameLabel.setText(u.displayName());
             if (avatarLabel != null) {
-                String name = u.displayName().trim();
-                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
         }
 

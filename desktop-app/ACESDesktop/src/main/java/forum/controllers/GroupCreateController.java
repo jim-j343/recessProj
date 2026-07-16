@@ -25,6 +25,9 @@ public class GroupCreateController {
     @FXML private Button    submitBtn;
     @FXML private Label     statusLabel;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ApiClient api = new ApiClient();
 
     @FXML
@@ -33,6 +36,9 @@ public class GroupCreateController {
         if (u != null) {
             avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
     }
 

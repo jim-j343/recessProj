@@ -226,6 +226,52 @@ public void approveMember(String token, long groupId, long userId)
     ok(resp);
 }
 
+/** PUT /api/groups/{id} */
+public GroupDto updateGroup(String token, long groupId, String name, String courseName, String description, int warningDays, int blacklistDays)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("name", name);
+    body.put("course_name", courseName);
+    body.put("description", description);
+    body.put("inactivity_warning_days", warningDays);
+    body.put("blacklist_duration_days", blacklistDays);
+    HttpResponse<String> resp = send(request("/groups/" + groupId, token)
+            .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+    return mapper.readValue(resp.body(), GroupDto.class);
+}
+
+/** DELETE /api/groups/{id} */
+public void deleteGroup(String token, long groupId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups/" + groupId, token)
+            .DELETE().build());
+    ok(resp);
+}
+
+/** POST /api/groups/{id}/add-member */
+public void addMemberGroup(String token, long groupId, String username)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("username", username);
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/add-member", token)
+            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+}
+
+/** DELETE /api/groups/{id}/members/{userId} */
+public void removeMemberGroup(String token, long groupId, long userId, String reason)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("reason", reason);
+    
+    // HTTP DELETE with body isn't fully supported by all servers/clients, 
+    // but Java 11 HttpClient supports custom methods. We use method("DELETE", body).
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/members/" + userId, token)
+            .method("DELETE", HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+}
+
 // ---------------------------------------------------------------
 //  Lecturer
 // ---------------------------------------------------------------
