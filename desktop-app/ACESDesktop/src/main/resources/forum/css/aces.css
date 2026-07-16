@@ -139,7 +139,7 @@
 .btn-primary:hover { -fx-background-color: -indigo-700; }
 .btn-dark          { -fx-background-color: -ink; -fx-text-fill: white; }
 .btn-dark:hover    { -fx-background-color: -ink-700; }
-.btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; }
+.btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; -fx-alignment: center-left; }
 .btn-secondary:hover { -fx-background-color: -border; }
 .btn-outline       { -fx-background-color: -surface; -fx-text-fill: -ink-700; -fx-border-color: -border; -fx-border-width: 1; }
 .btn-outline:hover { -fx-background-color: -bg-50; }

@@ -98,7 +98,7 @@ public class LecturerDashboardController {
 
     private HBox quizRow(QuizDto q) {
         Label title = new Label(q.title);
-        title.getStyleClass().add("label-strong");
+        title.setStyle("-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #111827;");
 
         String timeStr = "";
         if (q.startTime != null && !q.startTime.isBlank()) {
@@ -119,7 +119,7 @@ public class LecturerDashboardController {
         }
 
         Label meta = new Label(timeStr);
-        meta.getStyleClass().add("subtle");
+        meta.setStyle("-fx-font-size: 12px; -fx-text-fill: #6b7280;");
 
         VBox info = new VBox(2, title, meta);
         HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
