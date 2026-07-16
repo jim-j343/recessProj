@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\ParticipationScore;
 use App\Models\Post;
@@ -89,20 +90,32 @@ class StudentController extends Controller
         $quizzesTotal = $quizzes->count();
         $quizProgress = $quizzesTotal > 0 ? (int) round(($quizzesCompleted / $quizzesTotal) * 100) : 0;
 
-        // ---- Participation — computed live from current reply activity,
-        // same formula used in the lecturer's grading table and the
-        // progress page, so this number is never stale ----
-        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
-            ->groupBy('topic_id')
-            ->pluck('post_id');
+        // ---- Participation — computed live, per group. A student's
+        // activity in one lecturer's course shouldn't get blended away
+        // by another course they're also taking, so this is a real
+        // breakdown rather than one averaged number. ----
+        $groups = Group::whereIn('group_id', $groupIds)->get();
 
-        $liveReplyCount = Post::where('author_id', $user->user_id)
-            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $groupIds))
-            ->whereNotIn('post_id', $openingPostIds)
-            ->count();
+        $participationByGroup = $groups->map(function ($group) use ($user) {
+            $groupOpeningPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+                ->whereHas('topic', fn ($q) => $q->where('group_id', $group->group_id))
+                ->groupBy('topic_id')
+                ->pluck('post_id');
 
-        $participationAvg = min($liveReplyCount, 10) * 10;
+            $groupReplyCount = Post::where('author_id', $user->user_id)
+                ->whereHas('topic', fn ($q) => $q->where('group_id', $group->group_id))
+                ->whereNotIn('post_id', $groupOpeningPostIds)
+                ->count();
+
+            return [
+                'group_name' => $group->name,
+                'pct'        => min($groupReplyCount, 10) * 10,
+            ];
+        });
+
+        $participationAvg = $participationByGroup->count()
+            ? round($participationByGroup->avg('pct'), 1)
+            : 0;
         $participationTotal = $participationAvg;
 
         // ---- Compliance / community standing ----
@@ -116,10 +129,6 @@ class StudentController extends Controller
             ->orderByDesc('logged_at')
             ->take(5)
             ->get();
-
-        // ---- Blended overall assessment figure ----
-        $assessmentInputs = collect([$averageGrade, $participationAvg])->filter(fn ($v) => $v !== null);
-        $overallScore = $assessmentInputs->count() ? (int) round($assessmentInputs->avg()) : null;
 
         // ---- Latest topic in the student's groups (replaces hardcoded card) ----
         $latestTopic = Topic::whereIn('group_id', $groupIds)
@@ -151,9 +160,9 @@ class StudentController extends Controller
             'quizProgress',
             'participationTotal',
             'participationAvg',
+            'participationByGroup',
             'latestWarning',
             'recentActivity',
-            'overallScore',
             'latestTopic',
             'recommendedTopic'
         ));
