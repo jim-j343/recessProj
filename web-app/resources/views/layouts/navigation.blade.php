@@ -47,11 +47,8 @@
                         <x-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                             Analytics
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals')">
-                            Removals
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports')">
-                            Reports
+                        <x-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                            Moderation
                         </x-nav-link>
                     @endif
                 </div>
@@ -197,11 +194,8 @@
                 <x-responsive-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                     📈 Analytics
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals')">
-                    🚩 Removals
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports')">
-                    ⚠️ Reports
+                <x-responsive-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                    🛡️ Moderation
                 </x-responsive-nav-link>
             @endif
         </div>

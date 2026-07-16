@@ -1,10 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Group Removal Reports</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Moderation</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+
+            {{-- Section tabs — Reports and Removals share one Moderation area --}}
+            <div class="flex gap-2 mb-6 border-b border-gray-200">
+                <a href="{{ route('admin.reports') }}"
+                   class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px {{ request()->routeIs('admin.reports') ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+                    Post Reports
+                </a>
+                <a href="{{ route('admin.removals') }}"
+                   class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px {{ request()->routeIs('admin.removals') ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
+                    Member Removals
+                </a>
+            </div>
 
             @if(session('success'))
                 <div class="mb-4 bg-green-100 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
