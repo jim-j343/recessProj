@@ -114,6 +114,51 @@
                     </div>
                 </div>
 
+                {{-- Lecturer Performance — grades and grading activity
+                     grouped by who actually set each quiz, not by group
+                     admin (any student can admin a group now) --}}
+                <div class="col-span-3 bg-white border border-gray-200 rounded-lg p-6">
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900">Lecturer Performance</h3>
+                        <p class="text-xs text-gray-400">Quiz average and grading activity per lecturer</p>
+                    </div>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                                <th class="py-2 pr-4">Lecturer</th>
+                                <th class="py-2 pr-4">Course(s)</th>
+                                <th class="py-2 pr-4">Quizzes Set</th>
+                                <th class="py-2 pr-4">Avg Score</th>
+                                <th class="py-2">Students Graded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($lecturerPerformance as $row)
+                            <tr class="border-b border-gray-50 last:border-0">
+                                <td class="py-3 pr-4 font-medium text-gray-800">{{ $row['name'] }}</td>
+                                <td class="py-3 pr-4 text-gray-600">
+                                    {{ $row['courses']->isNotEmpty() ? $row['courses']->join(', ') : '—' }}
+                                </td>
+                                <td class="py-3 pr-4 text-gray-600">{{ $row['quizCount'] }}</td>
+                                <td class="py-3 pr-4">
+                                    @if($row['avgPct'] !== null)
+                                        <span class="font-semibold text-gray-900">{{ $row['avgPct'] }}%</span>
+                                        <span class="text-xs text-gray-400">({{ $row['submissionCount'] }} {{ Str::plural('submission', $row['submissionCount']) }})</span>
+                                    @else
+                                        <span class="text-xs text-gray-400">No completed quizzes yet</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 text-gray-600">{{ $row['studentsGraded'] }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-gray-400">No lecturers yet.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
                 {{-- Most Active Groups (replaces the mockup's "AI-curated Trending Topics" —
                      no topic-classification ML service is wired in yet, so this shows real
                      group-level activity instead of fabricating semantic clusters) --}}
