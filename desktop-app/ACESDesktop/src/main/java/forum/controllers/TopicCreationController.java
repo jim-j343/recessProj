@@ -121,7 +121,7 @@ public class TopicCreationController {
 
     private void openDetail(Topic t) {
         ViewState.setSelectedTopic(t);
-        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
+        SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
     }
 
     private Topic fromDto(TopicDto dto) {
@@ -144,6 +144,13 @@ public class TopicCreationController {
     @FXML private void onGroups() { SceneManager.goGroups(); }
     @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
     @FXML private void onGrading() { SceneManager.goParticipationGrading(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onLogout()    {
+        String token = forum.app.Session.authToken();
+        forum.app.Session.end();
+        new Thread(() -> new forum.services.AuthService().logout(token)).start();
+        SceneManager.show("Login", "ACES");
+    }
 
     private void showError(String msg) {
         if (errorLabel == null) return;

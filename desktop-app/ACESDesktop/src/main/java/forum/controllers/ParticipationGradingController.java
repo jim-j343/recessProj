@@ -31,11 +31,10 @@ public class ParticipationGradingController {
     @FXML private Label     statusLabel;
     @FXML private TableView<GradeRow> gradesTable;
     @FXML private TableColumn<GradeRow, String> colStudent;
-    @FXML private TableColumn<GradeRow, String> colGroup;
-    @FXML private TableColumn<GradeRow, String> colPosts;
     @FXML private TableColumn<GradeRow, String> colReplies;
-    @FXML private TableColumn<GradeRow, String> colQuality;
-    @FXML private TableColumn<GradeRow, String> colGrade;
+    @FXML private TableColumn<GradeRow, String> colParticipation;
+    @FXML private TableColumn<GradeRow, String> colTestAvg;
+    @FXML private TableColumn<GradeRow, String> colScore;
     @FXML private TableColumn<GradeRow, String> colRemarks;
 
     private final ObservableList<GradeRow> rows = FXCollections.observableArrayList();
@@ -53,26 +52,28 @@ public class ParticipationGradingController {
         }
 
         colStudent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().username));
-        colGroup.setCellValueFactory(c   -> new SimpleStringProperty(c.getValue().groupName));
-        colPosts.setCellValueFactory(c   -> new SimpleStringProperty(String.valueOf(c.getValue().posts)));
-        colReplies.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().replies)));
-        colQuality.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().quality));
+        colReplies.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().replyCount)));
+        colParticipation.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().participationPct + "%"));
+        colTestAvg.setCellValueFactory(c -> {
+            Double avg = c.getValue().quizAvgPct;
+            return new SimpleStringProperty(avg != null ? avg + "% (" + c.getValue().quizCount + " quizzes)" : "No quizzes");
+        });
 
-        // Editable grade dropdown
-        colGrade.setCellFactory(col -> new TableCell<>() {
-            private final ComboBox<String> combo = new ComboBox<>(
-                    FXCollections.observableArrayList("", "A", "B", "C", "D", "F"));
+        // Editable score field
+        colScore.setCellFactory(col -> new TableCell<>() {
+            private final TextField field = new TextField();
             {
-                combo.setOnAction(e -> {
+                field.setOnKeyReleased(e -> {
                     GradeRow row = getTableView().getItems().get(getIndex());
-                    row.grade = combo.getValue();
+                    row.score = field.getText();
                 });
             }
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) { setGraphic(null); return; }
-                combo.setValue(getTableView().getItems().get(getIndex()).grade);
-                setGraphic(combo);
+                GradeRow row = getTableView().getItems().get(getIndex());
+                field.setText(row.score);
+                setGraphic(field);
             }
         });
 
@@ -120,14 +121,15 @@ public class ParticipationGradingController {
                     List<GradeRow> result = new ArrayList<>();
                     for (JsonNode node : root) {
                         GradeRow row = new GradeRow();
-                        row.userId    = node.get("user_id").asLong();
-                        row.username  = node.get("username").asText();
-                        row.groupName = node.has("group_name") ? node.get("group_name").asText() : "—";
-                        row.posts     = node.get("post_count").asInt();
-                        row.replies   = node.get("reply_count").asInt();
-                        row.quality   = node.get("quality").asText();
-                        row.grade     = node.has("existing_grade") ? node.get("existing_grade").asText("") : "";
-                        row.remarks   = "";
+                        row.userId           = node.get("user_id").asLong();
+                        row.username         = node.get("username").asText();
+                        row.replyCount       = node.get("reply_count").asInt();
+                        row.participationPct = node.get("participation_pct").asDouble();
+                        row.quizAvgPct       = node.hasNonNull("quiz_avg_pct") ? node.get("quiz_avg_pct").asDouble() : null;
+                        row.quizCount        = node.get("quiz_count").asInt();
+                        row.suggestedScore   = node.get("suggested_score").asDouble();
+                        row.score            = node.hasNonNull("existing_score") ? node.get("existing_score").asText() : String.valueOf(row.suggestedScore);
+                        row.remarks          = "";
                         result.add(row);
                     }
                     Platform.runLater(() -> rows.setAll(result));
@@ -153,10 +155,10 @@ public class ParticipationGradingController {
                 StringBuilder json = new StringBuilder("{\"grades\":{");
                 boolean first = true;
                 for (GradeRow row : rows) {
-                    if (row.grade == null || row.grade.isBlank()) continue;
+                    if (row.score == null || row.score.isBlank()) continue;
                     if (!first) json.append(",");
                     json.append("\"").append(row.userId).append("\":")
-                        .append("{\"grade\":\"").append(row.grade).append("\",")
+                        .append("{\"score\":\"").append(row.score).append("\",")
                         .append("\"remark\":\"").append(
                                 row.remarks != null ? row.remarks.replace("\"", "'") : "")
                         .append("\"}");
@@ -186,15 +188,17 @@ public class ParticipationGradingController {
         worker.start();
     }
 
-    @FXML private void onDashboard()  { SceneManager.goLecturerDashboard(); }
-    @FXML private void onGroups()     { SceneManager.goGroups(); }
-    @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
-    @FXML private void onProfile()    { SceneManager.goProfile(); }
+    @FXML private void onDashboard() { SceneManager.goLecturerDashboard(); }
+    @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
+    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
+
+    @FXML private void onProfile() { SceneManager.goProfile(); }
     @FXML private void onLogout()     {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private void showStatus(String msg) {
@@ -206,11 +210,12 @@ public class ParticipationGradingController {
     public static class GradeRow {
         public long   userId;
         public String username;
-        public String groupName;
-        public int    posts;
-        public int    replies;
-        public String quality;
-        public String grade   = "";
+        public int    replyCount;
+        public double participationPct;
+        public Double quizAvgPct;
+        public int    quizCount;
+        public double suggestedScore;
+        public String score   = "";
         public String remarks = "";
     }
 }

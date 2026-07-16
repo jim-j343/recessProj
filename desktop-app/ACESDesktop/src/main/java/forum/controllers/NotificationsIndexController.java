@@ -191,7 +191,7 @@ public class NotificationsIndexController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private String iconFor(String type) {

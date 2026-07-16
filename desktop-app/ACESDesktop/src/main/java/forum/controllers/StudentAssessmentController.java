@@ -41,6 +41,6 @@ public class StudentAssessmentController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 }

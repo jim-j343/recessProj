@@ -186,7 +186,7 @@ public class StudentDashboardController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private String initial(String name) {

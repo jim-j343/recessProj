@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Assessment Overview â€” mirrors web participation/index.blade.php -->
+<!-- Assessment Overview — mirrors web participation/index.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/aces.css" styleClass="root"
             prefWidth="1280" prefHeight="820" fx:controller="forum.controllers.StudentAssessmentController">
@@ -13,7 +13,7 @@
                     <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                         <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
                     </javafx.scene.image.ImageView>
-                    <Label text="Smart Discussion Forum" styleClass="brand"/>
+                    <Label text="ACES" styleClass="brand"/>
                 </HBox>
             <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
             <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
@@ -27,8 +27,8 @@
                     </HBox>
                 </graphic>
                 <items>
-                    <MenuItem text="âœ“  Profile" onAction="#onProfile"/>
-                    <MenuItem text="â†’  Log Out" onAction="#onLogout"/>
+                    <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                    <MenuItem text="→  Log Out" onAction="#onLogout"/>
                 </items>
             </MenuButton>
         </HBox>

@@ -21,7 +21,7 @@
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
                             <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
-                            <Label fx:id="userNameLabel" text="Signed in"/>
+                            <Label fx:id="userNameLabel" text=""/>
                         </HBox>
                     </graphic>
                     <items>
@@ -94,12 +94,6 @@
                             <Button text="🏆  Award participation marks"
                                     styleClass="btn,btn-secondary" maxWidth="Infinity"
                                     onAction="#onGrading"/>
-                            <Button text="👥  Manage groups"
-                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
-                                    onAction="#onGroups"/>
-                            <Region VBox.vgrow="ALWAYS"/>
-                            <Button text="Log Out" styleClass="btn,btn-ghost"
-                                    maxWidth="Infinity" onAction="#onLogout"/>
                         </VBox>
                     </HBox>
 

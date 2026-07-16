@@ -132,7 +132,7 @@ public class TopicDetailController {
 
     @FXML
     private void onBack() {
-        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
+        SceneManager.show("ForumDashboard", "ACES");
     }
 
     @FXML

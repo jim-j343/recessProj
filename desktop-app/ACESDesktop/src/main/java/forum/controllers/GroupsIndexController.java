@@ -32,6 +32,10 @@ public class GroupsIndexController {
     @FXML private Button     newGroupBtn;
     @FXML private FlowPane   groupsPane;
     @FXML private Label      statusLabel;
+    @FXML private Label      navMyProgress;
+    @FXML private Label      navNewTopic;
+    @FXML private Label      navQuizCenter;
+    @FXML private Label      navGrading;
 
     private final ApiClient api = new ApiClient();
 
@@ -45,6 +49,16 @@ public class GroupsIndexController {
             if (u.getRole() == Role.LECTURER || u.getRole() == Role.SYSTEM_ADMIN) {
                 newGroupBtn.setManaged(true);
                 newGroupBtn.setVisible(true);
+            }
+            if (u.getRole() == Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
+            if (u.getRole() == Role.LECTURER && navQuizCenter != null && navGrading != null) {
+                navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+                navGrading.setManaged(true); navGrading.setVisible(true);
             }
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
@@ -174,13 +188,15 @@ public class GroupsIndexController {
         t.start();
     }
 
-    @FXML private void onNewGroup()  { SceneManager.show("GroupCreate", "Smart Discussion Forum — New Group"); }
+    @FXML private void onNewGroup()  { SceneManager.show("GroupCreate", "ACES — New Group"); }
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onForum()     { SceneManager.goForumDashboard(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
+    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
@@ -190,7 +206,7 @@ public class GroupsIndexController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private void showStatus(String msg) {

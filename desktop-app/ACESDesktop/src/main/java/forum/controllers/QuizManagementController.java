@@ -178,12 +178,14 @@ public class QuizManagementController {
     @FXML private void onDashboard() { SceneManager.goLecturerDashboard(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
+
     @FXML private void onProfile()   { SceneManager.goProfile(); }
     @FXML private void onLogout()    {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private void showStatus(String msg) {

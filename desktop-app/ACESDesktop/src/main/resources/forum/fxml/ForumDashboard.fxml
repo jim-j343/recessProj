@@ -13,9 +13,12 @@
             <!-- NAV BAR -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
-<Label text="Dashboard" styleClass="nav-link,active" onMouseClicked="#onDashboard"/>
-<Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
-<Label text="My Progress" styleClass="nav-link"      onMouseClicked="#onDashboard"/>
+<Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+<Label text="Groups"    styleClass="nav-link" onMouseClicked="#onGroups"/>
+<Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+<Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
+<Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
+<Label fx:id="navGrading"    text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
                     <Label fx:id="avatarLabel" text="?" styleClass="avatar" minWidth="32" minHeight="32"/>

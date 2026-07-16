@@ -18,6 +18,7 @@
 </HBox>
                 <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
                 <Label text="Quiz Center" styleClass="nav-link,active"/>
                 <Label text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading"/>
                 <Region HBox.hgrow="ALWAYS"/>

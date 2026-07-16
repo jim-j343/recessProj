@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProfileApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
+use App\Http\Controllers\Api\LecturerApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/quizzes/{id}/submit', [QuizApiController::class, 'submit']);
     Route::get('/quizzes/{id}/results', [QuizApiController::class, 'myResult']);
     Route::get('/quizzes/{id}/all-results', [QuizApiController::class, 'allResults']);
+
+    // Lecturer
+    Route::middleware('role:lecturer')->prefix('lecturer')->group(function () {
+        Route::get('/dashboard', [LecturerApiController::class, 'dashboard']);
+    });
 
     Route::middleware('role:system_admin')->prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
