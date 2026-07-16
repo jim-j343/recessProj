@@ -21,43 +21,39 @@ class UserSeeder extends Seeder
             'last_active_at'  => now(),
         ]);
 
-        // Lecturers
-        User::create([
-            'username'        => 'dr_namukasa',
-            'email'           => 'namukasa@smartforum.ac.ug',
-            'password_hash'   => Hash::make('password'),
-            'system_role'     => 'lecturer',
-            'status'          => 'active',
-            'agreed_to_rules' => true,
-            'last_active_at'  => now()->subDays(1),
-        ]);
-
-        User::create([
-            'username'        => 'prof_opio',
-            'email'           => 'opio@smartforum.ac.ug',
-            'password_hash'   => Hash::make('password'),
-            'system_role'     => 'lecturer',
-            'status'          => 'active',
-            'agreed_to_rules' => true,
-            'last_active_at'  => now()->subDays(2),
-        ]);
-
-        // Students
-        $students = [
-            ['kayongo_moses',  'moses@smartforum.ac.ug'],
-            ['akello_sarah',   'sarah@smartforum.ac.ug'],
-            ['opio_james',     'james@smartforum.ac.ug'],
-            ['mugisha_dan',    'dan@smartforum.ac.ug'],
-            ['nakato_alice',   'alice@smartforum.ac.ug'],
-            ['ssemwanga_bob',  'bob@smartforum.ac.ug'],
-            ['atim_grace',     'grace@smartforum.ac.ug'],
-            ['okello_peter',   'peter@smartforum.ac.ug'],
+        // Lecturers — one per course cluster, so admin analytics'
+        // Lecturer Performance table has more than two rows to show
+        $lecturers = [
+            ['dr_namukasa', 'namukasa@smartforum.ac.ug'],
+            ['prof_opio',   'opio@smartforum.ac.ug'],
+            ['dr_ssali',    'ssali@smartforum.ac.ug'],
         ];
 
-        foreach ($students as [$username, $email]) {
+        foreach ($lecturers as $i => [$username, $email]) {
             User::create([
                 'username'        => $username,
                 'email'           => $email,
+                'password_hash'   => Hash::make('password'),
+                'system_role'     => 'lecturer',
+                'status'          => 'active',
+                'agreed_to_rules' => true,
+                'last_active_at'  => now()->subDays($i + 1),
+            ]);
+        }
+
+        // Students — enough to populate 6 groups meaningfully, most
+        // enrolled across several courses at once (a real BSSE Year 1
+        // student's actual semester course load)
+        $students = [
+            'kayongo_moses',  'akello_sarah',  'opio_james',   'mugisha_dan',
+            'nakato_alice',   'ssemwanga_bob', 'atim_grace',   'okello_peter',
+            'nabirye_ruth',   'kato_isaac',
+        ];
+
+        foreach ($students as $username) {
+            User::create([
+                'username'        => $username,
+                'email'           => str_replace('_', '.', $username) . '@smartforum.ac.ug',
                 'password_hash'   => Hash::make('password'),
                 'system_role'     => 'student',
                 'status'          => 'active',

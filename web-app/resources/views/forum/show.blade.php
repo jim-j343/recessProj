@@ -288,6 +288,12 @@ use Illuminate\Support\Str;
                                 </div>
                             @endif
 
+                            @if($isOwn && $post->excludedUsers->isNotEmpty())
+                                <p class="text-[10px] text-amber-700 bg-amber-100 rounded-full px-2 py-0.5 mt-1.5 inline-block">
+                                    🔒 Hidden from {{ $post->excludedUsers->pluck('username')->join(', ') }}
+                                </p>
+                            @endif
+
                             <p class="text-[10px] text-gray-500 text-right mt-1.5 select-none">
                                 {{ $post->created_at->format('h:i A') }}
                             </p>
@@ -350,7 +356,22 @@ use Illuminate\Support\Str;
                 <button type="button" onclick="clearAttachment()" class="text-gray-400 hover:text-gray-700 font-bold">✕</button>
             </div>
 
-            <form method="POST"
+            @if($groupMembers->isNotEmpty())
+            <div id="exclude-picker" class="hidden mb-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-xs">
+                <p class="font-semibold text-amber-800 mb-2">Hide this reply from:</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($groupMembers as $member)
+                        <label class="flex items-center gap-1.5 bg-white border border-amber-200 rounded-full px-2.5 py-1 cursor-pointer hover:border-amber-400">
+                            <input type="checkbox" name="excluded_users[]" value="{{ $member->user_id }}"
+                                form="reply-form" onchange="updateExcludeCount()" class="w-3.5 h-3.5 accent-amber-600">
+                            <span class="text-gray-700">{{ $member->username }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            <form id="reply-form" method="POST"
                 action="/topics/{{ $topic->topic_id ?? 1 }}/posts"
                 enctype="multipart/form-data"
                 class="flex items-end gap-2">
@@ -367,6 +388,18 @@ use Illuminate\Support\Str;
                 <input type="file" id="attachment-input" name="attachment" class="hidden"
                     accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.ppt,.pptx,.zip"
                     onchange="showAttachment(this)">
+
+                @if($groupMembers->isNotEmpty())
+                <button type="button" id="exclude-toggle-btn" onclick="toggleExcludePicker()"
+                    class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors relative"
+                    title="Hide this reply from specific members">
+                    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a19.6 19.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                    <span id="exclude-count-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold w-4 h-4 rounded-full items-center justify-center">0</span>
+                </button>
+                @endif
 
                 <textarea
                     id="reply-input"
@@ -414,6 +447,28 @@ use Illuminate\Support\Str;
         }
         function closeReportModal() {
             document.getElementById('report-post-modal').classList.add('hidden');
+        }
+
+        function toggleExcludePicker() {
+            const picker = document.getElementById('exclude-picker');
+            picker.classList.toggle('hidden');
+            picker.classList.toggle('flex');
+        }
+
+        function updateExcludeCount() {
+            const checked = document.querySelectorAll('#exclude-picker input[type=checkbox]:checked').length;
+            const badge = document.getElementById('exclude-count-badge');
+            const btn = document.getElementById('exclude-toggle-btn');
+            if (checked > 0) {
+                badge.textContent = checked;
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+                btn.classList.add('text-amber-600');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('flex');
+                btn.classList.remove('text-amber-600');
+            }
         }
 
         // Auto-grow the reply textarea as the user types, so the full

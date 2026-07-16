@@ -122,8 +122,9 @@ class AdminController extends Controller
         // ---- Group Average Performance: mean completed-quiz score per
         // group, replacing the old fake "99.8% System Sync" style cards ----
         $groupPerformance = Group::orderBy('name')->get()->map(function ($group) use ($quizTotalMarks) {
-            $quizIds = Quiz::where('group_id', $group->group_id)->pluck('quiz_id');
-
+            $quizIds = Quiz::where('group_id', $group->group_id)
+                ->when($group->course_name, fn ($q) => $q->orWhere('course_name', $group->course_name))
+                ->pluck('quiz_id');
             $percentages = Submission::whereIn('quiz_id', $quizIds)
                 ->whereNotNull('submitted_at')
                 ->get()
@@ -158,11 +159,17 @@ class AdminController extends Controller
             $quizzes = Quiz::where('lecturer_id', $lecturer->user_id)->get();
             $quizIds = $quizzes->pluck('quiz_id');
 
-            $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->unique())
-                ->pluck('course_name')
-                ->filter()
-                ->unique()
-                ->values();
+            $courses = $quizzes->pluck('course_name')->filter()->unique();
+
+            // Legacy quizzes created before course_name existed only have
+            // a group_id — fall back to deriving the course from that
+            if ($courses->isEmpty()) {
+                $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->filter()->unique())
+                    ->pluck('course_name')
+                    ->filter()
+                    ->unique()
+                    ->values();
+            }
 
             $percentages = Submission::whereIn('quiz_id', $quizIds)
                 ->whereNotNull('submitted_at')

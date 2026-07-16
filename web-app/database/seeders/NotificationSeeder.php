@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Group;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Models\Topic;
@@ -19,20 +20,23 @@ class NotificationSeeder extends Seeder
 
         $topic = Topic::inRandomOrder()->first();
         $post  = $topic ? Post::where('topic_id', $topic->topic_id)->inRandomOrder()->first() : null;
+        $group = Group::where('name', 'Web Development Cohort')->first();
 
         $notifications = [
-            // [type, topic?, post?, is_read, hours/days ago]
-            ['reply',           $topic, $post, false, 'hours', 2],
-            ['quiz_announced',  null,   null,  false, 'days',  1],
-            ['warning',         null,   null,  true,  'days',  4],
-            ['mention',         $topic, $post, true,  'days',  6],
+            // [type, topic?, post?, group?, is_read, unit, amount]
+            ['reply',           $topic, $post, null,  false, 'hours', 2],
+            ['quiz_announced',  null,   null,  null,  false, 'days',  1],
+            ['warning',         null,   null,  null,  true,  'days',  4],
+            ['mention',         $topic, $post, null,  true,  'days',  6],
+            ['added_to_group',  null,   null,  $group, true,  'days', 10],
         ];
 
-        foreach ($notifications as [$type, $notifTopic, $notifPost, $isRead, $unit, $amount]) {
+        foreach ($notifications as [$type, $notifTopic, $notifPost, $notifGroup, $isRead, $unit, $amount]) {
             $notification = Notification::create([
                 'user_id'  => $moses->user_id,
                 'post_id'  => $notifPost?->post_id,
                 'topic_id' => $notifTopic?->topic_id,
+                'group_id' => $notifGroup?->group_id,
                 'type'     => $type,
                 'is_read'  => $isRead,
             ]);

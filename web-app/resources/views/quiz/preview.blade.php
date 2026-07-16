@@ -25,9 +25,9 @@
                     <div>
                         <h3 class="text-xl font-bold text-gray-900">{{ $quiz->title }}</h3>
                         <p class="text-sm text-gray-500 mt-1">
-                            {{ $quiz->group->name ?? 'Unknown group' }}
-                            @if($quiz->group?->course_name)
-                                · {{ $quiz->group->course_name }}
+                            {{ $quiz->course_name ?? $quiz->group->name ?? 'No course set' }}
+                            @if($eligibleGroupCount)
+                                · applies to {{ $eligibleGroupCount }} {{ Str::plural('group', $eligibleGroupCount) }}
                             @endif
                         </p>
                     </div>

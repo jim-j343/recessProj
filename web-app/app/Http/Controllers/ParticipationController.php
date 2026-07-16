@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Group;
 
 class ParticipationController extends Controller
 {
@@ -65,7 +66,17 @@ class ParticipationController extends Controller
         // Quizzes that belong to the lecturer's groups, and how many total
         // marks each one is worth — needed to turn a raw quiz score into a
         // percentage so multiple quizzes can be averaged together fairly.
-        $quizIds = Quiz::whereIn('group_id', $lecturerGroupIds)->pluck('quiz_id');
+        // Also picks up course-targeted quizzes covering these groups even
+        // if a different lecturer set them for the shared course.
+        $lecturerCourseNames = Group::whereIn('group_id', $lecturerGroupIds)->pluck('course_name')->filter();
+
+        $quizIds = Quiz::where(function ($q) use ($lecturerGroupIds, $lecturerCourseNames) {
+                $q->whereIn('group_id', $lecturerGroupIds);
+                if ($lecturerCourseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $lecturerCourseNames);
+                }
+            })
+            ->pluck('quiz_id');
 
         $quizTotalMarks = Question::whereIn('quiz_id', $quizIds)
             ->select('quiz_id', DB::raw('SUM(marks) as total'))
