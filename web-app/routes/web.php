@@ -81,6 +81,8 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
 Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/quiz/create', [QuizController::class, 'create'])->name('quiz.create');
     Route::post('/quiz/store', [QuizController::class, 'store'])->name('quiz.store');
+    Route::get('/quiz/{id}/preview', [QuizController::class, 'preview'])->name('quiz.preview');
+    Route::post('/quiz/{id}/publish', [QuizController::class, 'publish'])->name('quiz.publish');
     Route::get('/quiz/{id}', [QuizController::class, 'show'])->name('quiz.show');
     Route::post('/quiz/{id}/submit', [QuizController::class, 'submit'])->name('quiz.submit');
     Route::get('/quiz/{id}/results', [QuizController::class, 'results'])->name('quiz.results');
