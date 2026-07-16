@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\GroupRemoval;
+use App\Models\PostReport;
 
 class AdminController extends Controller
 {
@@ -236,5 +237,34 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Removal marked as reviewed.');
+    }
+
+    // Review queue for post reports
+    public function reports(Request $request)
+    {
+        $filter = $request->query('filter', 'unreviewed');
+
+        $query = PostReport::with(['post.author', 'post.topic', 'reportedBy', 'reviewedBy']);
+
+        if ($filter === 'unreviewed') {
+            $query->where('reviewed', false);
+        } elseif ($filter === 'reviewed') {
+            $query->where('reviewed', true);
+        }
+
+        $reports = $query->latest('created_at')->paginate(15)->withQueryString();
+
+        return view('admin.reports', compact('reports', 'filter'));
+    }
+
+    public function markReportReviewed(PostReport $report)
+    {
+        $report->update([
+            'reviewed'    => true,
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Report marked as reviewed.');
     }
 }
