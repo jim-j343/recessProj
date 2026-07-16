@@ -34,6 +34,10 @@ public class TopicCreationController {
     @FXML private ComboBox<forum.api.dto.GroupDto> groupCombo;
     @FXML private TextArea descriptionArea;
     @FXML private Label errorLabel;
+    @FXML private Label userNameLabel;
+    @FXML private Label avatarLabel;
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
 
     private final TopicDao topicDao = new TopicDao();
     private final PostDao postDao = new PostDao();
@@ -41,6 +45,17 @@ public class TopicCreationController {
 
     @FXML
     private void initialize() {
+        User u = Session.currentUser();
+        if (u != null) {
+            if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (avatarLabel != null) {
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+            }
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
         if (errorLabel != null) errorLabel.setManaged(false);
         if (categoryCombo != null && categoryCombo.getItems().isEmpty()) {
             categoryCombo.getItems().addAll("General", "Programming", "Mathematics", "Science", "Announcements");

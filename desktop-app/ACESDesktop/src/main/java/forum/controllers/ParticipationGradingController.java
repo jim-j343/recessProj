@@ -37,6 +37,9 @@ public class ParticipationGradingController {
     @FXML private TableColumn<GradeRow, String> colScore;
     @FXML private TableColumn<GradeRow, String> colRemarks;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ObservableList<GradeRow> rows = FXCollections.observableArrayList();
     private final ApiClient api = new ApiClient();
 
@@ -46,9 +49,12 @@ public class ParticipationGradingController {
         if (u != null) {
             userNameLabel.setText(u.displayName());
             if (avatarLabel != null) {
-                String name = u.displayName().trim();
-                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
         colStudent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().username));

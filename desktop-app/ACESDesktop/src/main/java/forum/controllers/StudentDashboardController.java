@@ -42,6 +42,9 @@ public class StudentDashboardController {
     @FXML private VBox        resultsBox;
     @FXML private Label       noResultsLabel;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ApiClient api = new ApiClient();
 
     @FXML
@@ -51,6 +54,9 @@ public class StudentDashboardController {
             avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
             welcomeLabel.setText("Welcome back, " + u.displayName() + " 👋");
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
     }

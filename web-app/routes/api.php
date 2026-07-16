@@ -49,9 +49,13 @@ Route::middleware('auth:sanctum')->group(function () {
         // Groups
     Route::get('/groups', [GroupApiController::class, 'index']);
     Route::post('/groups', [GroupApiController::class, 'store']);
+    Route::put('/groups/{group}', [GroupApiController::class, 'update']);
+    Route::delete('/groups/{group}', [GroupApiController::class, 'destroy']);
     Route::post('/groups/{group}/join', [GroupApiController::class, 'join']);
     Route::get('/groups/{group}/members', [GroupApiController::class, 'members']);
     Route::patch('/groups/{group}/members/{userId}/approve', [GroupApiController::class, 'approve']);
+    Route::post('/groups/{group}/add-member', [GroupApiController::class, 'addMember']);
+    Route::delete('/groups/{group}/members/{userId}', [GroupApiController::class, 'removeMember']);
 
     // Quizzes
     Route::get('/quizzes', [QuizApiController::class, 'index']);

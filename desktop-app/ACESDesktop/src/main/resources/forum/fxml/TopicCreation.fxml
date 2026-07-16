@@ -15,7 +15,6 @@
                     <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                         <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
                     </javafx.scene.image.ImageView>
-                    <Label text="ACES" styleClass="brand"/>
                 </HBox>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
@@ -23,6 +22,19 @@
                 <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
                 <Label text="Grading" styleClass="nav-link" onMouseClicked="#onGrading"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                    </items>
+                </MenuButton>
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">

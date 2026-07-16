@@ -12,6 +12,9 @@ public class GroupDto {
     @JsonProperty("admin_name")   public String adminName;
     @JsonProperty("member_count") public int    memberCount;
     @JsonProperty("topics_count") public int    topicsCount;
+    @JsonProperty("course_name")  public String courseName;
+    @JsonProperty("warning_days") public int    warningDays;
+    @JsonProperty("blacklist_days")public int   blacklistDays;
     @JsonProperty("my_status")    public String myStatus;  // null, "pending", "active"
     @JsonProperty("my_role")      public String myRole;    // null, "member", "moderator", "admin"
 }

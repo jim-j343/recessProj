@@ -22,8 +22,10 @@ public class StudentAssessmentController {
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            if (avatarLabel != null)
-                avatarLabel.setText(String.valueOf(u.displayName().charAt(0)).toUpperCase());
+            if (avatarLabel != null) {
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+            }
             if (userNameLabel != null)
                 userNameLabel.setText(u.displayName());
         }

@@ -35,6 +35,9 @@ public class LecturerDashboardController {
     @FXML private VBox  quizListBox;
     @FXML private Label noQuizzesLabel;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ApiClient api = new ApiClient();
 
     @FXML
@@ -43,6 +46,9 @@ public class LecturerDashboardController {
         if (u != null) {
             avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
     }
