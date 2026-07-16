@@ -11,54 +11,73 @@ class TopicSeeder extends Seeder
 {
     public function run(): void
     {
-        $groupA   = Group::where('name', 'Computer Science Year 2')->first();
-        $groupB   = Group::where('name', 'Software Engineering Year 3')->first();
-        $students = User::where('system_role', 'student')->get();
-        $lecturer = User::where('username', 'dr_namukasa')->first();
+        $streamA   = Group::where('name', 'BSSE Year 1 - Stream A')->first();
+        $streamB   = Group::where('name', 'BSSE Year 1 - Stream B')->first();
+        $webDev    = Group::where('name', 'Web Development Cohort')->first();
+        $oop       = Group::where('name', 'OOP Study Group')->first();
+        $dataMgmt  = Group::where('name', 'Data Management Group')->first();
+        $numerical = Group::where('name', 'Numerical Methods Group')->first();
 
-        $topicsGroupA = [
-            ['How do foreign keys work in MySQL?',         'Database'],
-            ['Difference between GET and POST in HTTP?',   'Networking'],
-            ['Explain normalisation with examples',        'Database'],
-            ['What is a REST API?',                        'Web Development'],
-            ['Git branching strategies for teams',         'Tools'],
+        $namukasa = User::where('username', 'dr_namukasa')->first();
+
+        $byGroup = [
+            $streamA->group_id => [
+                ['What is the software development lifecycle?', 'SDLC'],
+                ['Agile vs Waterfall — which is better for small teams?', 'Methodology'],
+                ['How do we write good user stories?', 'Requirements'],
+            ],
+            $streamB->group_id => [
+                ['Difference between verification and validation', 'Testing'],
+                ['What makes a good code review?', 'Best Practices'],
+                ['Version control branching strategies for teams', 'Tools'],
+            ],
+            $webDev->group_id => [
+                ['What is a REST API?', 'Web Development'],
+                ['Difference between GET and POST in HTTP?', 'Networking'],
+                ['How does Laravel handle authentication?', 'Web Development'],
+            ],
+            $oop->group_id => [
+                ['What is the difference between OOP and FP?', 'Programming'],
+                ['When should I use an interface vs abstract class?', 'Programming'],
+                ['Explain the MVC design pattern', 'Architecture'],
+            ],
+            $dataMgmt->group_id => [
+                ['How do foreign keys work in MySQL?', 'Database'],
+                ['Explain normalisation with examples', 'Database'],
+                ['Denormalization — when is it actually a good idea?', 'Database'],
+            ],
+            $numerical->group_id => [
+                ['Newton-Raphson method explained simply', 'Root Finding'],
+                ['When does the bisection method fail to converge?', 'Root Finding'],
+                ['Trapezoidal vs Simpson\'s rule for integration', 'Numerical Integration'],
+            ],
         ];
 
-        $topicsGroupB = [
-            ['What is the difference between OOP and FP?', 'Programming'],
-            ['How does Laravel handle authentication?',    'Web Development'],
-            ['Explain the MVC design pattern',             'Architecture'],
-            ['When should I use an interface vs abstract?','Programming'],
-            ['How to write unit tests in Java?',           'Testing'],
-        ];
+        foreach ($byGroup as $groupId => $topics) {
+            $members = \App\Models\GroupMembership::where('group_id', $groupId)
+                ->whereHas('user', fn ($q) => $q->where('system_role', 'student'))
+                ->with('user')
+                ->get()
+                ->pluck('user');
 
-        foreach ($topicsGroupA as [$title, $category]) {
-            Topic::create([
-                'group_id'   => $groupA->group_id,
-                'creator_id' => $students->random()->user_id,
-                'title'      => $title,
-                'category'   => $category,
-                'is_flagged' => false,
-            ]);
+            foreach ($topics as [$title, $category]) {
+                Topic::create([
+                    'group_id'   => $groupId,
+                    'creator_id' => $members->isNotEmpty() ? $members->random()->user_id : $namukasa->user_id,
+                    'title'      => $title,
+                    'category'   => $category,
+                    'is_flagged' => false,
+                ]);
+            }
         }
 
-        // Lecturer creates one topic in Group A
+        // Lecturer posts one assignment-style topic in Stream A
         Topic::create([
-            'group_id'   => $groupA->group_id,
-            'creator_id' => $lecturer->user_id,
-            'title'      => 'Assignment: Design a database schema for a library system',
+            'group_id'   => $streamA->group_id,
+            'creator_id' => $namukasa->user_id,
+            'title'      => 'Assignment: Document the SDLC phases for a mobile banking app',
             'category'   => 'Assignment',
             'is_flagged' => false,
         ]);
-
-        foreach ($topicsGroupB as [$title, $category]) {
-            Topic::create([
-                'group_id'   => $groupB->group_id,
-                'creator_id' => $students->random()->user_id,
-                'title'      => $title,
-                'category'   => $category,
-                'is_flagged' => false,
-            ]);
-        }
     }
 }

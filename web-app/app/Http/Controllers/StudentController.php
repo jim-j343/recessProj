@@ -31,8 +31,17 @@ class StudentController extends Controller
         $postCount = Post::where('author_id', $user->user_id)->count();
         $groupCount = $groupIds->count();
 
-        // ---- Quizzes eligible for this student's groups ----
-        $quizzes = Quiz::whereIn('group_id', $groupIds)
+        // ---- Quizzes eligible for this student's groups — matches both
+        // legacy quizzes pinned to one group_id and newer course-targeted
+        // quizzes (visible to every group sharing that course unit) ----
+        $studentCourseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
+
+        $quizzes = Quiz::where(function ($q) use ($groupIds, $studentCourseNames) {
+                $q->whereIn('group_id', $groupIds);
+                if ($studentCourseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $studentCourseNames);
+                }
+            })
             ->where('is_published', true)
             ->with('questions')
             ->orderByDesc('start_time')

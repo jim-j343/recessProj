@@ -20,6 +20,8 @@ class PostController extends Controller
             'content'        => ['required_without:attachment', 'nullable', 'string'],
             'parent_post_id' => ['nullable', 'exists:posts,post_id'],
             'attachment'     => ['nullable', 'file', 'max:10240'],
+            'excluded_users'   => ['nullable', 'array'],
+            'excluded_users.*' => ['exists:users,user_id'],
         ]);
 
         $attachmentData = $this->storeAttachment($request);
@@ -31,6 +33,15 @@ class PostController extends Controller
             'content'        => $validated['content'] ?? '',
             ...$attachmentData,
         ]);
+
+        // Never let a poster accidentally exclude themselves
+        $excludedIds = collect($validated['excluded_users'] ?? [])
+            ->reject(fn ($id) => (int) $id === Auth::id())
+            ->values();
+
+        if ($excludedIds->isNotEmpty()) {
+            $post->excludedUsers()->attach($excludedIds);
+        }
 
         $topic = Topic::find($topicId);
 

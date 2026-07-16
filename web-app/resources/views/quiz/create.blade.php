@@ -36,16 +36,18 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Group *</label>
-                        <select name="group_id" required
-                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400 bg-white">
-                            <option value="">-- Select a group --</option>
-                            @foreach($groups as $group)
-                                <option value="{{ $group->group_id }}" {{ old('group_id') == $group->group_id ? 'selected' : '' }}>
-                                    {{ $group->name }}
-                                </option>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Course Unit *</label>
+                        <input type="text" name="course_name" list="course-options" value="{{ old('course_name') }}" required
+                            placeholder="e.g. CS201: Database Systems"
+                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
+                        <datalist id="course-options">
+                            @foreach($courseNames as $courseName)
+                                <option value="{{ $courseName }}">
                             @endforeach
-                        </select>
+                        </datalist>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Applies to every group teaching this course — you don't need to be a member of each one.
+                        </p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-4">
