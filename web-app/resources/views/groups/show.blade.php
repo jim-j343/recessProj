@@ -79,6 +79,18 @@
                 </div>
             @endif
 
+            {{-- WhatsApp-style "X was added" announcements --}}
+            @if($additionAnnouncements->isNotEmpty())
+                <div class="flex flex-col items-center gap-2 mb-6">
+                    @foreach($additionAnnouncements as $entry)
+                        <div class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-full">
+                            🎉 {{ $entry->meta['added_username'] ?? 'A member' }} was added to the group by {{ $entry->user->username ?? 'an admin' }}
+                            <span class="text-indigo-400">· {{ $entry->logged_at->diffForHumans() }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             {{-- Stats --}}
             <div class="grid grid-cols-4 gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow-sm p-4 text-center">
@@ -130,7 +142,15 @@
 
                 {{-- Members --}}
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h3 class="text-base font-semibold text-gray-900 mb-4">Members</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-base font-semibold text-gray-900">Members</h3>
+                        @if($group->admin_id === auth()->id())
+                            <button type="button" onclick="document.getElementById('add-member-modal').classList.remove('hidden')"
+                                class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">
+                                + Add Member
+                            </button>
+                        @endif
+                    </div>
                     @foreach($group->memberships->take(8) as $membership)
                         <div class="flex items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0">
                             <div class="flex items-center gap-3 min-w-0">
@@ -164,6 +184,41 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    {{-- Add member modal — adds immediately, no pending state --}}
+    <div id="add-member-modal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-gray-900">Add a member</h3>
+                <button onclick="document.getElementById('add-member-modal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
+            </div>
+            @if($errors->any())
+                <div class="mb-3 bg-red-50 text-red-700 text-xs px-3 py-2 rounded">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="mb-3 bg-red-50 text-red-700 text-xs px-3 py-2 rounded">
+                    {{ session('error') }}
+                </div>
+            @endif
+            <form method="POST" action="{{ route('groups.members.add', $group->group_id) }}">
+                @csrf
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" name="username" required placeholder="e.g. atim_grace"
+                    class="w-full border-gray-300 rounded-md shadow-sm text-sm mb-3" />
+                <p class="text-xs text-gray-400 mb-3">They'll be added right away and notified.</p>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('add-member-modal').classList.add('hidden')"
+                        class="text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                        Add Member
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
