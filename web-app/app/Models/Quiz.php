@@ -15,6 +15,7 @@ class Quiz extends Model
         'lecturer_id',
         'group_id',
         'title',
+        'course_name',
         'target_category',
         'start_time',
         'duration_minutes',
@@ -44,5 +45,18 @@ class Quiz extends Model
     public function submissions()
     {
         return $this->hasMany(Submission::class, 'quiz_id', 'quiz_id');
+    }
+
+    // Every group this quiz should be visible to. A course-targeted quiz
+    // (course_name set) applies to every group sharing that course unit,
+    // even ones the lecturer isn't personally a member of. Older quizzes
+    // created before course_name existed fall back to their single group_id.
+    public function eligibleGroupIds()
+    {
+        if ($this->course_name) {
+            return Group::where('course_name', $this->course_name)->pluck('group_id');
+        }
+
+        return $this->group_id ? collect([$this->group_id]) : collect();
     }
 }

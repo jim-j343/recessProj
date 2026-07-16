@@ -17,13 +17,15 @@ class QuizController extends Controller
     // Lecturer: show create form
     public function create()
     {
-        $groups = GroupMembership::where('user_id', auth()->id())
-            ->where('status', 'active')
-            ->with('group')
-            ->get()
-            ->pluck('group');
+        // Every distinct course unit in the system — a lecturer doesn't
+        // need to already be a member of a group to set a quiz for the
+        // course it teaches
+        $courseNames = \App\Models\Group::whereNotNull('course_name')
+            ->distinct()
+            ->orderBy('course_name')
+            ->pluck('course_name');
 
-        return view('quiz.create', compact('groups'));
+        return view('quiz.create', compact('courseNames'));
     }
 
     // Lecturer: save quiz + questions
@@ -31,7 +33,7 @@ class QuizController extends Controller
     {
         $request->validate([
             'title'            => ['required', 'string', 'max:255'],
-            'group_id'         => ['required', 'exists:groups,group_id'],
+            'course_name'      => ['required', 'string', 'max:150'],
             'start_time'       => ['required', 'date'],
             'duration'         => ['required', 'integer', 'min:1'],
             'target'           => ['nullable', 'string', 'max:80'],
@@ -44,7 +46,7 @@ class QuizController extends Controller
 
         $quiz = Quiz::create([
             'lecturer_id'      => Auth::id(),
-            'group_id'         => $request->group_id,
+            'course_name'      => $request->course_name,
             'title'            => $request->title,
             'target_category'  => $request->target,
             'start_time'       => $request->start_time,
@@ -71,10 +73,11 @@ class QuizController extends Controller
         }
 
         if ($quiz->is_published) {
-            $memberIds = GroupMembership::where('group_id', $quiz->group_id)
+            $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
                 ->where('status', 'active')
                 ->where('user_id', '!=', Auth::id())
-                ->pluck('user_id');
+                ->pluck('user_id')
+                ->unique();
 
             foreach ($memberIds as $userId) {
                 Notification::notify($userId, 'quiz_announced');
@@ -89,37 +92,6 @@ class QuizController extends Controller
     // Deliberately separate from show() — that method creates a real
     // Submission the moment it's opened and blocks drafts entirely, since
     // it's built for a student taking the quiz, not a lecturer reviewing it.
-
-
-    // Lecturer: publish a draft quiz — flips is_published and notifies
-    // the group, same notification logic used when publishing at creation
-    // time in store()
-    public function publish($id)
-    {
-        $quiz = Quiz::findOrFail($id);
-
-        if ($quiz->lecturer_id !== Auth::id() && !Auth::user()->isAdmin()) {
-            abort(403);
-        }
-
-        if ($quiz->is_published) {
-            return back()->with('error', 'This quiz is already published.');
-        }
-
-        $quiz->update(['is_published' => true]);
-
-        $memberIds = GroupMembership::where('group_id', $quiz->group_id)
-            ->where('status', 'active')
-            ->where('user_id', '!=', Auth::id())
-            ->pluck('user_id');
-
-        foreach ($memberIds as $userId) {
-            Notification::notify($userId, 'quiz_announced');
-        }
-
-        return redirect()->route('quiz.preview', $quiz->quiz_id)
-            ->with('success', 'Quiz published! Group members have been notified.');
-    }
     public function preview($id)
     {
         $quiz = Quiz::with(['questions.answers', 'group'])->findOrFail($id);
@@ -138,10 +110,42 @@ class QuizController extends Controller
             ? round($completedSubmissions->avg(fn ($s) => ($s->score / $totalMarks) * 100), 1)
             : null;
 
-        return view('quiz.preview', compact('quiz', 'totalMarks', 'completedSubmissions', 'avgPct'));
+        $eligibleGroupCount = $quiz->eligibleGroupIds()->count();
+
+        return view('quiz.preview', compact('quiz', 'totalMarks', 'completedSubmissions', 'avgPct', 'eligibleGroupCount'));
     }
 
-    // Student: show quiz to attempt
+    // Lecturer: publish a draft quiz — flips is_published and notifies
+    // the group, same notification logic used when publishing at creation
+    // time in store()
+    public function publish($id)
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        if ($quiz->lecturer_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        if ($quiz->is_published) {
+            return back()->with('error', 'This quiz is already published.');
+        }
+
+        $quiz->update(['is_published' => true]);
+
+        $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
+            ->where('status', 'active')
+            ->where('user_id', '!=', Auth::id())
+            ->pluck('user_id')
+            ->unique();
+
+        foreach ($memberIds as $userId) {
+            Notification::notify($userId, 'quiz_announced');
+        }
+
+        return redirect()->route('quiz.preview', $quiz->quiz_id)
+            ->with('success', 'Quiz published! Group members have been notified.');
+    }
+
     // Student: show quiz to attempt
     public function show($id)
     {
@@ -150,9 +154,9 @@ class QuizController extends Controller
         // Guard: must be published
         abort_unless($quiz->is_published, 403, 'This quiz is not available.');
 
-        // Guard: user must belong to the quiz's group
+        // Guard: user must belong to a group this quiz applies to
         $isMember = GroupMembership::where('user_id', Auth::id())
-            ->where('group_id', $quiz->group_id)
+            ->whereIn('group_id', $quiz->eligibleGroupIds())
             ->where('status', 'active')
             ->exists();
         abort_unless($isMember, 403, 'You are not in this quiz\'s group.');
@@ -198,7 +202,6 @@ class QuizController extends Controller
         return view('quiz.show', compact('quiz', 'submission', 'timeLeft'));
     }
 
-    // Student: submit quiz answers
     // Student: submit quiz answers
     public function submit(Request $request, $id)
     {

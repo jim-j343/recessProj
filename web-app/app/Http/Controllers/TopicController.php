@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Topic;
 use App\Models\Post;
 use App\Models\ActivityLog;
+use App\Models\GroupMembership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -88,13 +89,22 @@ class TopicController extends Controller
     }
 
     // Show one topic
-    // Show one topic
     public function show(Topic $topic)
     {
         $allPosts = $topic->posts()
-            ->with('author')
+            ->with(['author', 'excludedUsers'])
             ->orderBy('created_at')
             ->get();
+
+        // A post excludes specific people from seeing it. The author and a
+        // system admin always see everything they wrote/oversee — everyone
+        // else loses visibility of a post they're specifically excluded from.
+        if (!Auth::user()->isAdmin()) {
+            $allPosts = $allPosts->reject(function ($post) {
+                return $post->author_id !== Auth::id()
+                    && $post->excludedUsers->contains('user_id', Auth::id());
+            })->values();
+        }
 
         // The topic's opening post (created alongside the topic itself) is
         // shown separately as the "original post" card — everything else
@@ -107,10 +117,21 @@ class TopicController extends Controller
             ? $allPosts->reject(fn ($post) => $post->post_id === $firstPost->post_id)->values()
             : $allPosts;
 
+        // Other members of this topic's group, for the "exclude from this
+        // reply" picker in the composer
+        $groupMembers = GroupMembership::where('group_id', $topic->group_id)
+            ->where('status', 'active')
+            ->where('user_id', '!=', Auth::id())
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->filter();
+
         return view('forum.show', compact(
             'topic',
             'posts',
-            'firstPost'
+            'firstPost',
+            'groupMembers'
         ));
     }
 
@@ -228,14 +249,22 @@ class TopicController extends Controller
             ->with('success', 'Topic deleted.');
     }
 
-    // Export topic
     // Export topic as a downloadable PDF
     public function exportPdf(Topic $topic)
     {
         $posts = $topic->posts()
-            ->with('author')
+            ->with(['author', 'excludedUsers'])
             ->orderBy('created_at')
             ->get();
+
+        // Same exclusion rule as the live thread — exporting to PDF must
+        // not become a way around being excluded from a post
+        if (!Auth::user()->isAdmin()) {
+            $posts = $posts->reject(function ($post) {
+                return $post->author_id !== Auth::id()
+                    && $post->excludedUsers->contains('user_id', Auth::id());
+            })->values();
+        }
 
         $firstPost = $posts->whereNull('parent_post_id')->first() ?? $posts->first();
 
@@ -248,4 +277,3 @@ class TopicController extends Controller
         return $pdf->download(Str::slug($topic->title) . '.pdf');
     }
 }
-
