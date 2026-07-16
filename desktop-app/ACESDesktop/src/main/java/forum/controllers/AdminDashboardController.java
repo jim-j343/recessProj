@@ -7,6 +7,7 @@ import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,13 +17,15 @@ import javafx.scene.control.*;
 
 public class AdminDashboardController {
 
-    @FXML private Label  avatarLabel;
-    @FXML private Label  userNameLabel;
-    @FXML private Label  totalMembersLabel;
-    @FXML private Label  activeTodayLabel;
-    @FXML private Label  warnedLabel;
-    @FXML private Label  blacklistedLabel;
-    @FXML private Label  statusLabel;
+    @FXML private Label      avatarLabel;
+    @FXML private Label      userNameLabel;
+    @FXML private MenuButton notifButton;
+    @FXML private Label      notifBadge;
+    @FXML private Label      totalMembersLabel;
+    @FXML private Label      activeTodayLabel;
+    @FXML private Label      warnedLabel;
+    @FXML private Label      blacklistedLabel;
+    @FXML private Label      statusLabel;
 
     // Group settings table (mirrors web HTML table)
     @FXML private TableView<AdminDashboardDto.GroupSetting> groupSettingsTable;
@@ -47,8 +50,12 @@ public class AdminDashboardController {
         User user = Session.currentUser();
         if (user != null) {
             userNameLabel.setText(user.displayName());
-            avatarLabel.setText(initials(user.displayName()));
+            // Single first-letter initial to match web x-avatar component
+            avatarLabel.setText(initial(user.displayName()));
         }
+
+        // Load real notifications from backend
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
 
         // ── Group settings table ──────────────────────────────────────
         colGroup.setCellValueFactory(c ->
@@ -65,6 +72,37 @@ public class AdminDashboardController {
         // ── Member table ──────────────────────────────────────────────
         colMember.setCellValueFactory(c ->
                 new SimpleStringProperty(memberName(c.getValue())));
+        // Render group name in bold to match web
+        colGroup.setCellFactory(column -> new TableCell<AdminDashboardDto.GroupSetting, String>() {
+            @Override
+            protected void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty || name == null) {
+                    setGraphic(null); setText(null);
+                } else {
+                    Label lbl = new Label(name);
+                    lbl.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #111827;");
+                    setGraphic(lbl);
+                    setText(null);
+                }
+            }
+        });
+
+        // Render member name in bold to match web
+        colMember.setCellFactory(column -> new TableCell<AdminMemberDto, String>() {
+            @Override
+            protected void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty || name == null) {
+                    setGraphic(null); setText(null);
+                } else {
+                    Label lbl = new Label(name);
+                    lbl.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #111827;");
+                    setGraphic(lbl);
+                    setText(null);
+                }
+            }
+        });
         colLastActive.setCellValueFactory(c ->
                 new SimpleStringProperty(safe(c.getValue().lastActiveHuman, "Never")));
         colPosts.setCellValueFactory(c ->
@@ -101,6 +139,7 @@ public class AdminDashboardController {
 
         // Right-click context menu on member rows for quick blacklist/lift
         membersTable.setRowFactory(table -> memberRow());
+
 
         loadDashboard();
     }
@@ -139,7 +178,10 @@ public class AdminDashboardController {
         membersTable.setItems(FXCollections.observableArrayList(
                 data.members == null ? java.util.List.of() : data.members));
 
-        showStatus("Loaded from web backend.");
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     // ── Member row context menu ───────────────────────────────────────
@@ -212,6 +254,8 @@ public class AdminDashboardController {
     @FXML private void onMembers()    { SceneManager.goAdminMembers(); }
     @FXML private void onGroups()     { SceneManager.goGroups(); }
 
+    @FXML private void onModeration()   { SceneManager.goAdminModeration(); }
+
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
     @FXML
@@ -219,36 +263,35 @@ public class AdminDashboardController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
 
     private String memberName(AdminMemberDto m) {
-        return safe(m.username, "Unknown") + " <" + safe(m.email, "no email") + ">";
+        return safe(m.username, "Unknown");
     }
 
     private String memberStatus(AdminMemberDto m) {
         if ("blacklisted".equalsIgnoreCase(m.status)) {
-            String days = m.activeBlacklist != null && m.activeBlacklist.daysRemaining != null
-                    ? " (" + m.activeBlacklist.daysRemaining + " days left)" : "";
-            return "Blacklisted" + days;
+            return "Blacklisted";
         }
         if (m.unheededWarningCount > 0) {
-            return "Warning #" + (m.latestWarningNumber == null
-                    ? m.unheededWarningCount : m.latestWarningNumber);
+            return "Warned";
         }
-        return safe(m.status, "Active");
+        // Capitalize first letter to match web ("Active" not "active")
+        String s = safe(m.status, "Active");
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
     private String safe(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value;
     }
 
-    private String initials(String name) {
-        if (name == null || name.isBlank()) return "??";
-        String t = name.trim();
-        return (t.length() >= 2 ? t.substring(0, 2) : t).toUpperCase();
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 
     private void showStatus(String message) {
@@ -258,3 +301,4 @@ public class AdminDashboardController {
         statusLabel.setVisible(true);
     }
 }
+

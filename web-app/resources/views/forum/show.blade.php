@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Topic | Smart Discussion Forum</title>
+    <title>Topic | ACES</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 min-h-screen">

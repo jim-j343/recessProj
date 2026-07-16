@@ -4,10 +4,14 @@ import forum.api.dto.AdminAnalyticsDto;
 import forum.api.dto.AdminDashboardDto;
 import forum.api.dto.AdminMemberDto;
 import forum.api.dto.MemberDto;
+import forum.api.dto.NotificationDto;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
-
+import forum.api.dto.AdminRemovalDto;
+import forum.api.dto.AdminRemovalsResponseDto;
+import forum.api.dto.AdminReportsResponseDto;
+import forum.api.dto.LecturerDashboardDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -88,6 +92,42 @@ public class ApiClient {
         } catch (Exception ignored) {
             // logging out is best-effort; the local session is cleared regardless
         }
+    }
+
+    // ---------------------------------------------------------------
+    //  Notifications
+    // ---------------------------------------------------------------
+
+    /** GET /api/notifications — unread count + latest unread messages. */
+    public NotificationDto fetchNotifications(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), NotificationDto.class);
+    }
+
+    /** GET /api/notifications/all — unread count + ALL notifications. */
+    public NotificationDto fetchAllNotifications(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/all", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), NotificationDto.class);
+    }
+
+    /** POST /api/notifications/read-all — mark every notification as read. */
+    public void markAllNotificationsRead(String token)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/read-all", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+    }
+
+    /** POST /api/notifications/{id}/read — mark a single notification as read. */
+    public void markNotificationRead(String token, long notificationId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/notifications/" + notificationId + "/read", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
     }
 
     // ---------------------------------------------------------------
@@ -185,6 +225,62 @@ public void approveMember(String token, long groupId, long userId)
             .method("PATCH", HttpRequest.BodyPublishers.noBody()).build());
     ok(resp);
 }
+
+/** PUT /api/groups/{id} */
+public GroupDto updateGroup(String token, long groupId, String name, String courseName, String description, int warningDays, int blacklistDays)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("name", name);
+    body.put("course_name", courseName);
+    body.put("description", description);
+    body.put("inactivity_warning_days", warningDays);
+    body.put("blacklist_duration_days", blacklistDays);
+    HttpResponse<String> resp = send(request("/groups/" + groupId, token)
+            .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+    return mapper.readValue(resp.body(), GroupDto.class);
+}
+
+/** DELETE /api/groups/{id} */
+public void deleteGroup(String token, long groupId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups/" + groupId, token)
+            .DELETE().build());
+    ok(resp);
+}
+
+/** POST /api/groups/{id}/add-member */
+public void addMemberGroup(String token, long groupId, String username)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("username", username);
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/add-member", token)
+            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+}
+
+/** DELETE /api/groups/{id}/members/{userId} */
+public void removeMemberGroup(String token, long groupId, long userId, String reason)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("reason", reason);
+    
+    // HTTP DELETE with body isn't fully supported by all servers/clients, 
+    // but Java 11 HttpClient supports custom methods. We use method("DELETE", body).
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/members/" + userId, token)
+            .method("DELETE", HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+}
+
+// ---------------------------------------------------------------
+//  Lecturer
+// ---------------------------------------------------------------
+
+    public LecturerDashboardDto getLecturerDashboard(String token) throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/lecturer/dashboard", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), LecturerDashboardDto.class);
+    }
 
 // ---------------------------------------------------------------
 //  Quizzes
@@ -290,6 +386,22 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
         return mapper.treeToValue(mapper.readTree(resp.body()).get("member"), AdminMemberDto.class);
     }
 
+    public AdminRemovalsResponseDto getRemovals(String token, String filter)
+            throws ApiException, IOException, InterruptedException {
+        String path = "/admin/removals";
+        if (filter != null && !filter.isBlank()) path += "?filter=" + encode(filter);
+        HttpResponse<String> resp = send(request(path, token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), AdminRemovalsResponseDto.class);
+    }
+
+    public void markRemovalReviewed(String token, long removalId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/admin/removals/" + removalId + "/review", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+    }
+
     // ---------------------------------------------------------------
     //  Low-level helpers
     // ---------------------------------------------------------------
@@ -355,5 +467,79 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
             // fall through to a generic message
         }
         return "Request failed (HTTP " + sc + ").";
+    }
+
+    // ── Profile ───────────────────────────────────────────────────────────────
+
+    /**
+     * PATCH /api/profile — update the signed-in user's username.
+     */
+    public void updateProfile(String token, String newUsername)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("username", newUsername);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(base + "/profile"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+    }
+
+    /**
+     * PATCH /api/profile/password — change the signed-in user's password.
+     */
+    public void updatePassword(String token, String currentPassword,
+                               String newPassword, String confirmPassword)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("current_password", currentPassword);
+        body.put("password", newPassword);
+        body.put("password_confirmation", confirmPassword);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(base + "/profile/password"))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+    }
+
+    // ── Moderation: Post Reports ─────────────────────────────────────
+    
+    public AdminReportsResponseDto getReports(String token, String filter) throws IOException, InterruptedException, ApiException {
+        String url = base + "/admin/reports?filter=" + encode(filter);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + token)
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        ok(response);
+        return mapper.readValue(response.body(), AdminReportsResponseDto.class);
+    }
+    
+    public void markReportReviewed(String token, long reportId) throws IOException, InterruptedException, ApiException {
+        String url = base + "/admin/reports/" + reportId + "/review";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + token)
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        ok(response);
     }
 }

@@ -9,6 +9,7 @@ import forum.app.Session;
 import forum.app.ViewState;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -41,18 +42,21 @@ public class StudentDashboardController {
     @FXML private VBox        resultsBox;
     @FXML private Label       noResultsLabel;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            String initials = u.displayName().length() >= 2
-                    ? u.displayName().substring(0, 2).toUpperCase()
-                    : u.displayName().toUpperCase();
-            avatarLabel.setText(initials);
+            avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
             welcomeLabel.setText("Welcome back, " + u.displayName() + " 👋");
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
     }
@@ -184,11 +188,15 @@ public class StudentDashboardController {
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
-    @FXML
-    private void onLogout() {
+    @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
+    }
+
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

@@ -37,39 +37,73 @@ public final class SceneManager {
         }
     }
 
+    public static <T> T showAndGetController(String fxmlName, String title) {
+        if (stage == null) throw new IllegalStateException("SceneManager not initialised");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneManager.class.getResource("/forum/fxml/" + fxmlName + ".fxml"));
+            Parent root = loader.load();
+            Scene existing = stage.getScene();
+            if (existing == null) {
+                stage.setScene(new Scene(root));
+            } else {
+                existing.setRoot(root);
+            }
+            stage.setTitle(title);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+            stage.show();
+            return loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void showHomeFor(forum.models.Role role) {
         switch (role) {
-            case LECTURER     -> show("LecturerDashboard", "Smart Discussion Forum — Lecturer");
-            case SYSTEM_ADMIN -> show("AdminDashboard",    "Smart Discussion Forum — Admin");
-            default           -> show("StudentDashboard",  "Smart Discussion Forum — Student");
+            case LECTURER     -> show("LecturerDashboard", "ACES — Lecturer");
+            case SYSTEM_ADMIN -> show("AdminDashboard",    "ACES — Admin");
+            default           -> show("StudentDashboard",  "ACES — Student");
         }
     }
 
     // Named nav helpers keep controllers clean
-    public static void goStudentDashboard()   { show("StudentDashboard",    "Smart Discussion Forum — Student"); }
-    public static void goLecturerDashboard()  { show("LecturerDashboard",   "Smart Discussion Forum — Lecturer"); }
+    public static void goStudentDashboard()   { show("StudentDashboard",    "ACES — Student"); }
+    public static void goLecturerDashboard()  { show("LecturerDashboard",   "ACES — Lecturer"); }
     public static void goGroups() {
         if (Session.currentUser() != null && Session.currentUser().getRole() == forum.models.Role.SYSTEM_ADMIN) {
-            show("AdminGroupsIndex", "Smart Discussion Forum — Admin Groups");
+            show("AdminGroupsIndex", "ACES — Admin Groups");
         } else {
-            show("GroupsIndex", "Smart Discussion Forum — Groups");
+            show("GroupsIndex", "ACES — Groups");
         }
     }
-    public static void goGroupShow()          { show("GroupShow",            "Smart Discussion Forum — Group"); }
-    public static void goForumDashboard()     { show("ForumDashboard",       "Smart Discussion Forum — Forum"); }
-    public static void goTopicCreation()      { show("TopicCreation",        "Smart Discussion Forum — New Topic"); }
-    public static void goQuizFocusMode()      { show("QuizFocusMode",        "Smart Discussion Forum — Quiz"); }
-    public static void goQuizResults()        { show("QuizResults",          "Smart Discussion Forum — Results"); }
-    public static void goQuizManagement()     { show("QuizManagement",       "Smart Discussion Forum — Create Quiz"); }
-    public static void goParticipationGrading(){ show("ParticipationGrading","Smart Discussion Forum — Grading"); }
-    public static void goAdminDashboard()     { show("AdminDashboard",       "Smart Discussion Forum — Admin"); }
-    public static void goAdminAnalytics()     { show("AdminAnalytics",       "Smart Discussion Forum — Analytics"); }
-    public static void goAdminMembers()       { show("ComplianceMonitoring", "Smart Discussion Forum — Members"); }
+    public static void goGroupShow()          { show("GroupShow",            "ACES — Group"); }
+    public static void showGroup(long groupId) {
+        // Find group and set ViewState, or assume ViewState is already set
+        show("GroupShow", "ACES — Group");
+    }
+    public static void goGroupEdit(forum.api.dto.GroupDto group) {
+        forum.controllers.GroupEditController controller = showAndGetController("GroupEdit", "ACES — Edit Group");
+        if (controller != null) controller.setGroup(group);
+    }
+    public static void goNotifications()      { show("NotificationsIndex",   "ACES — Notifications"); }
+    public static void goForumDashboard()     { show("ForumDashboard",       "ACES — Forum"); }
+    public static void goTopicCreation()      { show("TopicCreation",        "ACES — New Topic"); }
+    public static void goQuizFocusMode()      { show("QuizFocusMode",        "ACES — Quiz"); }
+    public static void goQuizResults()        { show("QuizResults",          "ACES — Results"); }
+    public static void goQuizManagement()     { show("QuizManagement",       "ACES — Create Quiz"); }
+    public static void goParticipationGrading(){ show("ParticipationGrading","ACES — Grading"); }
+    public static void goAdminDashboard()     { show("AdminDashboard",       "ACES — Admin"); }
+    public static void goAdminAnalytics()     { show("AdminAnalytics",       "ACES — Analytics"); }
+    public static void goAdminMembers()       { show("ComplianceMonitoring", "ACES — Members"); }
+    public static void goAdminModeration()      { show("AdminModeration",        "ACES — Moderation"); }
     public static void goProfile() {
         if (Session.currentUser() != null && Session.currentUser().getRole() == forum.models.Role.SYSTEM_ADMIN) {
-            show("AdminProfileEdit", "Smart Discussion Forum — Admin Profile");
+            show("AdminProfileEdit", "ACES — Admin Profile");
         } else {
-            show("ProfileEdit", "Smart Discussion Forum — Profile");
+            show("ProfileEdit", "ACES — Profile");
         }
     }
 }
+

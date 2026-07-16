@@ -34,6 +34,10 @@ public class TopicCreationController {
     @FXML private ComboBox<forum.api.dto.GroupDto> groupCombo;
     @FXML private TextArea descriptionArea;
     @FXML private Label errorLabel;
+    @FXML private Label userNameLabel;
+    @FXML private Label avatarLabel;
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
 
     private final TopicDao topicDao = new TopicDao();
     private final PostDao postDao = new PostDao();
@@ -41,6 +45,17 @@ public class TopicCreationController {
 
     @FXML
     private void initialize() {
+        User u = Session.currentUser();
+        if (u != null) {
+            if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (avatarLabel != null) {
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+            }
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
         if (errorLabel != null) errorLabel.setManaged(false);
         if (categoryCombo != null && categoryCombo.getItems().isEmpty()) {
             categoryCombo.getItems().addAll("General", "Programming", "Mathematics", "Science", "Announcements");
@@ -121,7 +136,7 @@ public class TopicCreationController {
 
     private void openDetail(Topic t) {
         ViewState.setSelectedTopic(t);
-        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
+        SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
     }
 
     private Topic fromDto(TopicDto dto) {
@@ -144,6 +159,13 @@ public class TopicCreationController {
     @FXML private void onGroups() { SceneManager.goGroups(); }
     @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
     @FXML private void onGrading() { SceneManager.goParticipationGrading(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onLogout()    {
+        String token = forum.app.Session.authToken();
+        forum.app.Session.end();
+        new Thread(() -> new forum.services.AuthService().logout(token)).start();
+        SceneManager.show("Login", "ACES");
+    }
 
     private void showError(String msg) {
         if (errorLabel == null) return;

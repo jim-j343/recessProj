@@ -40,6 +40,32 @@ public class TopicDao {
         return out;
     }
 
+    /** Most recent topics with author name + reply count for a specific group. */
+    public List<Topic> listRecentForGroup(long groupId, int limit) {
+        String sql = """
+            SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,
+                   t.is_flagged, t.created_at,
+                   COALESCE(u.username, u.email) AS author,
+                   (SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id) AS replies
+            FROM topics t
+            LEFT JOIN users u ON u.user_id = t.creator_id
+            WHERE t.group_id = ?
+            ORDER BY t.created_at DESC, t.topic_id DESC
+            LIMIT ?""";
+        List<Topic> out = new ArrayList<>();
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, groupId);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(map(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
     public Topic findById(long topicId) {
         String sql = """
             SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,

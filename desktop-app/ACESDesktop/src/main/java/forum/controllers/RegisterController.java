@@ -10,9 +10,8 @@ import forum.ui.RevealPasswordField;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 
 /** Controller for Register.fxml — creates a local account then routes to the role home. */
 public class RegisterController {
@@ -21,7 +20,7 @@ public class RegisterController {
     @FXML private IconTextField emailField;
     @FXML private RevealPasswordField passwordField;
     @FXML private RevealPasswordField confirmField;
-    @FXML private ToggleGroup role;
+    @FXML private ComboBox<String> roleComboBox;
     @FXML private CheckBox agreeTerms;
     @FXML private Label errorLabel;
 
@@ -30,6 +29,10 @@ public class RegisterController {
     @FXML
     private void initialize() {
         if (errorLabel != null) errorLabel.setManaged(false);
+        if (roleComboBox != null) {
+            roleComboBox.getItems().addAll("Student", "Lecturer", "Admin");
+            roleComboBox.setValue("Student");
+        }
     }
 
     @FXML
@@ -61,11 +64,29 @@ public class RegisterController {
         SceneManager.show("Login", "ACES");
     }
 
+    @FXML
+    private void onTerms() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/forum/fxml/TermsOfService.fxml"));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.showAndWait();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String text(IconTextField f) { return f == null ? "" : f.getText(); }
 
     private Role selectedRole() {
-        if (role != null && role.getSelectedToggle() instanceof ToggleButton tb) {
-            return Role.fromLabel(tb.getText());
+        if (roleComboBox != null && roleComboBox.getValue() != null) {
+            return Role.fromLabel(roleComboBox.getValue());
         }
         return Role.STUDENT;
     }
