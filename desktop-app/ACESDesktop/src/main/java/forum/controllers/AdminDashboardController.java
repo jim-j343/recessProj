@@ -72,6 +72,22 @@ public class AdminDashboardController {
         // ── Member table ──────────────────────────────────────────────
         colMember.setCellValueFactory(c ->
                 new SimpleStringProperty(memberName(c.getValue())));
+        // Render group name in bold to match web
+        colGroup.setCellFactory(column -> new TableCell<AdminDashboardDto.GroupSetting, String>() {
+            @Override
+            protected void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty || name == null) {
+                    setGraphic(null); setText(null);
+                } else {
+                    Label lbl = new Label(name);
+                    lbl.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #111827;");
+                    setGraphic(lbl);
+                    setText(null);
+                }
+            }
+        });
+
         // Render member name in bold to match web
         colMember.setCellFactory(column -> new TableCell<AdminMemberDto, String>() {
             @Override
@@ -81,7 +97,7 @@ public class AdminDashboardController {
                     setGraphic(null); setText(null);
                 } else {
                     Label lbl = new Label(name);
-                    lbl.setStyle("-fx-font-weight: 600; -fx-font-size: 13px;");
+                    lbl.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #111827;");
                     setGraphic(lbl);
                     setText(null);
                 }
@@ -162,7 +178,10 @@ public class AdminDashboardController {
         membersTable.setItems(FXCollections.observableArrayList(
                 data.members == null ? java.util.List.of() : data.members));
 
-        showStatus("Loaded from web backend.");
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     // ── Member row context menu ───────────────────────────────────────
@@ -235,7 +254,7 @@ public class AdminDashboardController {
     @FXML private void onMembers()    { SceneManager.goAdminMembers(); }
     @FXML private void onGroups()     { SceneManager.goGroups(); }
 
-    @FXML private void onRemovals()   { SceneManager.goAdminRemovals(); }
+    @FXML private void onModeration()   { SceneManager.goAdminModeration(); }
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
@@ -282,3 +301,4 @@ public class AdminDashboardController {
         statusLabel.setVisible(true);
     }
 }
+

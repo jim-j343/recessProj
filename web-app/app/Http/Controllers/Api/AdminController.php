@@ -13,6 +13,8 @@ use App\Models\Quiz;
 use App\Models\Submission;
 use App\Models\User;
 use App\Models\Warning;
+use App\Models\ParticipationScore;
+use App\Models\PostReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -123,6 +125,40 @@ class AdminController extends Controller
             return ['name' => $group->name, 'count' => $count];
         })->sortByDesc('count')->values();
 
+        $lecturerPerformance = User::where('system_role', 'lecturer')->get()->map(function ($lecturer) use ($quizTotalMarks) {
+            $quizzes = Quiz::where('lecturer_id', $lecturer->user_id)->get();
+            $quizIds = $quizzes->pluck('quiz_id');
+
+            $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->unique())
+                ->pluck('course_name')
+                ->filter()
+                ->unique()
+                ->values();
+
+            $percentages = Submission::whereIn('quiz_id', $quizIds)
+                ->whereNotNull('submitted_at')
+                ->get()
+                ->map(function ($submission) use ($quizTotalMarks) {
+                    $total = $quizTotalMarks[$submission->quiz_id] ?? 0;
+                    return $total > 0 ? ($submission->score / $total) * 100 : null;
+                })
+                ->filter(fn ($pct) => $pct !== null);
+
+            $studentsGraded = ParticipationScore::where('awarded_by', $lecturer->user_id)
+                ->pluck('user_id')
+                ->unique()
+                ->count();
+
+            return [
+                'name' => $lecturer->username,
+                'courses' => $courses,
+                'quizCount' => $quizzes->count(),
+                'avgPct' => $percentages->count() ? round($percentages->avg(), 1) : null,
+                'submissionCount' => $percentages->count(),
+                'studentsGraded' => $studentsGraded,
+            ];
+        })->values();
+
         return response()->json([
             'total_members' => $totalMembers,
             'active_this_week' => $activeThisWeek,
@@ -131,6 +167,7 @@ class AdminController extends Controller
             'post_volume' => $postVolume,
             'group_performance' => $groupPerformance,
             'group_activity' => $groupActivity,
+            'lecturer_performance' => $lecturerPerformance,
             'groups' => Group::withCount(['topics', 'memberships'])
                 ->orderBy('name')
                 ->get()
@@ -276,6 +313,54 @@ class AdminController extends Controller
             'message' => 'Removal marked as reviewed.',
             'removal' => [
                 'id' => $removal->id,
+                'reviewed' => true,
+                'reviewed_by' => Auth::user()->username,
+            ]
+        ]);
+    }
+
+    public function reports(Request $request)
+    {
+        $filter = $request->query('filter', 'unreviewed');
+        $query = PostReport::with(['post.author', 'post.topic', 'reportedBy', 'reviewedBy']);
+
+        if ($filter === 'unreviewed') {
+            $query->where('reviewed', false);
+        } elseif ($filter === 'reviewed') {
+            $query->where('reviewed', true);
+        }
+
+        return response()->json([
+            'filter' => $filter,
+            'reports' => $query->latest('created_at')->get()->map(function ($r) {
+                return [
+                    'id' => $r->report_id,
+                    'post_content' => $r->post ? $r->post->content : 'Unknown',
+                    'topic_title' => $r->post && $r->post->topic ? $r->post->topic->title : 'Unknown',
+                    'author' => $r->post && $r->post->author ? $r->post->author->username : 'Unknown',
+                    'reported_by' => $r->reportedBy ? $r->reportedBy->username : 'Unknown',
+                    'reason' => $r->reason,
+                    'reviewed' => (bool) $r->reviewed,
+                    'reviewed_by' => $r->reviewedBy ? $r->reviewedBy->username : null,
+                    'created_at' => $r->created_at ? $r->created_at->toISOString() : null,
+                    'created_at_human' => $r->created_at ? $r->created_at->diffForHumans() : null,
+                ];
+            })
+        ]);
+    }
+
+    public function markReportReviewed(PostReport $report)
+    {
+        $report->update([
+            'reviewed'    => true,
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Report marked as reviewed.',
+            'report' => [
+                'id' => $report->report_id,
                 'reviewed' => true,
                 'reviewed_by' => Auth::user()->username,
             ]

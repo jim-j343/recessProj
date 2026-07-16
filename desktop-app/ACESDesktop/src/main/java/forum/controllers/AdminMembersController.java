@@ -119,7 +119,10 @@ public class AdminMembersController {
         for (AdminMemberDto m : members) {
             membersListBox.getChildren().add(buildMemberCard(m));
         }
-        showStatus("Loaded " + members.size() + " member(s).");
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     /**
@@ -338,7 +341,7 @@ public class AdminMembersController {
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
-    @FXML private void onRemovals()  { SceneManager.goAdminRemovals(); }
+    @FXML private void onModeration()  { SceneManager.goAdminModeration(); }
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
@@ -392,3 +395,4 @@ public class AdminMembersController {
         statusLabel.setVisible(true);
     }
 }
+

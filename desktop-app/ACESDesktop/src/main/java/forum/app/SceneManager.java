@@ -66,7 +66,7 @@ public final class SceneManager {
     public static void goAdminDashboard()     { show("AdminDashboard",       "Smart Discussion Forum — Admin"); }
     public static void goAdminAnalytics()     { show("AdminAnalytics",       "Smart Discussion Forum — Analytics"); }
     public static void goAdminMembers()       { show("ComplianceMonitoring", "Smart Discussion Forum — Members"); }
-    public static void goAdminRemovals()      { show("AdminRemovals",        "Smart Discussion Forum — Removals"); }
+    public static void goAdminModeration()      { show("AdminModeration",        "Smart Discussion Forum — Moderation"); }
     public static void goProfile() {
         if (Session.currentUser() != null && Session.currentUser().getRole() == forum.models.Role.SYSTEM_ADMIN) {
             show("AdminProfileEdit", "Smart Discussion Forum — Admin Profile");
@@ -75,3 +75,4 @@ public final class SceneManager {
         }
     }
 }
+

@@ -184,7 +184,7 @@ public class GroupsIndexController {
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
-    @FXML private void onRemovals()  { SceneManager.goAdminRemovals(); }
+    @FXML private void onModeration()  { SceneManager.goAdminModeration(); }
     @FXML private void onProfile()   { SceneManager.goProfile(); }
     @FXML private void onLogout()    {
         String token = Session.authToken();
