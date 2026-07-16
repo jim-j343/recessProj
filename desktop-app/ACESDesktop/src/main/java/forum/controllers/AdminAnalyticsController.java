@@ -6,12 +6,16 @@ import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -21,20 +25,29 @@ import javafx.scene.layout.FlowPane;
 
 public class AdminAnalyticsController {
 
-    @FXML private Label avatarLabel;
-    @FXML private Label userNameLabel;
-    @FXML private Label totalMembersLabel;
-    @FXML private Label activeThisWeekLabel;
-    @FXML private Label activeThisWeekMetaLabel;
-    @FXML private Label warningsThisWeekLabel;
-    @FXML private Label activeBlacklistsLabel;
-    @FXML private Label statusLabel;
+    @FXML private Label      avatarLabel;
+    @FXML private Label      userNameLabel;
+    @FXML private MenuButton notifButton;
+    @FXML private Label      notifBadge;
+    @FXML private Label      totalMembersLabel;
+    @FXML private Label      activeThisWeekLabel;
+    @FXML private Label      activeThisWeekMetaLabel;
+    @FXML private Label      warningsThisWeekLabel;
+    @FXML private Label      activeBlacklistsLabel;
+    @FXML private Label      statusLabel;
     
     @FXML private VBox postVolumeBox;
     @FXML private VBox groupPerformanceBox;
     @FXML private VBox groupActivityBox;
     @FXML private FlowPane groupsBox;
-    @FXML private VBox recentActivityBox;
+    @FXML private VBox           recentActivityBox;
+
+    @FXML private TableView<AdminAnalyticsDto.LecturerPerformance> lecturerTable;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturer;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturerCourses;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, Integer> colLecturerQuizzes;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturerAvg;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, Integer> colLecturerGraded;
 
     private final ApiClient api = new ApiClient();
 
@@ -43,8 +56,19 @@ public class AdminAnalyticsController {
         User user = Session.currentUser();
         if (user != null) {
             userNameLabel.setText(user.displayName());
-            avatarLabel.setText(initials(user.displayName()));
+            avatarLabel.setText(initial(user.displayName()));
         }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        // Initialize Lecturer Table
+        colLecturer.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().name));
+        colLecturerCourses.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().courses != null ? String.join(", ", c.getValue().courses) : ""));
+        colLecturerQuizzes.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().quizCount));
+        colLecturerAvg.setCellValueFactory(c -> {
+            if (c.getValue().avgPct == null) return new javafx.beans.property.SimpleStringProperty("—");
+            return new javafx.beans.property.SimpleStringProperty(String.format("%.1f%% (%d submissions)", c.getValue().avgPct, c.getValue().submissionCount));
+        });
+        colLecturerGraded.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().studentsGraded));
+
         loadAnalytics();
     }
 
@@ -82,7 +106,15 @@ public class AdminAnalyticsController {
         renderActivity(data);
         renderGroups(data);
         renderRecentActivity(data);
-        showStatus("Loaded from web backend.");
+        
+        if (data.lecturerPerformance != null) {
+            lecturerTable.setItems(javafx.collections.FXCollections.observableArrayList(data.lecturerPerformance));
+        }
+        
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     private void renderPostVolume(AdminAnalyticsDto data) {
@@ -192,7 +224,7 @@ public class AdminAnalyticsController {
             AdminAnalyticsDto.ActivityItem item = data.recentActivity.get(i);
             String group = item.group == null || item.group.isBlank() ? "" : " in " + item.group;
             
-            Label av = new Label(initials(item.user));
+            Label av = new Label(initial(item.user));
             av.getStyleClass().add("avatar-soft");
             av.setMinSize(32, 32);
 
@@ -224,6 +256,8 @@ public class AdminAnalyticsController {
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
+    @FXML private void onModeration() { SceneManager.goAdminModeration(); }
+
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
     @FXML
@@ -231,7 +265,7 @@ public class AdminAnalyticsController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private Label muted(String text) {
@@ -241,10 +275,9 @@ public class AdminAnalyticsController {
         return label;
     }
 
-    private String initials(String name) {
-        if (name == null || name.isBlank()) return "??";
-        String t = name.trim();
-        return (t.length() >= 2 ? t.substring(0, 2) : t).toUpperCase();
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 
     private void showStatus(String message) {
@@ -254,3 +287,4 @@ public class AdminAnalyticsController {
         statusLabel.setVisible(true);
     }
 }
+

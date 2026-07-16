@@ -7,6 +7,8 @@ import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
+import javafx.scene.control.MenuButton;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,8 +31,10 @@ import java.util.List;
  */
 public class AdminMembersController {
 
-    @FXML private Label    avatarLabel;
-    @FXML private Label    userNameLabel;
+    @FXML private Label      avatarLabel;
+    @FXML private Label      userNameLabel;
+    @FXML private MenuButton notifButton;
+    @FXML private Label      notifBadge;
     @FXML private TextField searchField;
     @FXML private ToggleGroup filterGroup;
     @FXML private ToggleButton btnAll;
@@ -48,8 +52,9 @@ public class AdminMembersController {
         User user = Session.currentUser();
         if (user != null) {
             userNameLabel.setText(user.displayName());
-            avatarLabel.setText(initials(user.displayName()));
+            avatarLabel.setText(initial(user.displayName()));
         }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
 
         // Wire filter toggles
         btnAll.setUserData("all");
@@ -114,7 +119,10 @@ public class AdminMembersController {
         for (AdminMemberDto m : members) {
             membersListBox.getChildren().add(buildMemberCard(m));
         }
-        showStatus("Loaded " + members.size() + " member(s).");
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     /**
@@ -123,7 +131,7 @@ public class AdminMembersController {
      */
     private VBox buildMemberCard(AdminMemberDto m) {
         // ── header row ──────────────────────────────────────────────
-        Label avatar = new Label(initials(m.username));
+        Label avatar = new Label(initial(m.username));
         avatar.getStyleClass().addAll("avatar-soft", "avatar-lg");
 
         Label name = new Label(m.username == null ? "Unknown" : m.username);
@@ -330,8 +338,10 @@ public class AdminMembersController {
 
     @FXML private void onDashboard() { SceneManager.goAdminDashboard(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onMembers()   { /* already here */ }
+    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+
+    @FXML private void onModeration()  { SceneManager.goAdminModeration(); }
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
@@ -340,7 +350,7 @@ public class AdminMembersController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     // ---------------------------------------------------------------
@@ -373,12 +383,9 @@ public class AdminMembersController {
         };
     }
 
-    private String initials(String name) {
+    private String initial(String name) {
         if (name == null || name.isBlank()) return "?";
-        String trimmed = name.trim();
-        return trimmed.length() >= 2
-                ? trimmed.substring(0, 2).toUpperCase()
-                : trimmed.toUpperCase();
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 
     private void showStatus(String msg) {
@@ -388,3 +395,4 @@ public class AdminMembersController {
         statusLabel.setVisible(true);
     }
 }
+

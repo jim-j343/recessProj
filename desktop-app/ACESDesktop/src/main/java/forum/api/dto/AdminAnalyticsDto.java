@@ -14,6 +14,7 @@ public class AdminAnalyticsDto {
     @JsonProperty("post_volume") public List<CountPoint> postVolume;
     @JsonProperty("group_performance") public List<GroupPerformance> groupPerformance;
     @JsonProperty("group_activity") public List<CountPoint> groupActivity;
+    @JsonProperty("lecturer_performance") public List<LecturerPerformance> lecturerPerformance;
     public List<GroupSummary> groups;
     @JsonProperty("recent_activity") public List<ActivityItem> recentActivity;
 
@@ -45,5 +46,15 @@ public class AdminAnalyticsDto {
         public String action;
         public String group;
         @JsonProperty("logged_at_human") public String loggedAtHuman;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class LecturerPerformance {
+        public String name;
+        public List<String> courses;
+        public int quizCount;
+        public Double avgPct;
+        public int submissionCount;
+        public int studentsGraded;
     }
 }

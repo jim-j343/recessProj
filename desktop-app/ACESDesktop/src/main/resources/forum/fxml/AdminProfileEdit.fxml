@@ -11,26 +11,31 @@
     <top>
         <VBox>
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-                <Label text="Smart Discussion Forum" styleClass="brand"/>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                        <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                    </javafx.scene.image.ImageView>
+                    <Label text="ACES" styleClass="brand"/>
+                </HBox>
                 <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
                 <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 
-                <MenuButton styleClass="btn-ghost" text="">
+                <!-- Notification bell — populated dynamically from backend -->
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
                         <StackPane>
                             <Label text="🔔" style="-fx-font-size: 16px;"/>
-                            <Label text="3" styleClass="badge,badge-danger" style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;" StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
                         </StackPane>
                     </graphic>
                     <items>
-                        <MenuItem text="System Maintenance at Midnight" styleClass="muted"/>
-                        <MenuItem text="New user signups waiting approval" styleClass="muted"/>
-                        <MenuItem text="Database backup successful" styleClass="muted"/>
-                        <SeparatorMenuItem/>
-                        <MenuItem text="Mark all as read"/>
+                        <!-- Items populated by NavbarHelper.loadNotifications() -->
                     </items>
                 </MenuButton>
 
@@ -38,13 +43,13 @@
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
-                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="??"/>
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
                             <Label fx:id="userNameLabel" text="Signed in"/>
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="Profile" onAction="#onProfile"/>
-                        <MenuItem text="Log Out" onAction="#onLogout"/>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
                     </items>
                 </MenuButton>
             </HBox>
@@ -67,13 +72,17 @@
                         </VBox>
                         <VBox spacing="6" maxWidth="576">
                             <Label text="Username" styleClass="field-label"/>
-                            <TextField text="Alex Rivers"/>
+                            <TextField fx:id="usernameField" promptText="Username"/>
                         </VBox>
                         <VBox spacing="6" maxWidth="576">
                             <Label text="Email" styleClass="field-label"/>
-                            <TextField text="a.rivers@university.ac.ug"/>
+                            <TextField fx:id="emailField" promptText="Email" editable="false"
+                                       style="-fx-opacity: 0.7;"/>
                         </VBox>
-                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button text="SAVE" styleClass="btn,btn-dark" onAction="#onSaveProfile"/>
+                            <Label fx:id="saveStatusLabel" text="" styleClass="subtle" managed="false" visible="false"/>
+                        </HBox>
                     </VBox>
 
                     <!-- Update password -->
@@ -82,10 +91,13 @@
                             <Label text="Update Password" styleClass="h-md"/>
                             <Label text="Ensure your account is using a long, random password to stay secure." styleClass="subtle"/>
                         </VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="Current Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="New Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <VBox spacing="6" maxWidth="576"><Label text="Confirm Password" styleClass="field-label"/><PasswordField/></VBox>
-                        <Button text="SAVE" styleClass="btn,btn-dark"/>
+                        <VBox spacing="6" maxWidth="576"><Label text="Current Password" styleClass="field-label"/><PasswordField fx:id="currentPasswordField"/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="New Password" styleClass="field-label"/><PasswordField fx:id="newPasswordField"/></VBox>
+                        <VBox spacing="6" maxWidth="576"><Label text="Confirm Password" styleClass="field-label"/><PasswordField fx:id="confirmPasswordField"/></VBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button text="SAVE" styleClass="btn,btn-dark" onAction="#onSavePassword"/>
+                            <Label fx:id="passwordStatusLabel" text="" styleClass="subtle" managed="false" visible="false"/>
+                        </HBox>
                     </VBox>
 
                     <!-- Delete account -->
@@ -101,3 +113,4 @@
         </ScrollPane>
     </center>
 </BorderPane>
+

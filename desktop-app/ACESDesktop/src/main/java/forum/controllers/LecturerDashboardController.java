@@ -2,12 +2,18 @@ package forum.controllers;
 
 import forum.api.ApiClient;
 import forum.api.ApiException;
-import forum.api.dto.GroupDto;
+import forum.api.dto.LecturerDashboardDto;
 import forum.api.dto.QuizDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
+import forum.util.NavbarHelper;
+
+import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,17 +35,20 @@ public class LecturerDashboardController {
     @FXML private VBox  quizListBox;
     @FXML private Label noQuizzesLabel;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            String initials = u.displayName().length() >= 2
-                    ? u.displayName().substring(0, 2).toUpperCase()
-                    : u.displayName().toUpperCase();
-            avatarLabel.setText(initials);
+            avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
     }
@@ -50,17 +59,13 @@ public class LecturerDashboardController {
 
         Thread worker = new Thread(() -> {
             try {
-                List<QuizDto>  quizzes = api.myQuizzes(token);
-                List<GroupDto> groups  = api.listGroups(token);
-
-                long myGroupCount = groups.stream()
-                        .filter(g -> "active".equals(g.myStatus))
-                        .count();
+                LecturerDashboardDto dashboard = api.getLecturerDashboard(token);
 
                 Platform.runLater(() -> {
-                    quizCountLabel.setText(String.valueOf(quizzes.size()));
-                    groupCountLabel.setText(String.valueOf(myGroupCount));
-                    renderQuizList(quizzes);
+                    quizCountLabel.setText(String.valueOf(dashboard.quizCount));
+                    groupCountLabel.setText(String.valueOf(dashboard.groupCount));
+                    topicCountLabel.setText(String.valueOf(dashboard.topicCount));
+                    renderQuizList(dashboard.quizzes);
                 });
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
@@ -95,9 +100,24 @@ public class LecturerDashboardController {
         Label title = new Label(q.title);
         title.getStyleClass().add("label-strong");
 
-        String timeStr = q.startTime != null
-                ? q.startTime.replace("T", " ").substring(0, 16) + " · " + q.durationMinutes + " mins"
-                : q.durationMinutes + " mins";
+        String timeStr = "";
+        if (q.startTime != null && !q.startTime.isBlank()) {
+            try {
+                ZonedDateTime zdt = ZonedDateTime.parse(q.startTime);
+                timeStr = zdt.format(DateTimeFormatter.ofPattern("d MMM yyyy HH:mm"));
+            } catch (DateTimeParseException e) {
+                try {
+                    LocalDateTime ldt = LocalDateTime.parse(q.startTime);
+                    timeStr = ldt.format(DateTimeFormatter.ofPattern("d MMM yyyy HH:mm"));
+                } catch (DateTimeParseException ex) {
+                    timeStr = q.startTime;
+                }
+            }
+            timeStr += " · " + q.durationMinutes + " mins";
+        } else {
+            timeStr = q.durationMinutes + " mins";
+        }
+
         Label meta = new Label(timeStr);
         meta.getStyleClass().add("subtle");
 
@@ -126,6 +146,12 @@ public class LecturerDashboardController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
+    }
+
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

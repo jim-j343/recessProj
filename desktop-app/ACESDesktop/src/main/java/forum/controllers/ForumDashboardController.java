@@ -9,6 +9,8 @@ import forum.models.Topic;
 import forum.models.User;
 import forum.services.AuthService;
 import forum.services.SyncService;
+import forum.util.NavbarHelper;
+import javafx.scene.control.MenuButton;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -26,23 +28,54 @@ public class ForumDashboardController {
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
+    @FXML private Label userMetaLabel;
+    @FXML private Label navMyProgress;
+    @FXML private Label navNewTopic;
+    @FXML private Label navQuizCenter;
+    @FXML private Label navGrading;
+    @FXML private Label navMembers;
+    @FXML private Label navAnalytics;
+    @FXML private Label navModeration;
     
     @FXML private VBox myGroupsBox;
     @FXML private TextField searchField;
     @FXML private VBox discussionList;
     @FXML private VBox unansweredBox;
 
+    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private Label notifBadge;
+
     private final TopicDao topicDao = new TopicDao();
+    private final ApiClient api = new ApiClient();
 
     @FXML
     private void initialize() {
         User u = Session.currentUser();
         if (u != null) {
-            String initials = u.displayName().length() >= 2
-                    ? u.displayName().substring(0, 2).toUpperCase()
-                    : u.displayName().toUpperCase();
-            if (avatarLabel != null) avatarLabel.setText(initials);
+            if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
             if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (userMetaLabel != null) {
+                userMetaLabel.setText(u.getRole().name().toLowerCase());
+            }
+            if (u.getRole() == forum.models.Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != forum.models.Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
+            if (u.getRole() == forum.models.Role.LECTURER && navQuizCenter != null && navGrading != null) {
+                navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+                navGrading.setManaged(true); navGrading.setVisible(true);
+            }
+            if (u.getRole() == forum.models.Role.SYSTEM_ADMIN && navMembers != null) {
+                navMembers.setManaged(true); navMembers.setVisible(true);
+                navAnalytics.setManaged(true); navAnalytics.setVisible(true);
+                navModeration.setManaged(true); navModeration.setVisible(true);
+            }
+        }
+
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
         renderTopics(topicDao.listRecent(15));
@@ -76,7 +109,7 @@ public class ForumDashboardController {
             card.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand;");
             
             HBox header = new HBox(12);
-            Label av = new Label(initials(t.getAuthorName()));
+            Label av = new Label(initial(t.getAuthorName()));
             av.getStyleClass().addAll("avatar", "avatar-soft");
             av.setMinSize(36, 36);
 
@@ -185,16 +218,21 @@ public class ForumDashboardController {
 
     private void openTopic(Topic t) {
         ViewState.setSelectedTopic(t);
-        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
+        SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
     }
 
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onGroups() { SceneManager.goGroups(); }
-    @FXML private void onNewThread() { SceneManager.show("TopicCreation", "Smart Discussion Forum — New Topic"); }
-    @FXML private void onProfile() { SceneManager.goProfile(); }
+    @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onNewTopic()  { SceneManager.goTopicCreation(); }
+    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
+    @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+    @FXML private void onModeration() { SceneManager.goAdminModeration(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
 
     @FXML private void onLogout() {
         String token = Session.authToken();
@@ -202,14 +240,14 @@ public class ForumDashboardController {
         Thread t = new Thread(() -> new AuthService().logout(token), "aces-logout");
         t.setDaemon(true);
         t.start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private String safe(String s) { return s == null ? "Unknown" : s; }
-    
-    private String initials(String name) {
-        if (name == null || name.isBlank()) return "??";
-        String n = name.trim();
-        return n.length() >= 2 ? n.substring(0, 2).toUpperCase() : n.toUpperCase();
+
+    /** Single first-letter initial — matches web x-avatar component. */
+    private String initial(String name) {
+        if (name == null || name.isBlank()) return "?";
+        return String.valueOf(name.trim().charAt(0)).toUpperCase();
     }
 }

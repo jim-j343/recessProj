@@ -17,23 +17,19 @@
         <ToggleGroup fx:id="role"/>
     </fx:define>
 
-    <VBox alignment="CENTER" maxWidth="448" spacing="0">
+    <VBox alignment="CENTER" maxWidth="448" spacing="16">
         <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
         <VBox styleClass="auth-card" spacing="0" maxWidth="448">
 
-<!-- Branding -->
-<VBox alignment="CENTER" spacing="4">
-    <padding><Insets bottom="24"/></padding>
-    <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
-        <VBox.margin><Insets bottom="12"/></VBox.margin>
-        <image>
-            <Image url="@../images/aces-logo.png"/>
-        </image>
-    </ImageView>
-    <Label text="ACES" styleClass="display"/>
-    <Label text="Sign in to continue to your account" styleClass="muted"/>
-</VBox>
+            <VBox alignment="CENTER" spacing="4">
+                <padding><Insets bottom="24"/></padding>
+                <ImageView fitWidth="110" fitHeight="110" preserveRatio="true">
+                    <VBox.margin><Insets bottom="12"/></VBox.margin>
+                    <image><Image url="@../images/logo.jpg"/></image>
+                </ImageView>
+                <Label text="Sign in to continue to your account" styleClass="muted"/>
+            </VBox>
 
             <!-- Email -->
             <VBox spacing="6">
@@ -48,7 +44,7 @@
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Password" styleClass="field-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Hyperlink text="Forgot password?" styleClass="subtle"/>
+                    <Hyperlink text="Forgot password?" onAction="#onForgotPassword" styleClass="subtle"/>
                 </HBox>
                 <RevealPasswordField fx:id="passwordField" promptText="Enter your password" maxWidth="Infinity"/>
             </VBox>
@@ -82,3 +78,4 @@
         </VBox>
     </VBox>
 </StackPane>
+

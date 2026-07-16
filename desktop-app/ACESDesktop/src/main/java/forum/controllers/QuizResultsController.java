@@ -30,8 +30,8 @@ public class QuizResultsController {
         if (u != null) {
             userNameLabel.setText(u.displayName());
             if (avatarLabel != null) {
-                String name = u.displayName().trim();
-                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
         }
 
@@ -82,6 +82,6 @@ public class QuizResultsController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 }
