@@ -107,6 +107,7 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::post('/groups/{group}/members/{user}/remove', [GroupController::class, 'removeMember'])->name('groups.members.remove');
+    Route::post('/groups/{group}/members/add', [GroupController::class, 'addMember'])->name('groups.members.add');
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 
