@@ -17,9 +17,7 @@ return new class extends Migration
         }
 
         // Only touch group_id/its foreign key if it isn't already nullable
-        // — avoids re-running raw SQL against a column already fixed by an
-        // earlier partial attempt
-        $column = DB::select("SHOW COLUMNS FROM quizzes WHERE Field = 'group_id'");
+        $column = DB::select("SHOW COLUMNS FROM `quizzes` WHERE Field = 'group_id'");
         $alreadyNullable = $column && $column[0]->Null === 'YES';
 
         if (!$alreadyNullable) {
@@ -32,13 +30,16 @@ return new class extends Migration
             ");
 
             foreach ($existingForeignKeys as $fk) {
-                DB::statement("ALTER TABLE quizzes DROP FOREIGN KEY {$fk->CONSTRAINT_NAME}");
+                DB::statement("ALTER TABLE `quizzes` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
             }
 
-            DB::statement('ALTER TABLE quizzes MODIFY group_id BIGINT UNSIGNED NULL');
+            DB::statement('ALTER TABLE `quizzes` MODIFY `group_id` BIGINT UNSIGNED NULL');
 
-            DB::statement('ALTER TABLE quizzes ADD CONSTRAINT quizzes_group_id_foreign
-                FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE SET NULL');
+            // `groups` is a reserved word as of MySQL 8.0.2 (window function
+            // frame syntax) — must be backtick-quoted in raw SQL, unlike
+            // Schema Builder calls elsewhere which quote it automatically
+            DB::statement('ALTER TABLE `quizzes` ADD CONSTRAINT `quizzes_group_id_foreign`
+                FOREIGN KEY (`group_id`) REFERENCES `groups`(`group_id`) ON DELETE SET NULL');
         }
     }
 
@@ -59,11 +60,11 @@ return new class extends Migration
         ");
 
         foreach ($existingForeignKeys as $fk) {
-            DB::statement("ALTER TABLE quizzes DROP FOREIGN KEY {$fk->CONSTRAINT_NAME}");
+            DB::statement("ALTER TABLE `quizzes` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
         }
 
-        DB::statement('ALTER TABLE quizzes MODIFY group_id BIGINT UNSIGNED NOT NULL');
-        DB::statement('ALTER TABLE quizzes ADD CONSTRAINT quizzes_group_id_foreign
-            FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE');
+        DB::statement('ALTER TABLE `quizzes` MODIFY `group_id` BIGINT UNSIGNED NOT NULL');
+        DB::statement('ALTER TABLE `quizzes` ADD CONSTRAINT `quizzes_group_id_foreign`
+            FOREIGN KEY (`group_id`) REFERENCES `groups`(`group_id`) ON DELETE CASCADE');
     }
 };
