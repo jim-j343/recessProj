@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<!-- Create New Topic â€” mirrors web forum/create.blade.php -->
+<!-- Create New Topic — mirrors web forum/create.blade.php -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.TopicCreationController"
             stylesheets="@../css/aces.css" styleClass="root"
@@ -15,7 +15,7 @@
                     <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                         <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
                     </javafx.scene.image.ImageView>
-                    <Label text="Smart Discussion Forum" styleClass="brand"/>
+                    <Label text="ACES" styleClass="brand"/>
                 </HBox>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
@@ -31,15 +31,15 @@
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="âœ“  Profile" onAction="#onProfile"/>
-                        <MenuItem text="â†’  Log Out" onAction="#onLogout"/>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
                     </items>
                 </MenuButton>
             </HBox>
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <Label text="Create New Topic" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="â† Back to Forum" styleClass="btn,btn-secondary" onAction="#onCancel"/>
+                <Button text="← Back to Forum" styleClass="btn,btn-secondary" onAction="#onCancel"/>
             </HBox>
         </VBox>
     </top>

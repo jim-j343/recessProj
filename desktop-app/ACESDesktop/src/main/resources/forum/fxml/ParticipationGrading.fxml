@@ -18,6 +18,7 @@
 </HBox>
                 <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
                 <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
                 <Label text="Grading"     styleClass="nav-link,active"/>
                 <Region HBox.hgrow="ALWAYS"/>
@@ -65,13 +66,12 @@
 
                         <TableView fx:id="gradesTable" prefHeight="480">
                             <columns>
-                                <TableColumn fx:id="colStudent"  text="STUDENT"      prefWidth="180"/>
-                                <TableColumn fx:id="colGroup"    text="GROUP"        prefWidth="180"/>
-                                <TableColumn fx:id="colPosts"    text="POSTS"        prefWidth="80"/>
-                                <TableColumn fx:id="colReplies"  text="REPLIES"      prefWidth="80"/>
-                                <TableColumn fx:id="colQuality"  text="QUALITY"      prefWidth="100"/>
-                                <TableColumn fx:id="colGrade"    text="GRADE"        prefWidth="120"/>
-                                <TableColumn fx:id="colRemarks"  text="REMARKS"      prefWidth="200"/>
+                                <TableColumn fx:id="colStudent"       text="STUDENT"       prefWidth="180"/>
+                                <TableColumn fx:id="colReplies"       text="REPLIES"       prefWidth="80"/>
+                                <TableColumn fx:id="colParticipation" text="PARTICIPATION" prefWidth="120"/>
+                                <TableColumn fx:id="colTestAvg"       text="TEST AVG"      prefWidth="180"/>
+                                <TableColumn fx:id="colScore"         text="SCORE"         prefWidth="100"/>
+                                <TableColumn fx:id="colRemarks"       text="REMARKS"       prefWidth="220"/>
                             </columns>
                             <placeholder>
                                 <Label text="No students in your groups yet." styleClass="muted"/>

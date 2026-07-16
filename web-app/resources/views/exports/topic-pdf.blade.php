@@ -147,7 +147,7 @@
     @endforelse
 
     <div class="footer">
-        Exported from Smart Discussion Forum on {{ now()->format('d M Y, H:i') }}
+        Exported from ACES on {{ now()->format('d M Y, H:i') }}
     </div>
 
 </body>

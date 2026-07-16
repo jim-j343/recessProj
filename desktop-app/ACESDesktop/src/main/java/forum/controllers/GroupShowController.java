@@ -39,6 +39,10 @@ public class GroupShowController {
     @FXML private Button manageMembersBtn;
     @FXML private VBox   membersBox;
     @FXML private Label  pendingNote;
+    @FXML private Label      navMyProgress;
+    @FXML private Label      navNewTopic;
+    @FXML private Label      navQuizCenter;
+    @FXML private Label      navGrading;
 
     private final ApiClient api = new ApiClient();
     private GroupDto group;
@@ -48,7 +52,20 @@ public class GroupShowController {
         User u = Session.currentUser();
         if (u != null) {
             userNameLabel.setText(u.displayName());
-            if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
+            if (avatarLabel != null) {
+                String name = u.displayName().trim();
+                avatarLabel.setText(name.length() >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase());
+            }
+            if (u.getRole() == Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
+            if (u.getRole() == Role.LECTURER && navQuizCenter != null && navGrading != null) {
+                navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+                navGrading.setManaged(true); navGrading.setVisible(true);
+            }
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
 
@@ -178,7 +195,9 @@ public class GroupShowController {
 
     @FXML private void onManageMembers() { loadMembers(); }
     @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onForum()     { SceneManager.goForumDashboard(); }
+    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
+    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
@@ -188,7 +207,7 @@ public class GroupShowController {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private String capitalize(String s) {

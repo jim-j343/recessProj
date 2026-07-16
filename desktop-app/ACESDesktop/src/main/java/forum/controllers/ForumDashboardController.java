@@ -28,6 +28,11 @@ public class ForumDashboardController {
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
+    @FXML private Label userMetaLabel;
+    @FXML private Label navMyProgress;
+    @FXML private Label navNewTopic;
+    @FXML private Label navQuizCenter;
+    @FXML private Label navGrading;
     
     @FXML private VBox myGroupsBox;
     @FXML private TextField searchField;
@@ -43,6 +48,19 @@ public class ForumDashboardController {
         if (u != null) {
             if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
             if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (userMetaLabel != null) {
+                userMetaLabel.setText(u.getRole().name().toLowerCase());
+            }
+            if (u.getRole() == forum.models.Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != forum.models.Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
+            if (u.getRole() == forum.models.Role.LECTURER && navQuizCenter != null && navGrading != null) {
+                navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+                navGrading.setManaged(true); navGrading.setVisible(true);
+            }
         }
 
         renderTopics(topicDao.listRecent(15));
@@ -185,7 +203,7 @@ public class ForumDashboardController {
 
     private void openTopic(Topic t) {
         ViewState.setSelectedTopic(t);
-        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + t.getTitle());
+        SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
     }
 
     @FXML private void onDashboard() {
@@ -193,7 +211,10 @@ public class ForumDashboardController {
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
     @FXML private void onGroups() { SceneManager.goGroups(); }
-    @FXML private void onNewThread() { SceneManager.show("TopicCreation", "Smart Discussion Forum — New Topic"); }
+    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
+    @FXML private void onNewThread() { SceneManager.show("TopicCreation", "ACES — New Topic"); }
     @FXML private void onProfile() { SceneManager.goProfile(); }
 
     @FXML private void onLogout() {
@@ -202,7 +223,7 @@ public class ForumDashboardController {
         Thread t = new Thread(() -> new AuthService().logout(token), "aces-logout");
         t.setDaemon(true);
         t.start();
-        SceneManager.show("Login", "Smart Discussion Forum");
+        SceneManager.show("Login", "ACES");
     }
 
     private String safe(String s) { return s == null ? "Unknown" : s; }

@@ -22,13 +22,13 @@
                 
                 <VBox spacing="8">
                     <Label text="1. Acceptable Use Policy" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
-                    <Label text="Users of the Smart Discussion Forum are strictly prohibited from utilizing the system for any purpose other than authorized academic discussion and learning." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Label text="Users of the ACES are strictly prohibited from utilizing the system for any purpose other than authorized academic discussion and learning." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
                     <Label text="• All identity information provided must be verifiable through official university records.&#10;• Automated scripts or bot interactions are strictly prohibited.&#10;• Users are responsible for maintaining the confidentiality of their credentials.&#10;• Data scraping of internal content is a violation of this policy." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
                 </VBox>
 
                 <VBox spacing="8">
                     <Label text="2. Data Privacy &amp; Processing" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
-                    <Label text="The Smart Discussion Forum processes submitted data under applicable data protection frameworks. Your identification and email are encrypted at rest." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Label text="The ACES processes submitted data under applicable data protection frameworks. Your identification and email are encrypted at rest." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
                     <Label text="• Data is stored for the duration of your academic tenure.&#10;• Personal data is never shared with third-party vendors.&#10;• System logs include IP address and interaction timestamps for security auditing." wrapText="true" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
                 </VBox>
 

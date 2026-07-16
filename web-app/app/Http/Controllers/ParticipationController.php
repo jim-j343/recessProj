@@ -194,54 +194,92 @@ class ParticipationController extends Controller
             ->where('system_role', 'student')
             ->orderBy('username')->get();
 
-        $rows = $students->map(function ($student) use ($lecturerGroupIds) {
+        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
+            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
+            ->groupBy('topic_id')
+            ->pluck('post_id');
+
+        $quizIds = Quiz::whereIn('group_id', $lecturerGroupIds)->pluck('quiz_id');
+
+        $quizTotalMarks = Question::whereIn('quiz_id', $quizIds)
+            ->select('quiz_id', DB::raw('SUM(marks) as total'))
+            ->groupBy('quiz_id')
+            ->pluck('total', 'quiz_id');
+
+        $rows = $students->map(function ($student) use ($lecturerGroupIds, $openingPostIds, $quizIds, $quizTotalMarks) {
             $postsQuery = Post::where('author_id', $student->user_id)
                 ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
 
-            $postCount  = (clone $postsQuery)->count();
-            $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-                ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
-                ->groupBy('topic_id')
-                ->pluck('post_id');
-
             $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
-            $quality    = $postCount >= 5 ? 'High' : ($postCount >= 2 ? 'Medium' : 'Low');
 
-            $groupId = GroupMembership::where('user_id', $student->user_id)
-                ->whereIn('group_id', $lecturerGroupIds)->value('group_id');
+            $participationScore = min($replyCount, self::REPLIES_FOR_FULL_MARKS);
+            $participationPct   = $participationScore * (100 / self::REPLIES_FOR_FULL_MARKS);
 
-            $groupName = $groupId
-                ? \App\Models\Group::where('group_id', $groupId)->value('name')
-                : '—';
+            $completedSubmissions = Submission::where('user_id', $student->user_id)
+                ->whereIn('quiz_id', $quizIds)
+                ->whereNotNull('submitted_at')
+                ->get();
+
+            $quizPercentages = $completedSubmissions
+                ->map(function ($submission) use ($quizTotalMarks) {
+                    $total = $quizTotalMarks[$submission->quiz_id] ?? 0;
+                    return $total > 0 ? ($submission->score / $total) * 100 : null;
+                })
+                ->filter(fn ($pct) => $pct !== null);
+
+            $quizCount  = $quizPercentages->count();
+            $quizAvgPct = $quizCount ? round($quizPercentages->avg(), 1) : null;
+
+            $suggestedScore = $quizAvgPct !== null
+                ? round(($participationPct + $quizAvgPct) / 2, 1)
+                : round($participationPct, 1);
 
             $existing = ParticipationScore::where('user_id', $student->user_id)
                 ->latest('created_at')->first();
 
             return [
-                'user_id'        => $student->user_id,
-                'username'       => $student->username,
-                'group_name'     => $groupName,
-                'post_count'     => $postCount,
-                'reply_count'    => $replyCount,
-                'quality'        => $quality,
-                'existing_grade' => $existing ? $existing->criteria : null,
+                'user_id'            => $student->user_id,
+                'username'           => $student->username,
+                'reply_count'        => $replyCount,
+                'participation_pct'  => round($participationPct, 1),
+                'quiz_avg_pct'       => $quizAvgPct,
+                'quiz_count'         => $quizCount,
+                'suggested_score'    => $suggestedScore,
+                'existing_score'     => $existing ? $existing->score : null,
             ];
         });
 
         return response()->json($rows->values());
     }
+
     public function saveGrades(Request $request): \Illuminate\Http\JsonResponse
     {
         $grades = $request->input('grades', []);
+        
+        $lecturerGroupIds = GroupMembership::where('user_id', $request->user()->user_id)
+            ->where('status', 'active')
+            ->pluck('group_id');
+            
         foreach ($grades as $userId => $data) {
-            \App\Models\ParticipationScore::updateOrCreate(
-                ['user_id' => (int) $userId],
-                [
-                    'criteria' => $data['grade'] ?? '',
-                    'remarks'  => $data['remark'] ?? '',
-                    'scored_by' => $request->user()->user_id,
-                ]
-            );
+            if (!isset($data['score']) || $data['score'] === '') {
+                continue;
+            }
+            
+            $groupId = GroupMembership::where('user_id', $userId)
+                ->whereIn('group_id', $lecturerGroupIds)
+                ->value('group_id');
+
+            if (!$groupId) {
+                continue;
+            }
+
+            \App\Models\ParticipationScore::create([
+                'user_id'    => (int) $userId,
+                'group_id'   => $groupId,
+                'criteria'   => !empty($data['remark']) ? $data['remark'] : 'Forum participation + quiz average (auto-calculated)',
+                'score'      => round((float) $data['score'], 2),
+                'awarded_by' => $request->user()->user_id,
+            ]);
         }
         return response()->json(['message' => 'Grades saved.']);
     }

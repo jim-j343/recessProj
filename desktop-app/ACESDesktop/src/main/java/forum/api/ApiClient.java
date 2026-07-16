@@ -11,6 +11,7 @@ import forum.api.dto.QuizResultDto;
 import forum.api.dto.AdminRemovalDto;
 import forum.api.dto.AdminRemovalsResponseDto;
 import forum.api.dto.AdminReportsResponseDto;
+import forum.api.dto.LecturerDashboardDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -224,6 +225,16 @@ public void approveMember(String token, long groupId, long userId)
             .method("PATCH", HttpRequest.BodyPublishers.noBody()).build());
     ok(resp);
 }
+
+// ---------------------------------------------------------------
+//  Lecturer
+// ---------------------------------------------------------------
+
+    public LecturerDashboardDto getLecturerDashboard(String token) throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/lecturer/dashboard", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), LecturerDashboardDto.class);
+    }
 
 // ---------------------------------------------------------------
 //  Quizzes

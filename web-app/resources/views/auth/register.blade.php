@@ -3,7 +3,7 @@
 
         {{-- TOP NAV --}}
         <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100">
-            <h1 class="text-lg font-bold text-gray-800">Smart Discussion Forum</h1>
+            <h1 class="text-lg font-bold text-gray-800">ACES</h1>
             <div class="flex gap-3">
                 <a href="/" class="text-gray-500 hover:text-gray-700 text-sm">Help</a>
             </div>
@@ -14,7 +14,7 @@
             <div class="max-w-xl mx-auto px-6 py-10">
                 <h2 class="text-3xl font-bold text-gray-900 mb-1">Initialize Your Account</h2>
                 <p class="text-sm text-gray-500 mb-6">
-                    Complete the onboarding to gain access to the Smart Discussion Forum.
+                    Complete the onboarding to gain access to the ACES.
                 </p>
 
                 <form method="POST" action="{{ route('register') }}">
@@ -132,7 +132,7 @@
 
         {{-- FOOTER --}}
         <div class="border-t border-gray-100 px-8 py-4 flex justify-between text-xs text-gray-400 flex-shrink-0">
-            <span>Smart Discussion Forum</span>
+            <span>ACES</span>
             <div class="flex gap-4">
                 <a href="{{ route('privacy') }}" class="hover:text-gray-600">Privacy Policy</a>
                 <button type="button" x-data=""
@@ -142,7 +142,7 @@
                 </button>
                 <a href="{{ route('support') }}" class="hover:text-gray-600">Support</a>
             </div>
-            <span>© 2026 Smart Discussion Forum. All rights reserved.</span>
+            <span>© 2026 ACES. All rights reserved.</span>
         </div>
 
     </div>
@@ -158,7 +158,7 @@
 
             <div>
                 <h4 class="font-semibold text-gray-800 mb-2">1. Acceptable Use Policy</h4>
-                <p class="mb-2">Users of the Smart Discussion Forum are strictly prohibited
+                <p class="mb-2">Users of the ACES are strictly prohibited
                     from utilizing the system for any purpose other than authorized academic
                     discussion and learning.</p>
                 <ul class="list-disc list-inside space-y-1 text-gray-500">
@@ -173,7 +173,7 @@
 
             <div>
                 <h4 class="font-semibold text-gray-800 mb-2">2. Data Privacy &amp; Processing</h4>
-                <p class="mb-2">The Smart Discussion Forum processes submitted data under
+                <p class="mb-2">The ACES processes submitted data under
                     applicable data protection frameworks. Your identification and email
                     are encrypted at rest.</p>
                 <ul class="list-disc list-inside space-y-1 text-gray-500">

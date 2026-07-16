@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import forum.ui.RevealPasswordField?>
 <?import forum.ui.IconTextField?>
 
-<!-- Register / Onboarding â€” mirrors web auth/register.blade.php (full-width) -->
+<!-- Register / Onboarding - mirrors web auth/register.blade.php (full-width) -->
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.RegisterController"
             stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white;"
             prefWidth="960" prefHeight="760">
@@ -16,7 +16,7 @@
                     <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                         <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
                     </javafx.scene.image.ImageView>
-                    <Label text="Smart Discussion Forum" styleClass="brand"/>
+                    <Label text="ACES" styleClass="brand"/>
                 </HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Hyperlink text="Help" styleClass="muted"/>
@@ -30,7 +30,7 @@
                     <padding><Insets top="40" right="24" bottom="40" left="24"/></padding>
 
                     <Label text="Initialize Your Account" styleClass="h-lg"/>
-                    <Label text="Complete the onboarding to gain access to the Smart Discussion Forum." styleClass="muted" wrapText="true">
+                    <Label text="Complete the onboarding to gain access to the ACES." styleClass="muted" wrapText="true">
                         <VBox.margin><Insets top="4" bottom="24"/></VBox.margin>
                     </Label>
 
@@ -97,10 +97,9 @@
     <!-- FOOTER -->
     <bottom>
         <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0; -fx-padding:14 32 14 32;">
-            <Label text="Smart Discussion Forum" styleClass="subtle"/>
+            <Label text="ACES" styleClass="subtle"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label text="Â© 2026 Smart Discussion Forum. All rights reserved." styleClass="subtle"/>
+            <Label text="(c) 2026 ACES. All rights reserved." styleClass="subtle"/>
         </HBox>
     </bottom>
 </BorderPane>
-
