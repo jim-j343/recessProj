@@ -10,6 +10,7 @@ import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
 import forum.api.dto.AdminRemovalDto;
 import forum.api.dto.AdminRemovalsResponseDto;
+import forum.api.dto.AdminReportsResponseDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -456,5 +457,32 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
         HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
         int sc = resp.statusCode();
         if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+    }
+
+    // ── Moderation: Post Reports ─────────────────────────────────────
+    
+    public AdminReportsResponseDto getReports(String token, String filter) throws IOException, InterruptedException, ApiException {
+        String url = base + "/admin/reports?filter=" + encode(filter);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + token)
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        ok(response);
+        return mapper.readValue(response.body(), AdminReportsResponseDto.class);
+    }
+    
+    public void markReportReviewed(String token, long reportId) throws IOException, InterruptedException, ApiException {
+        String url = base + "/admin/reports/" + reportId + "/review";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + token)
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        ok(response);
     }
 }

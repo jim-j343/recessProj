@@ -18,7 +18,7 @@
 
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
-                <Label text="Removals"   onMouseClicked="#onRemovals"   styleClass="nav-link"/>
+                <Label text="Moderation"   onMouseClicked="#onModeration"   styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <!-- Notification bell — populated dynamically from backend -->
@@ -53,8 +53,10 @@
             </HBox>
 
             <!-- Page header -->
-            <HBox styleClass="page-header" alignment="CENTER_LEFT">
-                <Label text="Admin Analytics Dashboard" styleClass="page-title"/>
+            <HBox styleClass="page-header" alignment="CENTER">
+                <HBox alignment="CENTER_LEFT" maxWidth="1120" HBox.hgrow="ALWAYS">
+                    <Label text="Admin Analytics Dashboard" styleClass="page-title"/>
+                </HBox>
             </HBox>
         </VBox>
     </top>
@@ -135,4 +137,5 @@
         </ScrollPane>
     </center>
 </BorderPane>
+
 

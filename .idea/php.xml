@@ -5,6 +5,11 @@
       <LaravelPintConfiguration tool_path="$PROJECT_DIR$/web-app/vendor/bin/pint" />
     </laravel_pint_settings>
   </component>
+  <component name="PhpCodeSniffer">
+    <phpcs_settings>
+      <PhpCSConfiguration asDefaultInterpreter="true" />
+    </phpcs_settings>
+  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/web-app/vendor/composer" />

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.AdminModerationController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <!-- Navigation bar -->
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true">
+                    <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                </javafx.scene.image.ImageView>
+                <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
+                <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link"/>
+                <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
+                <Label text="Moderation" styleClass="nav-link,active"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                </MenuButton>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
+                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <!-- Page header -->
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Moderation" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER" style="-fx-padding: 0;">
+                <VBox maxWidth="1120" style="-fx-padding: 32 0 32 0;">
+
+                    <!-- Underline tab strip: Post Reports | Member Removals (ABOVE filters, matches web) -->
+                    <VBox styleClass="tab-strip-border">
+                        <HBox styleClass="tab-strip">
+                            <ToggleButton fx:id="btnTabReports"  text="Post Reports"    styleClass="tab-link" selected="true"/>
+                            <ToggleButton fx:id="btnTabRemovals" text="Member Removals" styleClass="tab-link"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Success label -->
+                    <Label fx:id="statusLabel" text="" managed="false" visible="false"
+                           styleClass="muted" wrapText="true" style="-fx-padding: 8 0 0 0;"/>
+
+                    <!-- Filter buttons (below tabs, matches web) -->
+                    <HBox spacing="8" styleClass="segmented-blue" style="-fx-padding: 20 0 20 0;">
+                        <ToggleButton fx:id="btnNeedsReview" text="Needs Review" selected="true"/>
+                        <ToggleButton fx:id="btnReviewed"    text="Reviewed"/>
+                        <ToggleButton fx:id="btnAll"         text="All"/>
+                    </HBox>
+
+                    <!-- Post Reports table (shown when Post Reports tab is active) -->
+                    <VBox fx:id="reportsPane">
+                        <TableView fx:id="reportsTable" prefHeight="480">
+                            <columns>
+                                <TableColumn fx:id="colReportPost"      text="POST"        prefWidth="260"/>
+                                <TableColumn fx:id="colReportAuthor"    text="AUTHOR"      prefWidth="120"/>
+                                <TableColumn fx:id="colReportedBy"      text="REPORTED BY" prefWidth="120"/>
+                                <TableColumn fx:id="colReportReason"    text="REASON"      prefWidth="220"/>
+                                <TableColumn fx:id="colReportWhen"      text="WHEN"        prefWidth="110"/>
+                                <TableColumn fx:id="colReportStatus"    text="STATUS"      prefWidth="140"/>
+                            </columns>
+                            <placeholder><Label text="No post reports." styleClass="muted"/></placeholder>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Member Removals table (shown when Member Removals tab is active) -->
+                    <VBox fx:id="removalsPane" managed="false" visible="false">
+                        <TableView fx:id="removalsTable" prefHeight="480">
+                            <columns>
+                                <TableColumn fx:id="colMember"    text="REMOVED MEMBER" prefWidth="180"/>
+                                <TableColumn fx:id="colGroup"     text="GROUP"          prefWidth="180"/>
+                                <TableColumn fx:id="colRemovedBy" text="REMOVED BY"     prefWidth="140"/>
+                                <TableColumn fx:id="colReason"    text="REASON"         prefWidth="280"/>
+                                <TableColumn fx:id="colWhen"      text="WHEN"           prefWidth="110"/>
+                                <TableColumn fx:id="colStatus"    text="STATUS"         prefWidth="140"/>
+                            </columns>
+                            <placeholder><Label text="No removal reports." styleClass="muted"/></placeholder>
+                        </TableView>
+                    </VBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

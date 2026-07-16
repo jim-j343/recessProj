@@ -13,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
@@ -38,7 +40,14 @@ public class AdminAnalyticsController {
     @FXML private VBox groupPerformanceBox;
     @FXML private VBox groupActivityBox;
     @FXML private FlowPane groupsBox;
-    @FXML private VBox recentActivityBox;
+    @FXML private VBox           recentActivityBox;
+
+    @FXML private TableView<AdminAnalyticsDto.LecturerPerformance> lecturerTable;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturer;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturerCourses;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, Integer> colLecturerQuizzes;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, String> colLecturerAvg;
+    @FXML private TableColumn<AdminAnalyticsDto.LecturerPerformance, Integer> colLecturerGraded;
 
     private final ApiClient api = new ApiClient();
 
@@ -50,6 +59,16 @@ public class AdminAnalyticsController {
             avatarLabel.setText(initial(user.displayName()));
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        // Initialize Lecturer Table
+        colLecturer.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().name));
+        colLecturerCourses.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().courses != null ? String.join(", ", c.getValue().courses) : ""));
+        colLecturerQuizzes.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().quizCount));
+        colLecturerAvg.setCellValueFactory(c -> {
+            if (c.getValue().avgPct == null) return new javafx.beans.property.SimpleStringProperty("—");
+            return new javafx.beans.property.SimpleStringProperty(String.format("%.1f%% (%d submissions)", c.getValue().avgPct, c.getValue().submissionCount));
+        });
+        colLecturerGraded.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().studentsGraded));
+
         loadAnalytics();
     }
 
@@ -87,7 +106,15 @@ public class AdminAnalyticsController {
         renderActivity(data);
         renderGroups(data);
         renderRecentActivity(data);
-        showStatus("Loaded from web backend.");
+        
+        if (data.lecturerPerformance != null) {
+            lecturerTable.setItems(javafx.collections.FXCollections.observableArrayList(data.lecturerPerformance));
+        }
+        
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
     }
 
     private void renderPostVolume(AdminAnalyticsDto data) {
@@ -229,7 +256,7 @@ public class AdminAnalyticsController {
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
 
-    @FXML private void onRemovals() { SceneManager.goAdminRemovals(); }
+    @FXML private void onModeration() { SceneManager.goAdminModeration(); }
 
     @FXML private void onProfile() { forum.app.SceneManager.goProfile(); }
 
@@ -260,3 +287,4 @@ public class AdminAnalyticsController {
         statusLabel.setVisible(true);
     }
 }
+

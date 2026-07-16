@@ -19,7 +19,7 @@
 
                 <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link,active"/>
                 <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
-                <Label text="Removals"   onMouseClicked="#onRemovals"   styleClass="nav-link"/>
+                <Label text="Moderation"   onMouseClicked="#onModeration"   styleClass="nav-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <!-- Notification bell — populated dynamically from backend -->
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
@@ -92,3 +92,4 @@
         </ScrollPane>
     </center>
 </BorderPane>
+

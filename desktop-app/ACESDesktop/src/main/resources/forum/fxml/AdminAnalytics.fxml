@@ -16,7 +16,7 @@
 
             <Label text="Members" onMouseClicked="#onMembers" styleClass="nav-link"/>
             <Label text="Analytics" onMouseClicked="#onAnalytics" styleClass="nav-link,active"/>
-            <Label text="Removals" onMouseClicked="#onRemovals" styleClass="nav-link"/>
+            <Label text="Moderation" onMouseClicked="#onModeration" styleClass="nav-link"/>
             <Region HBox.hgrow="ALWAYS"/>
             <!-- Notification bell -->
             <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
@@ -109,6 +109,24 @@
                         </VBox>
                     </HBox>
 
+                    <!-- Lecturer Performance -->
+                    <VBox styleClass="card-flat" spacing="16">
+                        <VBox>
+                            <Label text="Lecturer Performance" styleClass="card-title"/>
+                            <Label text="Quiz average and grading activity per lecturer" styleClass="subtle"/>
+                        </VBox>
+                        <TableView fx:id="lecturerTable" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="colLecturer" text="LECTURER" prefWidth="200"/>
+                                <TableColumn fx:id="colLecturerCourses" text="COURSE(S)" prefWidth="350"/>
+                                <TableColumn fx:id="colLecturerQuizzes" text="QUIZZES SET" prefWidth="120"/>
+                                <TableColumn fx:id="colLecturerAvg" text="AVG SCORE" prefWidth="200"/>
+                                <TableColumn fx:id="colLecturerGraded" text="STUDENTS GRADED" prefWidth="150"/>
+                            </columns>
+                            <placeholder><Label text="No lecturer data available." styleClass="muted"/></placeholder>
+                        </TableView>
+                    </VBox>
+
                     <!-- Trending + activity -->
                     <HBox spacing="24">
                         <VBox styleClass="card-flat" spacing="16" HBox.hgrow="ALWAYS">
@@ -126,3 +144,4 @@
         </ScrollPane>
     </center>
 </BorderPane>
+

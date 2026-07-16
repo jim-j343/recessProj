@@ -70,8 +70,8 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            stage.getIcons().add(new Image(
-                    getClass().getResourceAsStream("/forum/images/aces-logo.png")));
+            stage.getIcons().add(new javafx.scene.image.Image(
+            getClass().getResourceAsStream("/forum/images/logo.jpg")));
         } catch (Exception ignored) { }
 
         // Initialise the local SQLite cache and seed demo accounts.
