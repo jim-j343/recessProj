@@ -40,7 +40,8 @@
                         <a href="{{ route('quiz.create') }}" class="text-sm text-indigo-600 hover:underline">+ New</a>
                     </div>
                     @forelse($quizzes ?? [] as $quiz)
-                        <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
+                        <a href="{{ route('quiz.preview', $quiz->quiz_id) }}"
+                           class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-2 px-2 rounded transition-colors">
                             <div>
                                 <p class="text-sm font-medium text-gray-800">{{ $quiz->title }}</p>
                                 <p class="text-xs text-gray-400">{{ $quiz->start_time->format('d M Y H:i') }} · {{ $quiz->duration_minutes }} mins</p>
@@ -48,7 +49,7 @@
                             <span class="text-xs px-2 py-1 rounded-full {{ $quiz->is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
                                 {{ $quiz->is_published ? 'Published' : 'Draft' }}
                             </span>
-                        </div>
+                        </a>
                     @empty
                         <p class="text-sm text-gray-400">No quizzes yet. Create your first one.</p>
                     @endforelse

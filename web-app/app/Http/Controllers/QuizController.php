@@ -85,6 +85,62 @@ class QuizController extends Controller
             ->with('success', 'Quiz created successfully!');
     }
 
+    // Lecturer: read-only preview of their own quiz (draft or published).
+    // Deliberately separate from show() — that method creates a real
+    // Submission the moment it's opened and blocks drafts entirely, since
+    // it's built for a student taking the quiz, not a lecturer reviewing it.
+
+
+    // Lecturer: publish a draft quiz — flips is_published and notifies
+    // the group, same notification logic used when publishing at creation
+    // time in store()
+    public function publish($id)
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        if ($quiz->lecturer_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        if ($quiz->is_published) {
+            return back()->with('error', 'This quiz is already published.');
+        }
+
+        $quiz->update(['is_published' => true]);
+
+        $memberIds = GroupMembership::where('group_id', $quiz->group_id)
+            ->where('status', 'active')
+            ->where('user_id', '!=', Auth::id())
+            ->pluck('user_id');
+
+        foreach ($memberIds as $userId) {
+            Notification::notify($userId, 'quiz_announced');
+        }
+
+        return redirect()->route('quiz.preview', $quiz->quiz_id)
+            ->with('success', 'Quiz published! Group members have been notified.');
+    }
+    public function preview($id)
+    {
+        $quiz = Quiz::with(['questions.answers', 'group'])->findOrFail($id);
+
+        if ($quiz->lecturer_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $totalMarks = $quiz->questions->sum('marks');
+
+        $completedSubmissions = Submission::where('quiz_id', $quiz->quiz_id)
+            ->whereNotNull('submitted_at')
+            ->get();
+
+        $avgPct = ($totalMarks > 0 && $completedSubmissions->count())
+            ? round($completedSubmissions->avg(fn ($s) => ($s->score / $totalMarks) * 100), 1)
+            : null;
+
+        return view('quiz.preview', compact('quiz', 'totalMarks', 'completedSubmissions', 'avgPct'));
+    }
+
     // Student: show quiz to attempt
     // Student: show quiz to attempt
     public function show($id)
@@ -134,7 +190,7 @@ class QuizController extends Controller
         // Timer counts from FIRST open (survives refresh),
         // and never extends past the quiz's own closing time
         $elapsed  = $submission->started_at->diffInSeconds(now());
-        $timeLeft = max(0, min(
+        $timeLeft = (int) max(0, min(
             ($quiz->duration_minutes * 60) - $elapsed,
             $now->diffInSeconds($endsAt, false)
         ));

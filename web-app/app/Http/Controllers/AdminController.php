@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\GroupRemoval;
+use App\Models\ParticipationScore;
 use App\Models\PostReport;
 
 class AdminController extends Controller
@@ -149,6 +150,44 @@ class AdminController extends Controller
             return ['name' => $group->name, 'count' => $count];
         })->sortByDesc('count')->values();
 
+        // ---- Lecturer Performance: quiz average and grading activity,
+        // grouped by the lecturer who actually set each quiz — not by
+        // group admin, since any student can admin a group now. Answers
+        // "how are grades looking under this lecturer's course(s)?" ----
+        $lecturerPerformance = User::where('system_role', 'lecturer')->get()->map(function ($lecturer) use ($quizTotalMarks) {
+            $quizzes = Quiz::where('lecturer_id', $lecturer->user_id)->get();
+            $quizIds = $quizzes->pluck('quiz_id');
+
+            $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->unique())
+                ->pluck('course_name')
+                ->filter()
+                ->unique()
+                ->values();
+
+            $percentages = Submission::whereIn('quiz_id', $quizIds)
+                ->whereNotNull('submitted_at')
+                ->get()
+                ->map(function ($submission) use ($quizTotalMarks) {
+                    $total = $quizTotalMarks[$submission->quiz_id] ?? 0;
+                    return $total > 0 ? ($submission->score / $total) * 100 : null;
+                })
+                ->filter(fn ($pct) => $pct !== null);
+
+            $studentsGraded = ParticipationScore::where('awarded_by', $lecturer->user_id)
+                ->pluck('user_id')
+                ->unique()
+                ->count();
+
+            return [
+                'name'           => $lecturer->username,
+                'courses'        => $courses,
+                'quizCount'      => $quizzes->count(),
+                'avgPct'         => $percentages->count() ? round($percentages->avg(), 1) : null,
+                'submissionCount'=> $percentages->count(),
+                'studentsGraded' => $studentsGraded,
+            ];
+        })->values();
+
         $recentActivity = ActivityLog::with(['user', 'group'])
             ->latest('logged_at')
             ->take(5)
@@ -163,6 +202,7 @@ class AdminController extends Controller
             'postVolume',
             'groupPerformance',
             'groupActivity',
+            'lecturerPerformance',
             'recentActivity'
         ));
     }
