@@ -25,9 +25,11 @@
                         </x-nav-link>
                     @endif
 
-                        <x-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
-                            New Topic
-                        </x-nav-link>
+                        @if(auth()->user()->system_role !== 'system_admin')
+                            <x-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
+                                New Topic
+                            </x-nav-link>
+                        @endif
 
                     @if(auth()->user()->system_role === 'lecturer')
                         <x-nav-link :href="route('quiz.create')" :active="request()->routeIs('quiz.create')">
@@ -45,8 +47,8 @@
                         <x-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                             Analytics
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals')">
-                            Removals
+                        <x-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                            Moderation
                         </x-nav-link>
                     @endif
                 </div>
@@ -169,9 +171,11 @@
                 </x-responsive-nav-link>
             @endif
 
-                <x-responsive-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
-                    ✏️ New Topic
-                </x-responsive-nav-link>
+                @if(auth()->user()->system_role !== 'system_admin')
+                    <x-responsive-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
+                        ✏️ New Topic
+                    </x-responsive-nav-link>
+                @endif
 
             @if(auth()->user()->system_role === 'lecturer')
 
@@ -190,8 +194,8 @@
                 <x-responsive-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                     📈 Analytics
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals')">
-                    🚩 Removals
+                <x-responsive-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                    🛡️ Moderation
                 </x-responsive-nav-link>
             @endif
         </div>

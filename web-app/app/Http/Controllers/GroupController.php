@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\GroupRemoval;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,8 +65,8 @@ class GroupController extends Controller
         $group->load(['admin', 'topics.creator', 'memberships.user']);
         $isMember = $group->isMember(Auth::id());
 
-        // Recent "X was removed" announcements, WhatsApp-style, for everyone
-        // still in the group to see
+        // Recent "X was removed" / "X was added" announcements,
+        // WhatsApp-style, for everyone still in the group to see
         $removalAnnouncements = ActivityLog::where('group_id', $group->group_id)
             ->where('action_type', 'member_removed')
             ->with('user')
@@ -73,7 +74,14 @@ class GroupController extends Controller
             ->take(10)
             ->get();
 
-        return view('groups.show', compact('group', 'isMember', 'removalAnnouncements'));
+        $additionAnnouncements = ActivityLog::where('group_id', $group->group_id)
+            ->where('action_type', 'member_added')
+            ->with('user')
+            ->latest('logged_at')
+            ->take(10)
+            ->get();
+
+        return view('groups.show', compact('group', 'isMember', 'removalAnnouncements', 'additionAnnouncements'));
     }
 
     public function join(Group $group)
@@ -185,6 +193,50 @@ class GroupController extends Controller
         ]);
 
         return back()->with('success', "{$user->username} was removed from the group.");
+    }
+
+    public function addMember(Request $request, Group $group)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'username' => ['required', 'string', 'exists:users,username'],
+        ]);
+
+        $newMember = User::where('username', $validated['username'])->first();
+
+        if ($newMember->user_id === Auth::id()) {
+            return back()->with('error', 'You are already the group admin.');
+        }
+
+        if ($group->isMember($newMember->user_id)) {
+            return back()->with('error', "{$newMember->username} is already a member of this group.");
+        }
+
+        GroupMembership::create([
+            'user_id'   => $newMember->user_id,
+            'group_id'  => $group->group_id,
+            'role'      => 'member',
+            'status'    => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Notification::notify($newMember->user_id, 'added_to_group', null, null, $group->group_id);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $group->group_id,
+            'action_type' => 'member_added',
+            'meta'        => [
+                'added_user_id'  => $newMember->user_id,
+                'added_username' => $newMember->username,
+            ],
+            'logged_at'   => now(),
+        ]);
+
+        return back()->with('success', "{$newMember->username} was added to the group.");
     }
 
     public function destroy(Group $group)

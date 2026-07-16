@@ -63,7 +63,13 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::post('/topics/{topic}/posts', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
+
+    // ---> ADD THESE TWO LINES HERE <---
+    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
+    Route::put('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
+
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
+    Route::post('/posts/{post}/flag', [PostController::class, 'flag'])->name('posts.flag');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     // Edit a reply
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])
@@ -98,11 +104,12 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
-        Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::get('/groups/{group}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
     Route::post('/groups/{group}/members/{user}/remove', [GroupController::class, 'removeMember'])->name('groups.members.remove');
+    Route::post('/groups/{group}/members/add', [GroupController::class, 'addMember'])->name('groups.members.add');
     Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 
@@ -141,6 +148,9 @@ Route::middleware(['auth', 'role:system_admin'])->group(function () {
     Route::post('/admin/lift-blacklist/{user}', [AdminController::class, 'liftBlacklist'])->name('admin.liftBlacklist');
     Route::get('/admin/removals', [AdminController::class, 'removals'])->name('admin.removals');
     Route::post('/admin/removals/{removal}/review', [AdminController::class, 'markRemovalReviewed'])->name('admin.removals.review');
+    Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::post('/admin/reports/{report}/review', [AdminController::class, 'markReportReviewed'])->name('admin.reports.review');
 });
 
 require __DIR__.'/auth.php';
+
