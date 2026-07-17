@@ -2,6 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.StudentDashboardController"
@@ -102,6 +103,20 @@
                         <Label fx:id="noResultsLabel" text="No quiz results yet." styleClass="muted"
                                managed="false" visible="false"/>
                     </VBox>
+
+                    <!-- Latest topic / Recommended for you -->
+                    <HBox spacing="16">
+                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" cursor="HAND">
+                            <Label text="LATEST TOPIC" styleClass="eyebrow"/>
+                            <Label fx:id="latestTopicTitle" styleClass="label-strong" wrapText="true"/>
+                            <Label fx:id="latestTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" cursor="HAND">
+                            <Label text="RECOMMENDED FOR YOU" styleClass="eyebrow"/>
+                            <Label fx:id="recommendedTopicTitle" styleClass="label-strong" wrapText="true"/>
+                            <Label fx:id="recommendedTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                    </HBox>
 
                     <!-- Logout -->
                     <HBox alignment="CENTER_RIGHT">
