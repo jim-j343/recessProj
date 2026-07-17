@@ -77,10 +77,13 @@
                         </VBox>
 
                         <VBox spacing="6">
-                            <Label text="GROUP *" styleClass="eyebrow"/>
+                            <Label text="COURSE *" styleClass="eyebrow"/>
                             <ComboBox fx:id="groupCombo"
-                                      promptText="-- Select a group --"
+                                      editable="true"
+                                      promptText="e.g. Advanced Macroeconomics"
                                       maxWidth="Infinity"/>
+                            <Label text="Applies to every group teaching this course — type a new one or pick an existing course."
+                                   styleClass="subtle" wrapText="true"/>
                         </VBox>
 
                         <HBox spacing="16">

@@ -248,6 +248,25 @@ public List<QuizDto> myQuizzes(String token)
     return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
 }
 
+/** POST /api/quizzes — lecturer: create a quiz with its questions/answers. */
+public QuizDto createQuiz(String token, String title, String courseName, String startTime,
+                           int duration, String target, boolean publish,
+                           List<Map<String, Object>> questions)
+        throws ApiException, IOException, InterruptedException {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("title", title);
+    body.put("course_name", courseName);
+    body.put("start_time", startTime);
+    body.put("duration", duration);
+    body.put("target", target);
+    if (publish) body.put("publish", true);
+    body.put("questions", questions);
+    HttpResponse<String> resp = send(request("/quizzes", token)
+            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+    ok(resp);
+    return mapper.readValue(resp.body(), QuizDto.class);
+}
+
 /** GET /api/quizzes/{id} — quiz with questions */
 public QuizDetailResponse getQuiz(String token, long quizId)
         throws ApiException, IOException, InterruptedException {
