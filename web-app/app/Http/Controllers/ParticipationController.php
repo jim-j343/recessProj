@@ -197,30 +197,60 @@ class ParticipationController extends Controller
             ->where('status', 'active')
             ->pluck('group_id');
 
+        $topics = Topic::whereIn('group_id', $lecturerGroupIds)
+            ->orderBy('title')->get();
+
+        $topicFilter = $request->query('topic');
+        $search      = $request->query('search');
+
         $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
             ->where('status', 'active')
             ->pluck('user_id');
 
-        $students = User::whereIn('user_id', $studentIds)
-            ->where('system_role', 'student')
-            ->orderBy('username')->get();
+        $studentsQuery = User::whereIn('user_id', $studentIds)
+            ->where('system_role', 'student');
+
+        if ($search) {
+            $studentsQuery->where('username', 'like', "%{$search}%");
+        }
+
+        $students = $studentsQuery->orderBy('username')->get();
 
         $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
+            ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
+                $q->whereIn('group_id', $lecturerGroupIds);
+                if ($topicFilter) {
+                    $q->where('topic_id', $topicFilter);
+                }
+            })
             ->groupBy('topic_id')
             ->pluck('post_id');
 
-        $quizIds = Quiz::whereIn('group_id', $lecturerGroupIds)->pluck('quiz_id');
+        $lecturerCourseNames = Group::whereIn('group_id', $lecturerGroupIds)->pluck('course_name')->filter();
+
+        $quizIds = Quiz::where(function ($q) use ($lecturerGroupIds, $lecturerCourseNames) {
+                $q->whereIn('group_id', $lecturerGroupIds);
+                if ($lecturerCourseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $lecturerCourseNames);
+                }
+            })
+            ->pluck('quiz_id');
 
         $quizTotalMarks = Question::whereIn('quiz_id', $quizIds)
             ->select('quiz_id', DB::raw('SUM(marks) as total'))
             ->groupBy('quiz_id')
             ->pluck('total', 'quiz_id');
 
-        $rows = $students->map(function ($student) use ($lecturerGroupIds, $openingPostIds, $quizIds, $quizTotalMarks) {
+        $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter, $openingPostIds, $quizIds, $quizTotalMarks) {
             $postsQuery = Post::where('author_id', $student->user_id)
-                ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
+                ->whereHas('topic', function($q) use ($lecturerGroupIds, $topicFilter) {
+                    $q->whereIn('group_id', $lecturerGroupIds);
+                    if ($topicFilter) {
+                        $q->where('topic_id', $topicFilter);
+                    }
+                });
 
+            $postCount  = (clone $postsQuery)->count();
             $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
 
             $participationScore = min($replyCount, self::REPLIES_FOR_FULL_MARKS);
@@ -251,16 +281,25 @@ class ParticipationController extends Controller
             return [
                 'user_id'            => $student->user_id,
                 'username'           => $student->username,
+                'post_count'         => $postCount,
                 'reply_count'        => $replyCount,
                 'participation_pct'  => round($participationPct, 1),
                 'quiz_avg_pct'       => $quizAvgPct,
                 'quiz_count'         => $quizCount,
                 'suggested_score'    => $suggestedScore,
                 'existing_score'     => $existing ? $existing->score : null,
+                'existing_remark'    => $existing ? $existing->criteria : null,
             ];
         });
 
-        return response()->json($rows->values());
+        if ($topicFilter) {
+            $rows = $rows->filter(fn ($r) => $r['post_count'] > 0)->values();
+        }
+
+        return response()->json([
+            'rows' => $rows->values(),
+            'topics' => $topics
+        ]);
     }
 
     public function saveGrades(Request $request): \Illuminate\Http\JsonResponse
