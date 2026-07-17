@@ -14,8 +14,10 @@
             <Hyperlink text="← Back" onAction="#onBack" styleClass="muted"/>
             <Label fx:id="topicTitleLabel" text="Topic" styleClass="label-strong"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline"/>
-            <Button text="↗ Share" styleClass="btn-sm,btn-outline"/>
+            <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline" onAction="#onExportPdf"/>
+            <Button text="↗ Share" styleClass="btn-sm,btn-outline" onAction="#onShare"/>
+            <Button fx:id="editTopicBtn" text="✎ Edit" styleClass="btn-sm,btn-outline" onAction="#onEditTopic" managed="false" visible="false"/>
+            <Button fx:id="deleteTopicBtn" text="Delete" style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:4 10 4 10; -fx-background-radius:6; -fx-cursor:hand;" onAction="#onDeleteTopic" managed="false" visible="false"/>
         </HBox>
     </top>
 

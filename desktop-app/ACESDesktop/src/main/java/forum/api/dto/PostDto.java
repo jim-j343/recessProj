@@ -12,6 +12,7 @@ public class PostDto {
     public long    author_id;
     public Long    parent_post_id;   // nullable
     public String  content;
+    public boolean is_flagged;
     public String  created_at;
     public String  author;
 

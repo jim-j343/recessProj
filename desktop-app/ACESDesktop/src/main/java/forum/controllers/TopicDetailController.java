@@ -1,6 +1,7 @@
 package forum.controllers;
 
 import forum.api.ApiClient;
+import forum.api.ApiException;
 import forum.api.dto.PostDto;
 import forum.api.dto.TopicDetailResponse;
 import forum.app.SceneManager;
@@ -9,16 +10,20 @@ import forum.app.ViewState;
 import forum.database.PostDao;
 import forum.database.TopicDao;
 import forum.models.Post;
+import forum.models.Role;
 import forum.models.Topic;
 import forum.models.User;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Topic thread — offline-first. Shows cached posts immediately, then (if the
@@ -31,18 +36,33 @@ public class TopicDetailController {
     @FXML private Label repliesCountLabel;
     @FXML private VBox postList;
     @FXML private TextField composerField;
+    @FXML private Button editTopicBtn;
+    @FXML private Button deleteTopicBtn;
 
     private final PostDao postDao = new PostDao();
     private final TopicDao topicDao = new TopicDao();
     private final ApiClient api = new ApiClient();
 
     private Topic topic;
+    private long currentUserId = -1;
+    private boolean isAdmin = false;
 
     @FXML
     private void initialize() {
         topic = ViewState.getSelectedTopic();
         if (topic == null) { onBack(); return; }
         if (topicTitleLabel != null) topicTitleLabel.setText(topic.getTitle());
+
+        User u = Session.currentUser();
+        if (u != null) {
+            currentUserId = u.getUserId();
+            isAdmin = u.getRole() == Role.SYSTEM_ADMIN;
+        }
+
+        boolean canManageTopic = currentUserId == topic.getCreatorId() || isAdmin;
+        if (editTopicBtn != null) { editTopicBtn.setManaged(canManageTopic); editTopicBtn.setVisible(canManageTopic); }
+        if (deleteTopicBtn != null) { deleteTopicBtn.setManaged(canManageTopic); deleteTopicBtn.setVisible(canManageTopic); }
+
         renderPosts(postDao.listByTopic(topic.getTopicId()));   // instant, from cache
         fetchOnline();
     }
@@ -92,7 +112,203 @@ public class TopicDetailController {
 
         VBox card = new VBox(6, author, body, meta);
         card.getStyleClass().add("card");
+
+        // Actions only make sense once a post has a real server id — mirrors
+        // web's post-level actions (flag/edit/delete), which need it too.
+        boolean isOwn = p.getAuthorId() == currentUserId;
+        if (p.isSynced()) {
+            HBox actions = new HBox(12);
+            actions.setPadding(new Insets(4, 0, 0, 0));
+
+            if (!isOwn) {
+                Hyperlink flag = new Hyperlink("🚩 Report");
+                flag.getStyleClass().add("subtle");
+                flag.setOnAction(e -> onFlagPost(p));
+                actions.getChildren().add(flag);
+            }
+            if (isOwn || isAdmin) {
+                Hyperlink edit = new Hyperlink("✎ Edit");
+                edit.getStyleClass().add("subtle");
+                edit.setOnAction(e -> onEditPost(p));
+
+                Hyperlink delete = new Hyperlink("Delete");
+                delete.setStyle("-fx-text-fill:#ef4444;");
+                delete.setOnAction(e -> onDeletePost(p));
+
+                actions.getChildren().addAll(edit, delete);
+            }
+            if (!actions.getChildren().isEmpty()) card.getChildren().add(actions);
+        }
+
         return card;
+    }
+
+    private void onFlagPost(Post p) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Report post");
+        dialog.setHeaderText("Report this post to a system admin");
+        dialog.setContentText("Reason:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(reason -> {
+            if (reason.isBlank()) return;
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.flagPost(token, p.getPostId(), reason.trim());
+                    Platform.runLater(() -> infoAlert("Reported", "Post reported. A system admin will review it."));
+                } catch (ApiException e) {
+                    Platform.runLater(() -> errorAlert("Couldn't report post", e.getMessage()));
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                }
+            }, "flag-post-api");
+            t.setDaemon(true);
+            t.start();
+        });
+    }
+
+    private void onEditPost(Post p) {
+        TextArea area = new TextArea(p.getContent());
+        area.setWrapText(true);
+        area.setPrefRowCount(6);
+
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Edit reply");
+        dialog.getDialogPane().setContent(area);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.setResultConverter(btn -> btn == ButtonType.OK ? area.getText().trim() : null);
+
+        dialog.showAndWait().ifPresent(newContent -> {
+            if (newContent.isBlank() || newContent.equals(p.getContent())) return;
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.updatePost(token, p.getPostId(), newContent);
+                    postDao.updateContentLocal(p.getPostId(), newContent);
+                    List<Post> fresh = postDao.listByTopic(topic.getTopicId());
+                    Platform.runLater(() -> renderPosts(fresh));
+                } catch (ApiException e) {
+                    Platform.runLater(() -> errorAlert("Couldn't update post", e.getMessage()));
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                }
+            }, "edit-post-api");
+            t.setDaemon(true);
+            t.start();
+        });
+    }
+
+    private void onDeletePost(Post p) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete this post? This can't be undone.", ButtonType.YES, ButtonType.NO);
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(choice -> {
+            if (choice != ButtonType.YES) return;
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.deletePost(token, p.getPostId());
+                    postDao.deleteLocal(p.getPostId());
+                    List<Post> fresh = postDao.listByTopic(topic.getTopicId());
+                    Platform.runLater(() -> renderPosts(fresh));
+                } catch (ApiException e) {
+                    Platform.runLater(() -> errorAlert("Couldn't delete post", e.getMessage()));
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                }
+            }, "delete-post-api");
+            t.setDaemon(true);
+            t.start();
+        });
+    }
+
+    @FXML
+    private void onEditTopic() {
+        if (topic == null) return;
+        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
+        if (serverTopicId <= 0) { errorAlert("Can't edit yet", "This topic hasn't synced to the server yet."); return; }
+
+        TextField titleField = new TextField(topic.getTitle());
+        TextField categoryField = new TextField(topic.getCategory() == null ? "" : topic.getCategory());
+        TextArea contentArea = new TextArea(postDao.listByTopic(topic.getTopicId()).stream()
+                .filter(p -> p.getParentPostId() == null)
+                .findFirst().map(Post::getContent).orElse(""));
+        contentArea.setWrapText(true);
+        contentArea.setPrefRowCount(6);
+
+        VBox content = new VBox(8,
+                new Label("Title"), titleField,
+                new Label("Category"), categoryField,
+                new Label("Opening post content"), contentArea);
+        content.setPadding(new Insets(8));
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Edit topic");
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(btn -> {
+            if (btn != ButtonType.OK) return;
+            String title = titleField.getText().trim();
+            String category = categoryField.getText().trim();
+            String contentText = contentArea.getText().trim();
+            if (title.isEmpty() || contentText.isEmpty()) {
+                errorAlert("Missing fields", "Title and content are both required.");
+                return;
+            }
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.updateTopic(token, serverTopicId, title, category, topic.getGroupId(), contentText);
+                    topicDao.updateLocal(topic.getTopicId(), title, category);
+                    topic.setTitle(title);
+                    topic.setCategory(category);
+                    Platform.runLater(() -> {
+                        if (topicTitleLabel != null) topicTitleLabel.setText(title);
+                        renderPosts(postDao.listByTopic(topic.getTopicId()));
+                    });
+                } catch (ApiException e) {
+                    Platform.runLater(() -> errorAlert("Couldn't update topic", e.getMessage()));
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                }
+            }, "edit-topic-api");
+            t.setDaemon(true);
+            t.start();
+        });
+    }
+
+    @FXML
+    private void onDeleteTopic() {
+        if (topic == null) return;
+        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
+        if (serverTopicId <= 0) { errorAlert("Can't delete yet", "This topic hasn't synced to the server yet."); return; }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete this topic and all its replies? This can't be undone.", ButtonType.YES, ButtonType.NO);
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(choice -> {
+            if (choice != ButtonType.YES) return;
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.deleteTopic(token, serverTopicId);
+                    topicDao.deleteLocal(topic.getTopicId());
+                    Platform.runLater(TopicDetailController.this::onBack);
+                } catch (ApiException e) {
+                    Platform.runLater(() -> errorAlert("Couldn't delete topic", e.getMessage()));
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                }
+            }, "delete-topic-api");
+            t.setDaemon(true);
+            t.start();
+        });
     }
 
     @FXML
@@ -172,5 +388,17 @@ public class TopicDetailController {
                 Platform.runLater(() -> topicTitleLabel.setText(original));
             }).start();
         }
+    }
+
+    private void infoAlert(String header, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
+        a.setHeaderText(header);
+        a.showAndWait();
+    }
+
+    private void errorAlert(String header, String msg) {
+        Alert a = new Alert(Alert.AlertType.ERROR, msg == null ? "Something went wrong." : msg);
+        a.setHeaderText(header);
+        a.showAndWait();
     }
 }
