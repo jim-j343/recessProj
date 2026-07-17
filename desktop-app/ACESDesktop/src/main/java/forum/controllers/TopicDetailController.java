@@ -112,7 +112,7 @@ public class TopicDetailController {
             // Online — post to the server and cache the result.
             if (token != null && !token.isBlank() && serverTopicId > 0) {
                 try {
-                    PostDto dto = api.createPost(token, serverTopicId, body, null);
+                    PostDto dto = api.createPost(token, serverTopicId, body, null, null);
                     postDao.upsertFromServer(dto);
                     List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                     Platform.runLater(() -> renderPosts(fresh));
@@ -132,7 +132,7 @@ public class TopicDetailController {
 
     @FXML
     private void onBack() {
-        SceneManager.show("ForumDashboard", "ACES");
+        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
     }
 
     @FXML

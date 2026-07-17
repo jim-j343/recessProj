@@ -32,11 +32,21 @@
 
     <!-- STICKY REPLY BAR -->
     <bottom>
-        <HBox alignment="CENTER" style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0; -fx-padding:12 24 12 24;">
-            <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
-                <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
-                <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
+        <VBox style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0;">
+            <VBox fx:id="excludePickerBox" spacing="6" managed="false" visible="false"
+                  style="-fx-background-color:#fffbeb; -fx-border-color:#fde68a; -fx-border-width:0 0 1 0; -fx-padding:10 24 10 24;">
+                <Label text="Hide this reply from:" styleClass="subtle" style="-fx-font-size:11px; -fx-font-weight:600;"/>
+                <VBox fx:id="excludeCheckboxList" spacing="4"/>
+            </VBox>
+            <HBox alignment="CENTER" style="-fx-padding:12 24 12 24;">
+                <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
+                    <Button fx:id="excludeToggleBtn" text="🔒" styleClass="btn-sm,btn-outline" onAction="#onToggleExcludePicker"/>
+                    <Label fx:id="excludeCountBadge" text="" managed="false" visible="false"
+                           styleClass="badge,badge-warning" style="-fx-font-size:10px;"/>
+                    <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
+                    <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
+                </HBox>
             </HBox>
-        </HBox>
+        </VBox>
     </bottom>
 </BorderPane>
