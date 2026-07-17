@@ -261,6 +261,14 @@ public void joinGroup(String token, long groupId)
     ok(resp);
 }
 
+/** POST /api/groups/{id}/leave */
+public void leaveGroup(String token, long groupId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/groups/" + groupId + "/leave", token)
+            .POST(HttpRequest.BodyPublishers.noBody()).build());
+    ok(resp);
+}
+
 /** GET /api/groups/{id}/members */
 public com.fasterxml.jackson.databind.JsonNode groupMembers(String token, long groupId)
         throws ApiException, IOException, InterruptedException {

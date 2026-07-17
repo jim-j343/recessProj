@@ -64,6 +64,7 @@
                     <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
                     <Button fx:id="editGroupBtn" text="Edit Group" styleClass="btn,btn-secondary" onAction="#onEditGroup" managed="false" visible="false"/>
                     <Button fx:id="deleteGroupBtn" text="Delete Group" style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-weight:bold; -fx-padding:8 16 8 16; -fx-background-radius:6; -fx-cursor:hand;" onAction="#onDeleteGroup" managed="false" visible="false"/>
+                    <Button fx:id="leaveGroupBtn" text="Leave Group" styleClass="btn,btn-secondary" onAction="#onLeaveGroup" managed="false" visible="false"/>
                 </HBox>
             </HBox>
         </VBox>
