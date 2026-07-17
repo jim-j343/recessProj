@@ -166,6 +166,56 @@ public class ApiClient {
         return mapper.readValue(resp.body(), TopicDetailResponse.class);
     }
 
+    /** PUT /topics/{id} — edit title/category/group + the opening post's content. */
+    public TopicDto updateTopic(String token, long topicId, String title, String category,
+                                 long groupId, String content)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("title", title);
+        body.put("category", category);
+        body.put("group_id", groupId);
+        body.put("content", content);
+        HttpResponse<String> resp = send(request("/topics/" + topicId, token)
+                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+        return mapper.readValue(resp.body(), TopicDto.class);
+    }
+
+    /** DELETE /topics/{id}. */
+    public void deleteTopic(String token, long topicId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/topics/" + topicId, token).DELETE().build());
+        ok(resp);
+    }
+
+    /** POST /posts/{id}/flag — report a post to a system admin. */
+    public void flagPost(String token, long postId, String reason)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("reason", reason);
+        HttpResponse<String> resp = send(request("/posts/" + postId + "/flag", token)
+                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+    }
+
+    /** PUT /posts/{id} — edit a reply's text content. */
+    public PostDto updatePost(String token, long postId, String content)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("content", content);
+        HttpResponse<String> resp = send(request("/posts/" + postId, token)
+                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+        return mapper.readValue(resp.body(), PostDto.class);
+    }
+
+    /** DELETE /posts/{id}. */
+    public void deletePost(String token, long postId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/posts/" + postId, token).DELETE().build());
+        ok(resp);
+    }
+
     /** POST /topics/{id}/posts — add a reply. */
     public PostDto createPost(String token, long topicId, String content, Long parentPostId, List<Long> excludedUserIds)
             throws ApiException, IOException, InterruptedException {
