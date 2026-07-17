@@ -14,13 +14,22 @@ use Illuminate\Http\Request;
 
 class QuizApiController extends Controller
 {
-    /** GET /api/quizzes — student: available quizzes in their groups */
+    /** GET /api/quizzes — student: available quizzes in their groups
+     *  (including course-targeted quizzes visible to every group sharing
+     *  that course unit — mirrors StudentController::dashboard() on web) */
     public function index(Request $request): JsonResponse
     {
         $groupIds = GroupMembership::where('user_id', $request->user()->user_id)
             ->where('status', 'active')->pluck('group_id');
 
-        $quizzes = Quiz::whereIn('group_id', $groupIds)
+        $courseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
+
+        $quizzes = Quiz::where(function ($q) use ($groupIds, $courseNames) {
+                $q->whereIn('group_id', $groupIds);
+                if ($courseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $courseNames);
+                }
+            })
             ->where('is_published', true)
             ->latest()->get()
             ->map(fn($q) => $this->quizShape($q));
