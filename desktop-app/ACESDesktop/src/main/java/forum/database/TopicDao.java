@@ -22,7 +22,7 @@ public class TopicDao {
             SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,
                    t.is_flagged, t.created_at,
                    COALESCE(u.username, u.email) AS author,
-                   (SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id) AS replies
+                   MAX((SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id), IFNULL(t.reply_count, 0)) AS replies
             FROM topics t
             LEFT JOIN users u ON u.user_id = t.creator_id
             ORDER BY t.created_at DESC, t.topic_id DESC
@@ -46,7 +46,7 @@ public class TopicDao {
             SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,
                    t.is_flagged, t.created_at,
                    COALESCE(u.username, u.email) AS author,
-                   (SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id) AS replies
+                   MAX((SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id), IFNULL(t.reply_count, 0)) AS replies
             FROM topics t
             LEFT JOIN users u ON u.user_id = t.creator_id
             WHERE t.group_id = ?
@@ -115,7 +115,7 @@ public class TopicDao {
      */
     public void upsertFromServer(TopicDto dto) {
         String update = "UPDATE topics SET group_id = ?, creator_id = ?, title = ?, "
-                + "category = ?, created_at = COALESCE(?, created_at), server_id = ? WHERE server_id = ?";
+                + "category = ?, created_at = COALESCE(?, created_at), reply_count = ?, server_id = ? WHERE server_id = ?";
         try (Connection c = SQLiteConnection.get()) {
             int rows;
             try (PreparedStatement ps = c.prepareStatement(update)) {
@@ -124,14 +124,15 @@ public class TopicDao {
                 ps.setString(3, dto.title);
                 ps.setString(4, dto.category);
                 ps.setString(5, dto.created_at);
-                ps.setLong(6, dto.topic_id);
+                ps.setInt(6, dto.posts_count > 0 ? dto.posts_count : dto.replies);
                 ps.setLong(7, dto.topic_id);
+                ps.setLong(8, dto.topic_id);
                 rows = ps.executeUpdate();
             }
             if (rows == 0) {
                 String insert = "INSERT OR REPLACE INTO topics"
-                        + "(topic_id, group_id, creator_id, title, category, is_flagged, server_id, created_at) "
-                        + "VALUES(?,?,?,?,?,0,?,?)";
+                        + "(topic_id, group_id, creator_id, title, category, is_flagged, server_id, created_at, reply_count) "
+                        + "VALUES(?,?,?,?,?,0,?,?,?)";
                 try (PreparedStatement pi = c.prepareStatement(insert)) {
                     pi.setLong(1, dto.topic_id);
                     pi.setLong(2, dto.group_id);
@@ -140,6 +141,7 @@ public class TopicDao {
                     pi.setString(5, dto.category);
                     pi.setLong(6, dto.topic_id);
                     pi.setString(7, dto.created_at);
+                    pi.setInt(8, dto.posts_count > 0 ? dto.posts_count : dto.replies);
                     pi.executeUpdate();
                 }
             }
