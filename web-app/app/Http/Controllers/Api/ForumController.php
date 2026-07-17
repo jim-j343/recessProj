@@ -79,30 +79,59 @@ class ForumController extends Controller
         return response()->json($this->topicShape($topic), 201);
     }
 
-    /** GET /api/topics/{topic} — the topic plus its posts. */
-    public function show(Topic $topic): JsonResponse
+    /** GET /api/topics/{topic} — the topic, its posts, and the group roster
+     *  (for the "exclude from this reply" picker). */
+    public function show(Request $request, Topic $topic): JsonResponse
     {
         $topic->loadCount('posts')->load('creator');
+        $viewerId = $request->user()->user_id;
 
-        $posts = $topic->posts()
-            ->with('author')
+        $allPosts = $topic->posts()
+            ->with(['author', 'excludedUsers'])
             ->orderBy('created_at')
             ->orderBy('post_id')
+            ->get();
+
+        // A post excludes specific people from seeing it. The author and a
+        // system admin always see everything — everyone else loses
+        // visibility of a post they're specifically excluded from. Mirrors
+        // TopicController::show() on web.
+        if (! $request->user()->isAdmin()) {
+            $allPosts = $allPosts->reject(function (Post $p) use ($viewerId) {
+                return $p->author_id !== $viewerId
+                    && $p->excludedUsers->contains('user_id', $viewerId);
+            })->values();
+        }
+
+        $posts = $allPosts->map(fn (Post $p) => $this->postShape($p, $viewerId));
+
+        // Other members of this topic's group, for the exclude picker —
+        // same query as web's $groupMembers in TopicController::show().
+        $groupMembers = GroupMembership::where('group_id', $topic->group_id)
+            ->where('status', 'active')
+            ->where('user_id', '!=', $viewerId)
+            ->with('user')
             ->get()
-            ->map(fn (Post $p) => $this->postShape($p));
+            ->pluck('user')
+            ->filter()
+            ->map(fn ($u) => ['user_id' => (int) $u->user_id, 'username' => $u->username])
+            ->values();
 
         return response()->json([
-            'topic' => $this->topicShape($topic),
-            'posts' => $posts,
+            'topic'         => $this->topicShape($topic),
+            'posts'         => $posts,
+            'group_members' => $groupMembers,
         ]);
     }
 
-    /** POST /api/topics/{topic}/posts — add a reply. */
+    /** POST /api/topics/{topic}/posts — add a reply, optionally hidden from specific members. */
     public function storePost(Request $request, Topic $topic): JsonResponse
     {
         $data = $request->validate([
-            'content'        => ['required', 'string'],
-            'parent_post_id' => ['nullable', 'integer', 'exists:posts,post_id'],
+            'content'          => ['required', 'string'],
+            'parent_post_id'   => ['nullable', 'integer', 'exists:posts,post_id'],
+            'excluded_users'   => ['nullable', 'array'],
+            'excluded_users.*' => ['integer', 'exists:users,user_id'],
         ]);
 
         $post = Post::create([
@@ -113,11 +142,21 @@ class ForumController extends Controller
             'is_synced'      => true,
         ]);
 
+        // Never let a poster accidentally exclude themselves — mirrors
+        // PostController::store() on web.
+        $excludedIds = collect($data['excluded_users'] ?? [])
+            ->reject(fn ($id) => (int) $id === $request->user()->user_id)
+            ->values();
+
+        if ($excludedIds->isNotEmpty()) {
+            $post->excludedUsers()->attach($excludedIds);
+        }
+
         $request->user()->forceFill(['last_active_at' => now()])->save();
 
-        $post->load('author');
+        $post->load(['author', 'excludedUsers']);
 
-        return response()->json($this->postShape($post), 201);
+        return response()->json($this->postShape($post, $request->user()->user_id), 201);
     }
 
     private function topicShape(Topic $t): array
@@ -134,9 +173,9 @@ class ForumController extends Controller
         ];
     }
 
-    private function postShape(Post $p): array
+    private function postShape(Post $p, ?int $viewerId = null): array
     {
-        return [
+        $shape = [
             'post_id'        => (int) $p->post_id,
             'topic_id'       => (int) $p->topic_id,
             'author_id'      => (int) $p->author_id,
@@ -145,5 +184,16 @@ class ForumController extends Controller
             'created_at'     => optional($p->created_at)->toIso8601String(),
             'author'         => $p->author->username ?? null,
         ];
+
+        // Only the post's own author sees who it's hidden from — mirrors
+        // the @if($isOwn && ...) badge in forum/show.blade.php.
+        if ($viewerId !== null && $viewerId === (int) $p->author_id && $p->relationLoaded('excludedUsers')) {
+            $excludedNames = $p->excludedUsers->pluck('username')->values();
+            if ($excludedNames->isNotEmpty()) {
+                $shape['excluded_usernames'] = $excludedNames;
+            }
+        }
+
+        return $shape;
     }
 }
