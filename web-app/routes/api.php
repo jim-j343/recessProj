@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Quizzes
     Route::get('/quizzes', [QuizApiController::class, 'index']);
     Route::get('/quizzes/my', [QuizApiController::class, 'myQuizzes']);
+    Route::post('/quizzes', [QuizApiController::class, 'store']);
     Route::get('/quizzes/{id}', [QuizApiController::class, 'show']);
     Route::post('/quizzes/{id}/submit', [QuizApiController::class, 'submit']);
     Route::get('/quizzes/{id}/results', [QuizApiController::class, 'myResult']);
