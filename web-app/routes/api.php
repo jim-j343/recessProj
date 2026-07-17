@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
 use App\Http\Controllers\Api\LecturerApiController;
+use App\Http\Controllers\Api\StudentApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/quizzes/{id}/submit', [QuizApiController::class, 'submit']);
     Route::get('/quizzes/{id}/results', [QuizApiController::class, 'myResult']);
     Route::get('/quizzes/{id}/all-results', [QuizApiController::class, 'allResults']);
+
+    // Student — dashboard/progress extras not covered by /quizzes
+    Route::get('/student/dashboard', [StudentApiController::class, 'dashboard']);
+    Route::get('/student/progress', [StudentApiController::class, 'progress']);
+
 
     // Lecturer
     Route::middleware('role:lecturer')->prefix('lecturer')->group(function () {
