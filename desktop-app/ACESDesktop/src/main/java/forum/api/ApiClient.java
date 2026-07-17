@@ -177,6 +177,35 @@ public class ApiClient {
         return mapper.readValue(resp.body(), PostDto.class);
     }
 
+    /** POST /posts/{id}/report */
+    public void reportPost(String token, long postId, String reason)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("reason", reason);
+        HttpResponse<String> resp = send(request("/posts/" + postId + "/report", token)
+                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+    }
+
+    /** PUT /posts/{id} */
+    public PostDto updatePost(String token, long postId, String content)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("content", content);
+        HttpResponse<String> resp = send(request("/posts/" + postId, token)
+                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+        return mapper.readValue(resp.body(), PostDto.class);
+    }
+
+    /** DELETE /posts/{id} */
+    public void deletePost(String token, long postId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/posts/" + postId, token)
+                .method("DELETE", HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+    }
+
 // ---------------------------------------------------------------
 //  Groups
 // ---------------------------------------------------------------
