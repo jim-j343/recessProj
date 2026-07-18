@@ -229,6 +229,7 @@ class TopicController extends Controller
         Auth::user()->update(['last_active_at' => now()]);
 
         return redirect()->route('topics.show', $topic->topic_id)
+            ->withFragment('post-' . $post->post_id)
             ->with('success', 'Reply posted!');
     }
 

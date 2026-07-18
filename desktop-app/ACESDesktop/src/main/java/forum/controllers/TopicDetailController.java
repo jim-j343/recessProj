@@ -71,6 +71,7 @@ public class TopicDetailController {
         if (topic == null) { onBack(); return; }
         if (topicTitleLabel != null) topicTitleLabel.setText(topic.getTitle());
         renderPosts(postDao.listByTopic(topic.getTopicId()));   // instant, from cache
+        scrollToBottom();
         fetchOnline();
     }
 
@@ -86,7 +87,10 @@ public class TopicDetailController {
                 if (detail.topic != null) topicDao.upsertFromServer(detail.topic);
                 if (detail.posts != null) for (PostDto p : detail.posts) postDao.upsertFromServer(p);
                 List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                Platform.runLater(() -> renderPosts(fresh));
+                Platform.runLater(() -> {
+                    renderPosts(fresh);
+                    scrollToBottom();
+                });
             } catch (Exception ignored) {
                 // stay on the cached view if the fetch fails
             }
@@ -362,8 +366,12 @@ public class TopicDetailController {
     
     private void scrollToBottom() {
         if (scrollPane != null) {
-            scrollPane.layout();
-            scrollPane.setVvalue(1.0);
+            // Delay the scroll until after JavaFX finishes its layout pulse for the new nodes
+            Platform.runLater(() -> {
+                scrollPane.applyCss();
+                scrollPane.layout();
+                scrollPane.setVvalue(1.0);
+            });
         }
     }
 

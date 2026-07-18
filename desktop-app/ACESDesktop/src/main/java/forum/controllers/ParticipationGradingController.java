@@ -60,6 +60,18 @@ public class ParticipationGradingController {
         topicCombo.getItems().add(new TopicOption(null, "All Topics"));
         topicCombo.setValue(topicCombo.getItems().get(0));
 
+        // Auto-reload when topic changes
+        topicCombo.valueProperty().addListener((obs, oldV, newV) -> {
+            if (oldV == newV) return;
+            if (oldV != null && newV != null && java.util.Objects.equals(oldV.id, newV.id)) return;
+            loadStudents();
+        });
+
+        // Instant local filter when search text changes
+        searchField.textProperty().addListener((obs, oldV, newV) -> {
+            renderStudentRows();
+        });
+
         loadStudents();
     }
 
@@ -151,8 +163,14 @@ public class ParticipationGradingController {
 
     private void renderStudentRows() {
         studentListContainer.getChildren().clear();
+        String searchText = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
+
         for (GradeRow row : rows) {
-            HBox rowBox = new HBox(16);
+            if (!searchText.isEmpty() && row.username != null && !row.username.toLowerCase().contains(searchText)) {
+                continue; // Skip rendering this row if it doesn't match the search
+            }
+
+            HBox rowBox = new HBox(15);
             rowBox.setAlignment(Pos.CENTER_LEFT);
             rowBox.setStyle("-fx-padding: 16 16; -fx-border-color: transparent transparent #f3f4f6 transparent; -fx-border-width: 0 0 1 0; -fx-background-color: transparent;");
 
