@@ -119,7 +119,7 @@
                                 <TableColumn fx:id="colCourse"     text="COURSE"              prefWidth="220"/>
                                 <TableColumn fx:id="colMembers"    text="MEMBERS"             prefWidth="110"/>
                                 <TableColumn fx:id="colWarnDays"   text="DAYS BEFORE WARNING" prefWidth="200"/>
-                                <TableColumn fx:id="colBlkDays"    text="BLACKLIST DURATION"  styleClass="indigo-col" prefWidth="180"/>
+                                <TableColumn fx:id="colBlkDays"    text="BLACKLIST DURATION"  prefWidth="180"/>
                             </columns>
                             <placeholder><Label text="No groups exist yet." styleClass="muted"/></placeholder>
                         </TableView>

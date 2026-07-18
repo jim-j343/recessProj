@@ -337,6 +337,7 @@ class AdminController extends Controller
                     'id' => $r->report_id,
                     'post_content' => $r->post ? $r->post->content : 'Unknown',
                     'topic_title' => $r->post && $r->post->topic ? $r->post->topic->title : 'Unknown',
+                    'topic_id' => $r->post && $r->post->topic ? $r->post->topic->topic_id : null,
                     'author' => $r->post && $r->post->author ? $r->post->author->username : 'Unknown',
                     'reported_by' => $r->reportedBy ? $r->reportedBy->username : 'Unknown',
                     'reason' => $r->reason,
