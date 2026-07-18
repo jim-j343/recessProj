@@ -191,6 +191,36 @@ public class TopicDao {
         }
     }
 
+    /** Removes a topic (and its posts) from the local cache after a successful server-side delete. */
+    public void deleteLocal(long topicId) {
+        try (Connection c = SQLiteConnection.get()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE topic_id = ?")) {
+                ps.setLong(1, topicId);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM topics WHERE topic_id = ?")) {
+                ps.setLong(1, topicId);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Updates a topic's cached title/category after a successful server-side edit. */
+    public void updateLocal(long topicId, String title, String category) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement(
+                     "UPDATE topics SET title = ?, category = ? WHERE topic_id = ?")) {
+            ps.setString(1, title);
+            ps.setString(2, category);
+            ps.setLong(3, topicId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     /** Ensures a default group + a couple of demo topics exist on first run. */
     public void seedDemoIfEmpty() {
         if (count("\"groups\"") == 0) insertDefaultGroup();

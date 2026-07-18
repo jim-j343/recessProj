@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\QuizApiController;
 use App\Http\Controllers\Api\LecturerApiController;
+use App\Http\Controllers\Api\StudentApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +43,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/topics',                 [ForumController::class, 'index']);
     Route::post('/topics',                [ForumController::class, 'store']);
     Route::get('/topics/{topic}',         [ForumController::class, 'show']);
+    Route::put('/topics/{topic}',         [ForumController::class, 'update']);
+    Route::delete('/topics/{topic}',      [ForumController::class, 'destroy']);
     Route::post('/topics/{topic}/posts',  [ForumController::class, 'storePost']);
+    Route::post('/posts/{post}/flag',     [ForumController::class, 'flagPost']);
+    Route::put('/posts/{post}',           [ForumController::class, 'updatePost']);
+    Route::delete('/posts/{post}',        [ForumController::class, 'destroyPost']);
     Route::get('/participation/grade-json', [\App\Http\Controllers\ParticipationController::class, 'gradeJson']);
     Route::post('/participation/grade-json', [\App\Http\Controllers\ParticipationController::class, 'saveGrades']);
 
@@ -52,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/groups/{group}', [GroupApiController::class, 'update']);
     Route::delete('/groups/{group}', [GroupApiController::class, 'destroy']);
     Route::post('/groups/{group}/join', [GroupApiController::class, 'join']);
+    Route::post('/groups/{group}/leave', [GroupApiController::class, 'leave']);
     Route::get('/groups/{group}/members', [GroupApiController::class, 'members']);
     Route::patch('/groups/{group}/members/{userId}/approve', [GroupApiController::class, 'approve']);
     Route::post('/groups/{group}/add-member', [GroupApiController::class, 'addMember']);
@@ -60,10 +67,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Quizzes
     Route::get('/quizzes', [QuizApiController::class, 'index']);
     Route::get('/quizzes/my', [QuizApiController::class, 'myQuizzes']);
+    Route::post('/quizzes', [QuizApiController::class, 'store']);
+    Route::post('/quizzes/{id}/publish', [QuizApiController::class, 'publish']);
     Route::get('/quizzes/{id}', [QuizApiController::class, 'show']);
     Route::post('/quizzes/{id}/submit', [QuizApiController::class, 'submit']);
     Route::get('/quizzes/{id}/results', [QuizApiController::class, 'myResult']);
     Route::get('/quizzes/{id}/all-results', [QuizApiController::class, 'allResults']);
+
+    // Student — dashboard/progress extras not covered by /quizzes
+    Route::get('/student/dashboard', [StudentApiController::class, 'dashboard']);
+    Route::get('/student/progress', [StudentApiController::class, 'progress']);
+
 
     // Lecturer
     Route::middleware('role:lecturer')->prefix('lecturer')->group(function () {
