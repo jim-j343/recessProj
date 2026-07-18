@@ -114,9 +114,18 @@ class StudentApiController extends Controller
             return ['label' => $date->format('D'), 'count' => $count];
         })->values();
 
+        // Quizzes are matched by group_id OR by course_name (a course-targeted
+        // quiz has no group_id at all) — same pattern as QuizApiController::index().
+        $courseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
+
         $submissions = Submission::where('user_id', $user->user_id)
             ->whereNotNull('submitted_at')
-            ->whereHas('quiz', fn ($q) => $q->whereIn('group_id', $groupIds))
+            ->whereHas('quiz', function ($q) use ($groupIds, $courseNames) {
+                $q->whereIn('group_id', $groupIds);
+                if ($courseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $courseNames);
+                }
+            })
             ->with('quiz.questions')
             ->latest('submitted_at')
             ->get();
