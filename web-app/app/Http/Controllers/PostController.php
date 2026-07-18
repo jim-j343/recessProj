@@ -67,6 +67,7 @@ class PostController extends Controller
         Auth::user()->update(['last_active_at' => now()]);
 
         return redirect()->route('topics.show', $topicId)
+            ->withFragment('post-' . $post->post_id)
             ->with('success', 'Reply posted!');
     }
 
