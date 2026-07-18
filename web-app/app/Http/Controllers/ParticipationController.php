@@ -197,6 +197,8 @@ class ParticipationController extends Controller
             ->where('status', 'active')
             ->pluck('group_id');
 
+        $lecturerCourseNames = Group::whereIn('group_id', $lecturerGroupIds)->pluck('course_name')->filter();
+
         $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
             ->where('status', 'active')
             ->pluck('user_id');
@@ -210,7 +212,13 @@ class ParticipationController extends Controller
             ->groupBy('topic_id')
             ->pluck('post_id');
 
-        $quizIds = Quiz::whereIn('group_id', $lecturerGroupIds)->pluck('quiz_id');
+        $quizIds = Quiz::where(function ($q) use ($lecturerGroupIds, $lecturerCourseNames) {
+                $q->whereIn('group_id', $lecturerGroupIds);
+                if ($lecturerCourseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $lecturerCourseNames);
+                }
+            })
+            ->pluck('quiz_id');
 
         $quizTotalMarks = Question::whereIn('quiz_id', $quizIds)
             ->select('quiz_id', DB::raw('SUM(marks) as total'))
