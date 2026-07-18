@@ -488,21 +488,19 @@ use Illuminate\Support\Str;
         }
     </script>
 
-    {{-- After posting a reply, jump to it instead of landing back at the
-         top of the page (the default behaviour of a full-page redirect) --}}
-    @if(session('success') === 'Reply posted!')
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash) {
                 const posts = document.querySelectorAll('[id^="post-"]');
                 const lastPost = posts[posts.length - 1];
                 if (lastPost) {
-                    lastPost.scrollIntoView({ behavior: 'instant', block: 'end' });
+                    lastPost.scrollIntoView({ behavior: 'auto', block: 'end' });
                 } else {
-                    window.scrollTo(0, document.body.scrollHeight);
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
                 }
-            });
-        </script>
-    @endif
+            }
+        });
+    </script>
 
 </body>
 </html>

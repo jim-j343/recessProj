@@ -95,6 +95,12 @@ public final class SQLiteConnection {
             st.execute(topics);
             st.execute(posts);
             st.execute(syncLog);
+            
+            try {
+                st.execute("ALTER TABLE topics ADD COLUMN reply_count INTEGER NOT NULL DEFAULT 0");
+            } catch (SQLException ignore) {
+                // column likely already exists
+            }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialise local schema", e);
         }

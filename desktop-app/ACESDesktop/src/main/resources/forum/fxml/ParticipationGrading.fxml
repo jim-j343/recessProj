@@ -42,8 +42,20 @@
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
                     </items>
                 </MenuButton>
             </HBox>
@@ -63,6 +75,22 @@
                     <Label fx:id="statusLabel" styleClass="muted"
                            managed="false" visible="false"/>
 
+                    <!-- Filter Section -->
+                    <HBox spacing="16" alignment="CENTER_LEFT" styleClass="card">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Filter by Topic" style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
+                            <ComboBox fx:id="topicCombo" promptText="All Topics" maxWidth="Infinity" styleClass="input"/>
+                        </VBox>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Filter by Student" style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
+                            <TextField fx:id="searchField" promptText="Search student name..." styleClass="input"/>
+                        </VBox>
+                        <VBox alignment="BOTTOM_CENTER">
+                            <padding><Insets top="20"/></padding>
+                            <Button text="Filter" styleClass="btn,btn-primary" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 6;" onAction="#onFilter"/>
+                        </VBox>
+                    </HBox>
+
                     <!-- Grading table -->
                     <VBox styleClass="card" spacing="0">
                         <HBox alignment="CENTER_LEFT">
@@ -70,23 +98,22 @@
                             <Label text="Student Forum Participation" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Button text="💾 Save All Grades"
-                                    styleClass="btn,btn-primary"
+                                    styleClass="btn-ghost" style="-fx-text-fill: #4f46e5; -fx-font-weight: bold; -fx-background-color: transparent;"
                                     onAction="#onSaveGrades"/>
                         </HBox>
 
-                        <TableView fx:id="gradesTable" prefHeight="480">
-                            <columns>
-                                <TableColumn fx:id="colStudent"       text="STUDENT"       prefWidth="180"/>
-                                <TableColumn fx:id="colReplies"       text="REPLIES"       prefWidth="80"/>
-                                <TableColumn fx:id="colParticipation" text="PARTICIPATION" prefWidth="120"/>
-                                <TableColumn fx:id="colTestAvg"       text="TEST AVG"      prefWidth="180"/>
-                                <TableColumn fx:id="colScore"         text="SCORE"         prefWidth="100"/>
-                                <TableColumn fx:id="colRemarks"       text="REMARKS"       prefWidth="220"/>
-                            </columns>
-                            <placeholder>
-                                <Label text="No students in your groups yet." styleClass="muted"/>
-                            </placeholder>
-                        </TableView>
+                        <HBox spacing="16" style="-fx-padding: 12 16; -fx-border-color: transparent transparent #e5e7eb transparent; -fx-border-width: 0 0 1 0; -fx-background-color: transparent;">
+                            <Label text="STUDENT" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 200px;"/>
+                            <Label text="REPLIES" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 80px;"/>
+                            <Label text="PARTICIPATION" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 140px;"/>
+                            <Label text="TEST AVG" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 140px;"/>
+                            <Label text="SCORE" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 120px;"/>
+                            <Label text="REMARKS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #9ca3af; -fx-pref-width: 220px;"/>
+                        </HBox>
+                        
+                        <VBox fx:id="studentListContainer" spacing="0">
+                            <!-- Rows go here dynamically -->
+                        </VBox>
                     </VBox>
 
                 </VBox>
