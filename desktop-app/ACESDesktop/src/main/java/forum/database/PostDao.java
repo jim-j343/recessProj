@@ -157,6 +157,29 @@ public class PostDao {
         }
     }
 
+    /** Removes a post from the local cache after it's been deleted server-side. */
+    public void deleteLocal(long postId) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE post_id = ?")) {
+            ps.setLong(1, postId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Updates a post's cached content after a successful server-side edit. */
+    public void updateContentLocal(long postId, String content) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("UPDATE posts SET content = ? WHERE post_id = ?")) {
+            ps.setString(1, content);
+            ps.setLong(2, postId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Post map(ResultSet rs) throws SQLException {
         Post p = new Post();
         p.setPostId(rs.getLong("post_id"));

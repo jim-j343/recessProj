@@ -1,7 +1,9 @@
 package forum.controllers;
 
 import forum.api.ApiClient;
+import forum.api.ApiException;
 import forum.api.dto.PostDto;
+import forum.api.dto.MemberDto;
 import forum.api.dto.TopicDetailResponse;
 import forum.app.SceneManager;
 import forum.app.Session;
@@ -9,6 +11,7 @@ import forum.app.ViewState;
 import forum.database.PostDao;
 import forum.database.TopicDao;
 import forum.models.Post;
+import forum.models.Role;
 import forum.models.Topic;
 import forum.models.User;
 
@@ -64,12 +67,25 @@ public class TopicDetailController {
     private final ApiClient api = new ApiClient();
 
     private Topic topic;
+    private long currentUserId = -1;
+    private boolean isAdmin = false;
 
     @FXML
     private void initialize() {
         topic = ViewState.getSelectedTopic();
         if (topic == null) { onBack(); return; }
         if (topicTitleLabel != null) topicTitleLabel.setText(topic.getTitle());
+
+        User u = Session.currentUser();
+        if (u != null) {
+            currentUserId = u.getUserId();
+            isAdmin = u.getRole() == Role.SYSTEM_ADMIN;
+        }
+
+        boolean canManageTopic = currentUserId == topic.getCreatorId() || isAdmin;
+        if (editTopicBtn != null) { editTopicBtn.setManaged(canManageTopic); editTopicBtn.setVisible(canManageTopic); }
+        if (deleteTopicBtn != null) { deleteTopicBtn.setManaged(canManageTopic); deleteTopicBtn.setVisible(canManageTopic); }
+
         renderPosts(postDao.listByTopic(topic.getTopicId()));   // instant, from cache
         scrollToBottom();
         fetchOnline();
@@ -85,7 +101,12 @@ public class TopicDetailController {
             try {
                 TopicDetailResponse detail = api.getTopic(token, serverTopicId);
                 if (detail.topic != null) topicDao.upsertFromServer(detail.topic);
-                if (detail.posts != null) for (PostDto p : detail.posts) postDao.upsertFromServer(p);
+                if (detail.posts != null) {
+                    for (PostDto p : detail.posts) {
+                        postDao.upsertFromServer(p);
+                        if (p.excluded_usernames != null) excludedUsernamesByPost.put(p.post_id, p.excluded_usernames);
+                    }
+                }
                 List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                 Platform.runLater(() -> {
                     renderPosts(fresh);
@@ -335,13 +356,15 @@ public class TopicDetailController {
         String token = Session.authToken();
         long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
         String body = content.trim();
+        List<Long> excludedForThisReply = new java.util.ArrayList<>(excludedUserIds);
 
         Thread worker = new Thread(() -> {
             // Online — post to the server and cache the result.
             if (token != null && !token.isBlank() && serverTopicId > 0) {
                 try {
-                    PostDto dto = api.createPost(token, serverTopicId, body, null);
+                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedForThisReply);
                     postDao.upsertFromServer(dto);
+                    if (dto.excluded_usernames != null) excludedUsernamesByPost.put(dto.post_id, dto.excluded_usernames);
                     List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                     Platform.runLater(() -> {
                         renderPosts(fresh);
@@ -349,7 +372,8 @@ public class TopicDetailController {
                     });
                     return;
                 } catch (Exception offline) {
-                    // fall through to the local queue
+                    // fall through to the local queue — excluded_users isn't
+                    // supported for queued offline replies (server-only feature)
                 }
             }
             // Offline — save locally and queue for sync.
@@ -412,9 +436,23 @@ public class TopicDetailController {
         }
     }
 
+    private void resetExcludePicker() {
+        excludedUserIds.clear();
+        updateExcludeBadge();
+        if (excludeCheckboxList != null) {
+            for (var node : excludeCheckboxList.getChildren()) {
+                if (node instanceof CheckBox cb) cb.setSelected(false);
+            }
+        }
+        if (excludePickerBox != null) {
+            excludePickerBox.setManaged(false);
+            excludePickerBox.setVisible(false);
+        }
+    }
+
     @FXML
     private void onBack() {
-        SceneManager.show("ForumDashboard", "ACES");
+        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
     }
 
     @FXML
@@ -796,5 +834,17 @@ public class TopicDetailController {
         } catch (Exception ex) {
             System.err.println("Failed to open web link: " + ex.getMessage());
         }
+    }
+
+    private void infoAlert(String header, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
+        a.setHeaderText(header);
+        a.showAndWait();
+    }
+
+    private void errorAlert(String header, String msg) {
+        Alert a = new Alert(Alert.AlertType.ERROR, msg == null ? "Something went wrong." : msg);
+        a.setHeaderText(header);
+        a.showAndWait();
     }
 }
