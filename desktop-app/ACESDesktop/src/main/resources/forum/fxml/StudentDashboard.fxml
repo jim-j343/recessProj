@@ -106,12 +106,12 @@
 
                     <!-- Latest topic / Recommended for you -->
                     <HBox spacing="16">
-                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" cursor="HAND">
+                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="LATEST TOPIC" styleClass="eyebrow"/>
                             <Label fx:id="latestTopicTitle" styleClass="label-strong" wrapText="true"/>
                             <Label fx:id="latestTopicMeta" styleClass="subtle" wrapText="true"/>
                         </VBox>
-                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" cursor="HAND">
+                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="RECOMMENDED FOR YOU" styleClass="eyebrow"/>
                             <Label fx:id="recommendedTopicTitle" styleClass="label-strong" wrapText="true"/>
                             <Label fx:id="recommendedTopicMeta" styleClass="subtle" wrapText="true"/>
