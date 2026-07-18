@@ -3,6 +3,7 @@ package forum.controllers;
 import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.PostDto;
+import forum.api.dto.MemberDto;
 import forum.api.dto.TopicDetailResponse;
 import forum.app.SceneManager;
 import forum.app.Session;
@@ -38,6 +39,13 @@ public class TopicDetailController {
     @FXML private TextField composerField;
     @FXML private Button editTopicBtn;
     @FXML private Button deleteTopicBtn;
+    @FXML private VBox excludePickerBox;
+    @FXML private VBox excludeCheckboxList;
+    @FXML private Button excludeToggleBtn;
+    @FXML private Label excludeCountBadge;
+
+    private final java.util.Set<Long> excludedUserIds = new java.util.HashSet<>();
+    private final java.util.Map<Long, List<String>> excludedUsernamesByPost = new java.util.HashMap<>();
 
     private final PostDao postDao = new PostDao();
     private final TopicDao topicDao = new TopicDao();
@@ -77,9 +85,17 @@ public class TopicDetailController {
             try {
                 TopicDetailResponse detail = api.getTopic(token, serverTopicId);
                 if (detail.topic != null) topicDao.upsertFromServer(detail.topic);
-                if (detail.posts != null) for (PostDto p : detail.posts) postDao.upsertFromServer(p);
+                if (detail.posts != null) {
+                    for (PostDto p : detail.posts) {
+                        postDao.upsertFromServer(p);
+                        if (p.excluded_usernames != null) excludedUsernamesByPost.put(p.post_id, p.excluded_usernames);
+                    }
+                }
                 List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                Platform.runLater(() -> renderPosts(fresh));
+                Platform.runLater(() -> {
+                    renderPosts(fresh);
+                    if (detail.groupMembers != null) populateExcludePicker(detail.groupMembers);
+                });
             } catch (Exception ignored) {
                 // stay on the cached view if the fetch fails
             }
@@ -113,9 +129,14 @@ public class TopicDetailController {
         VBox card = new VBox(6, author, body, meta);
         card.getStyleClass().add("card");
 
-        // Actions only make sense once a post has a real server id — mirrors
-        // web's post-level actions (flag/edit/delete), which need it too.
         boolean isOwn = p.getAuthorId() == currentUserId;
+        List<String> hiddenFrom = excludedUsernamesByPost.get(p.getPostId());
+        if (isOwn && hiddenFrom != null && !hiddenFrom.isEmpty()) {
+            Label hidden = new Label("🔒 Hidden from " + String.join(", ", hiddenFrom));
+            hidden.getStyleClass().add("subtle");
+            hidden.setStyle("-fx-text-fill:#b45309; -fx-font-size:11px;");
+            card.getChildren().add(hidden);
+        }
         if (p.isSynced()) {
             HBox actions = new HBox(12);
             actions.setPadding(new Insets(4, 0, 0, 0));
@@ -141,6 +162,45 @@ public class TopicDetailController {
         }
 
         return card;
+    }
+
+    /** Builds the "hide this reply from" checkbox list from the topic's group roster. */
+    private void populateExcludePicker(List<MemberDto> members) {
+        if (excludeCheckboxList == null) return;
+        excludeCheckboxList.getChildren().clear();
+        excludedUserIds.clear();
+        updateExcludeBadge();
+
+        if (members.isEmpty()) {
+            Label none = new Label("No other members in this group yet.");
+            none.getStyleClass().add("subtle");
+            excludeCheckboxList.getChildren().add(none);
+            return;
+        }
+        for (MemberDto m : members) {
+            CheckBox cb = new CheckBox(m.username);
+            cb.selectedProperty().addListener((obs, was, isNow) -> {
+                if (isNow) excludedUserIds.add(m.userId); else excludedUserIds.remove(m.userId);
+                updateExcludeBadge();
+            });
+            excludeCheckboxList.getChildren().add(cb);
+        }
+    }
+
+    private void updateExcludeBadge() {
+        if (excludeCountBadge == null) return;
+        int n = excludedUserIds.size();
+        excludeCountBadge.setText(String.valueOf(n));
+        excludeCountBadge.setManaged(n > 0);
+        excludeCountBadge.setVisible(n > 0);
+    }
+
+    @FXML
+    private void onToggleExcludePicker() {
+        if (excludePickerBox == null) return;
+        boolean nowVisible = !excludePickerBox.isVisible();
+        excludePickerBox.setManaged(nowVisible);
+        excludePickerBox.setVisible(nowVisible);
     }
 
     private void onFlagPost(Post p) {
@@ -323,27 +383,44 @@ public class TopicDetailController {
         String token = Session.authToken();
         long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
         String body = content.trim();
+        List<Long> excludedForThisReply = new java.util.ArrayList<>(excludedUserIds);
 
         Thread worker = new Thread(() -> {
             // Online — post to the server and cache the result.
             if (token != null && !token.isBlank() && serverTopicId > 0) {
                 try {
-                    PostDto dto = api.createPost(token, serverTopicId, body, null, null);
+                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedForThisReply);
                     postDao.upsertFromServer(dto);
+                    if (dto.excluded_usernames != null) excludedUsernamesByPost.put(dto.post_id, dto.excluded_usernames);
                     List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                    Platform.runLater(() -> renderPosts(fresh));
+                    Platform.runLater(() -> { renderPosts(fresh); resetExcludePicker(); });
                     return;
                 } catch (Exception offline) {
-                    // fall through to the local queue
+                    // fall through to the local queue — excluded_users isn't
+                    // supported for queued offline replies (server-only feature)
                 }
             }
             // Offline — save locally and queue for sync.
             postDao.create(topic.getTopicId(), authorId, null, body);
             List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-            Platform.runLater(() -> renderPosts(fresh));
+            Platform.runLater(() -> { renderPosts(fresh); resetExcludePicker(); });
         }, "aces-reply");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    private void resetExcludePicker() {
+        excludedUserIds.clear();
+        updateExcludeBadge();
+        if (excludeCheckboxList != null) {
+            for (var node : excludeCheckboxList.getChildren()) {
+                if (node instanceof CheckBox cb) cb.setSelected(false);
+            }
+        }
+        if (excludePickerBox != null) {
+            excludePickerBox.setManaged(false);
+            excludePickerBox.setVisible(false);
+        }
     }
 
     @FXML
