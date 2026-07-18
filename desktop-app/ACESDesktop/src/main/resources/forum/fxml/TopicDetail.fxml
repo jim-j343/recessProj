@@ -16,13 +16,11 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline" onAction="#onExportPdf"/>
             <Button text="↗ Share" styleClass="btn-sm,btn-outline" onAction="#onShare"/>
-            <Button fx:id="editTopicBtn" text="✎ Edit" styleClass="btn-sm,btn-outline" onAction="#onEditTopic" managed="false" visible="false"/>
-            <Button fx:id="deleteTopicBtn" text="Delete" style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:4 10 4 10; -fx-background-radius:6; -fx-cursor:hand;" onAction="#onDeleteTopic" managed="false" visible="false"/>
         </HBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" styleClass="content-50">
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" styleClass="content-50">
             <VBox alignment="TOP_CENTER">
                 <VBox spacing="16" maxWidth="768">
                     <Label fx:id="repliesCountLabel" text="Replies" styleClass="h-sm"/>
@@ -32,22 +30,39 @@
         </ScrollPane>
     </center>
 
-    <!-- STICKY REPLY BAR -->
+    <!-- STICKY REPLY BAR AREA -->
     <bottom>
-        <VBox style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0;">
-            <VBox fx:id="excludePickerBox" spacing="6" managed="false" visible="false"
-                  style="-fx-background-color:#fffbeb; -fx-border-color:#fde68a; -fx-border-width:0 0 1 0; -fx-padding:10 24 10 24;">
-                <Label text="Hide this reply from:" styleClass="subtle" style="-fx-font-size:11px; -fx-font-weight:600;"/>
-                <VBox fx:id="excludeCheckboxList" spacing="4"/>
-            </VBox>
-            <HBox alignment="CENTER" style="-fx-padding:12 24 12 24;">
-                <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
-                    <Button fx:id="excludeToggleBtn" text="🔒" styleClass="btn-sm,btn-outline" onAction="#onToggleExcludePicker"/>
-                    <Label fx:id="excludeCountBadge" text="" managed="false" visible="false"
-                           styleClass="badge,badge-warning" style="-fx-font-size:10px;"/>
-                    <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
-                    <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
-                </HBox>
+        <VBox alignment="BOTTOM_CENTER">
+            <!-- HIDE PANEL -->
+            <HBox fx:id="hidePanel" visible="false" managed="false" spacing="12" alignment="CENTER_LEFT" maxWidth="768"
+                  style="-fx-background-color: #fefce8; -fx-border-color: #fde047; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 12 16;">
+                <VBox.margin>
+                    <Insets top="8" right="24" bottom="8" left="24"/>
+                </VBox.margin>
+                <Label text="Hide this reply from:" style="-fx-text-fill: #ca8a04; -fx-font-weight: bold;" minWidth="120" wrapText="true"/>
+                <FlowPane fx:id="hideMembersFlow" hgap="8" vgap="8" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <HBox alignment="CENTER" style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0; -fx-padding:16 24 16 24;">
+                <HBox spacing="16" alignment="CENTER" maxWidth="768" HBox.hgrow="ALWAYS">
+                    <Button onAction="#onAttach" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 4;">
+                    <graphic>
+                        <javafx.scene.shape.SVGPath content="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke="#9ca3af" strokeWidth="2" fill="transparent" scaleX="0.8" scaleY="0.8"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="hideButton" onAction="#onHide" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 4;">
+                    <graphic>
+                        <javafx.scene.shape.SVGPath fx:id="hideIcon" content="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" stroke="#9ca3af" strokeWidth="2" fill="transparent" scaleX="0.9" scaleY="0.9"/>
+                    </graphic>
+                </Button>
+                <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"
+                           style="-fx-background-color: #ffffff; -fx-border-color: #d1d5db; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 10 16; -fx-font-size: 14px;"/>
+                <Button onAction="#onReply" style="-fx-background-color: #22c55e; -fx-background-radius: 50; -fx-min-width: 40; -fx-min-height: 40; -fx-max-width: 40; -fx-max-height: 40; -fx-cursor: hand; -fx-padding: 0;">
+                    <graphic>
+                        <javafx.scene.shape.SVGPath content="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke="white" strokeWidth="2" strokeLineCap="ROUND" strokeLineJoin="ROUND" fill="white" scaleX="0.8" scaleY="0.8" rotate="90" translateX="2"/>
+                    </graphic>
+                </Button>
+            </HBox>
             </HBox>
         </VBox>
     </bottom>

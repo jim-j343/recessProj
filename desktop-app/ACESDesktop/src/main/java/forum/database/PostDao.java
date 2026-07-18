@@ -193,4 +193,25 @@ public class PostDao {
         p.setAuthorName(rs.getString("author"));
         return p;
     }
+
+    public void deleteLocally(long postId) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE post_id = ?")) {
+            ps.setLong(1, postId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateContentLocally(long postId, String content) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement("UPDATE posts SET content = ? WHERE post_id = ?")) {
+            ps.setString(1, content);
+            ps.setLong(2, postId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

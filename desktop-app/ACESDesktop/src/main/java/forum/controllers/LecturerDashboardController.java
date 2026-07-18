@@ -98,7 +98,7 @@ public class LecturerDashboardController {
 
     private HBox quizRow(QuizDto q) {
         Label title = new Label(q.title);
-        title.setStyle("-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #111827;");
+        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;");
 
         String timeStr = "";
         if (q.startTime != null && !q.startTime.isBlank()) {

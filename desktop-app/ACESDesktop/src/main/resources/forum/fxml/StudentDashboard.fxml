@@ -37,8 +37,71 @@
                         </HBox>
                     </graphic>
                     <items>
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label fx:id="welcomeLabel" styleClass="page-title"/>
+                    <Label text="Here's where your progress, grades, and quizzes stand today." styleClass="subtle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Quiz alert -->
+                    <HBox fx:id="quizAlertBox" styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12">
+                        <Label fx:id="quizAlertIcon" style="-fx-text-fill:#4b5563; -fx-font-size:18px;"/>
+                        <VBox>
+                            <Label fx:id="quizAlertTitle" styleClass="label-strong"/>
+                            <Label fx:id="quizAlertSub"   styleClass="subtle"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="takeQuizBtn" text="Take Quiz"
+                                styleClass="btn,btn-primary"
+                                onAction="#onTakeQuiz"
+                                managed="false" visible="false"/>
+                    </HBox>
+
+                    <!-- Stats -->
+                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT" styleClass="eyebrow"/>
+                    <HBox spacing="16">
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="QUIZ PROGRESS" styleClass="eyebrow"/>
+                            <Label fx:id="quizProgressLabel" text="—" styleClass="metric-value"/>
+                            <ProgressBar fx:id="quizProgressBar" progress="0" maxWidth="Infinity"/>
+                            <Label fx:id="quizProgressSub" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
+                            <Label fx:id="participationLabel" text="—" styleClass="metric-value"/>
+                            <Label styleClass="subtle" text="Based on posts and replies"/>
+                        </VBox>
+                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
+                            <Label fx:id="standingLabel" styleClass="badge,badge-success" text="Active"/>
+                        </MenuItem>
                     </items>
                 </MenuButton>
             </HBox>
@@ -120,7 +183,11 @@
 
                     <!-- Logout -->
                     <HBox alignment="CENTER_RIGHT">
-                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout"/>
+                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </graphic>
+                        </Button>
                     </HBox>
 
                 </VBox>

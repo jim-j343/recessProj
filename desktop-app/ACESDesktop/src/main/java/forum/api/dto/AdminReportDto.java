@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AdminReportDto {
     public long id;
+    @JsonProperty("topic_id") public Long topicId;
     @JsonProperty("post_content") public String postContent;
     @JsonProperty("topic_title") public String topicTitle;
     public String author;

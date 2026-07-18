@@ -104,41 +104,38 @@ public class ForumDashboardController {
         }
 
         for (Topic t : topics) {
-            VBox card = new VBox(8);
-            card.getStyleClass().add("card-flat");
-            card.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand;");
-            
-            HBox header = new HBox(12);
-            Label av = new Label(initial(t.getAuthorName()));
-            av.getStyleClass().addAll("avatar", "avatar-soft");
-            av.setMinSize(36, 36);
+            VBox card = new VBox(12);
+            card.getStyleClass().add("card");
+            card.setStyle("-fx-border-color: #f3f4f6; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand; -fx-background-color: white;");
 
-            VBox text = new VBox(2);
-            Label title = new Label(t.getTitle());
-            title.getStyleClass().add("label-strong");
-            title.setWrapText(true);
-
-            text.getChildren().addAll(title);
-
-            HBox.setHgrow(text, Priority.ALWAYS);
-            header.getChildren().addAll(av, text);
-
-            HBox footer = new HBox(8);
+            // Top row: Category tag + Answered badge
+            HBox topRow = new HBox();
+            topRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
             if (t.getCategory() != null && !t.getCategory().isBlank()) {
-                Label tag = new Label("#" + t.getCategory());
-                tag.setStyle("-fx-text-fill: #4f46e5; -fx-font-size: 11px; -fx-font-weight: bold;");
-                footer.getChildren().add(tag);
+                Label tag = new Label(t.getCategory());
+                tag.setStyle("-fx-background-color: #e0e7ff; -fx-text-fill: #4338ca; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-radius: 12;");
+                topRow.getChildren().add(tag);
             }
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            
-            Label meta = new Label("Posted by " + safe(t.getAuthorName()) + "  ·  💬 " + t.getReplyCount());
-            meta.getStyleClass().add("subtle");
-            meta.setStyle("-fx-font-size: 11px;");
-            
-            footer.getChildren().addAll(spacer, meta);
+            topRow.getChildren().add(spacer);
 
-            card.getChildren().addAll(header, footer);
+            if (t.getReplyCount() > 0) {
+                Label answered = new Label("Answered");
+                answered.setStyle("-fx-background-color: #d1fae5; -fx-text-fill: #059669; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-radius: 12;");
+                topRow.getChildren().add(answered);
+            }
+
+            // Middle row: Title
+            Label title = new Label(t.getTitle());
+            title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+            title.setWrapText(true);
+
+            // Bottom row: Meta
+            Label meta = new Label("Posted by " + safe(t.getAuthorName()) + " · " + t.getReplyCount() + " replies");
+            meta.setStyle("-fx-font-size: 13px; -fx-text-fill: #6b7280;");
+
+            card.getChildren().addAll(topRow, title, meta);
             card.setOnMouseClicked(e -> openTopic(t));
 
             discussionList.getChildren().add(card);
