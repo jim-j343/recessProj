@@ -325,6 +325,15 @@ public QuizDto createQuiz(String token, String title, String courseName, String 
     return mapper.readValue(resp.body(), QuizDto.class);
 }
 
+/** POST /api/quizzes/{id}/publish */
+public QuizDto publishQuiz(String token, long quizId)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/publish", token)
+            .POST(HttpRequest.BodyPublishers.noBody()).build());
+    ok(resp);
+    return mapper.readValue(resp.body(), QuizDto.class);
+}
+
 /** GET /api/quizzes/{id} — quiz with questions */
 public QuizDetailResponse getQuiz(String token, long quizId)
         throws ApiException, IOException, InterruptedException {

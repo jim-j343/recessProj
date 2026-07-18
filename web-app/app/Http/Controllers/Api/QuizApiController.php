@@ -109,6 +109,34 @@ class QuizApiController extends Controller
         return response()->json($this->quizShape($quiz->fresh()), 201);
     }
 
+    /** POST /api/quizzes/{id}/publish — lecturer: publish a draft quiz.
+     *  Mirrors QuizController::publish() on web. */
+    public function publish(Request $request, $id): JsonResponse
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        if ($quiz->lecturer_id !== $request->user()->user_id && ! $request->user()->isAdmin()) {
+            return response()->json(['message' => 'You cannot publish this quiz.'], 403);
+        }
+        if ($quiz->is_published) {
+            return response()->json(['message' => 'This quiz is already published.'], 422);
+        }
+
+        $quiz->update(['is_published' => true]);
+
+        $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
+            ->where('status', 'active')
+            ->where('user_id', '!=', $request->user()->user_id)
+            ->pluck('user_id')
+            ->unique();
+
+        foreach ($memberIds as $userId) {
+            Notification::notify($userId, 'quiz_announced');
+        }
+
+        return response()->json($this->quizShape($quiz->fresh()));
+    }
+
     /** GET /api/quizzes/{id} — quiz with questions and answers */
     public function show($id): JsonResponse
     {
