@@ -55,11 +55,15 @@
                             class="w-full border-gray-300 rounded-md shadow-sm
                                    focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="">-- Select a category --</option>
-                            <option value="General" {{ old('category') == 'General' ? 'selected' : '' }}>General</option>
-                            <option value="Programming" {{ old('category') == 'Programming' ? 'selected' : '' }}>Programming</option>
-                            <option value="Mathematics" {{ old('category') == 'Mathematics' ? 'selected' : '' }}>Mathematics</option>
-                            <option value="Science" {{ old('category') == 'Science' ? 'selected' : '' }}>Science</option>
-                            <option value="Announcements" {{ old('category') == 'Announcements' ? 'selected' : '' }}>Announcements</option>
+                            @foreach([
+                                'SDLC', 'Methodology', 'Requirements', 'Testing', 'Best Practices',
+                                'Tools', 'Web Development', 'Networking', 'Programming',
+                                'Architecture', 'Database', 'Numerical Analysis',
+                            ] as $cat)
+                                <option value="{{ $cat }}" {{ old('category') == $cat ? 'selected' : '' }}>
+                                    {{ $cat }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
