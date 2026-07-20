@@ -11,6 +11,7 @@ use App\Models\Quiz;
 use App\Models\Submission;
 use App\Models\Topic;
 use App\Models\Warning;
+use App\Models\TopicRecommendation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -145,16 +146,13 @@ class StudentController extends Controller
             ->latest('created_at')
             ->first();
 
-        // ---- "Recommended for You" — replaces the fixed, dead-linked
-        // placeholder card with a real pick: the most-replied-to topic in the
-        // student's groups that they haven't posted in themselves ----
-        $postedTopicIds = Post::where('author_id', $user->user_id)->pluck('topic_id');
-
-        $recommendedTopic = Topic::whereIn('group_id', $groupIds)
-            ->whereNotIn('topic_id', $postedTopicIds)
-            ->withCount('posts')
-            ->orderByDesc('posts_count')
-            ->first();
+        // ---- ML-backed recommendations, read from topic_recommendations ----
+        $recommendedTopics = TopicRecommendation::where('user_id', $user->user_id)
+            ->where('is_dismissed', false)
+            ->with('topic')
+            ->orderByDesc('score')
+            ->take(3)
+            ->get();
 
         return view('student.dashboard', compact(
             'topicCount',
@@ -173,7 +171,7 @@ class StudentController extends Controller
             'latestWarning',
             'recentActivity',
             'latestTopic',
-            'recommendedTopic'
+            'recommendedTopics'
         ));
     }
 

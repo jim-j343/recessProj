@@ -63,6 +63,7 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::post('/topics/{topic}/posts', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
+    Route::get('/recommendations/refresh', [\App\Http\Controllers\RecommendationController::class, 'refresh'])->name('recommendations.refresh');
 
     // ---> ADD THESE TWO LINES HERE <---
     Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
