@@ -1,4 +1,3 @@
-import os
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
@@ -39,8 +38,5 @@ print(f"Fold scores: {[round(s * 100, 1) for s in scores]}")
 classifier.fit(texts, labels)
 
 # SAVE the trained model to a file[cite: 2]
-script_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(script_dir, 'topic_classifier.pkl')
-
-joblib.dump(classifier, model_path)
-print(f"Model saved to {model_path}")
+joblib.dump(classifier, 'topic_classifier.pkl')
+print("Model saved to topic_classifier.pkl")
