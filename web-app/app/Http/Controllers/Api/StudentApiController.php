@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\ParticipationScore;
 use App\Models\Post;
+use App\Models\Topic;
 use App\Models\Submission;
 use App\Models\Warning;
 use Illuminate\Http\JsonResponse;
@@ -71,11 +72,41 @@ class StudentApiController extends Controller
             'sub'            => 'No active warnings on your account',
         ];
 
+        // ---- Latest topic in the student's groups ----
+        $latestTopic = Topic::whereIn('group_id', $groupIds)
+            ->withCount('posts')
+            ->with('group')
+            ->latest('created_at')
+            ->first();
+
+        // ---- Recommended: most-replied-to topic the student hasn't posted in ----
+        $postedTopicIds = Post::where('author_id', $user->user_id)->pluck('topic_id');
+
+        $recommendedTopic = Topic::whereIn('group_id', $groupIds)
+            ->whereNotIn('topic_id', $postedTopicIds)
+            ->withCount('posts')
+            ->with('group')
+            ->orderByDesc('posts_count')
+            ->first();
+
         return response()->json([
             'participation_avg'      => $participationAvg,
             'participation_by_group' => $participationByGroup,
             'standing'               => $standing,
+            'latest_topic'           => $latestTopic ? $this->topicPayload($latestTopic) : null,
+            'recommended_topic'      => $recommendedTopic ? $this->topicPayload($recommendedTopic) : null,
         ]);
+    }
+
+    private function topicPayload(Topic $topic): array
+    {
+        return [
+            'topic_id'         => $topic->topic_id,
+            'title'            => $topic->title,
+            'group_name'       => $topic->group?->name,
+            'posts_count'      => $topic->posts_count ?? 0,
+            'created_at_human' => optional($topic->created_at)->diffForHumans(),
+        ];
     }
 
     // GET /api/student/progress — full assessment history + real
