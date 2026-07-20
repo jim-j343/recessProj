@@ -136,28 +136,15 @@ public class StudentDashboardController {
     }
 
     private void renderExtras(StudentDashboardDto dto) {
-        participationLabel.setText(Math.round(dto.participationPct) + "%");
+        participationLabel.setText(Math.round(dto.participationAvg) + "%");
 
         standingLabel.getStyleClass().removeAll("badge-success", "badge-warning", "badge-danger");
-        switch (dto.standing == null ? "active" : dto.standing) {
-            case "warned" -> {
-                standingLabel.setText("Warned");
-                standingLabel.getStyleClass().add("badge-warning");
-                standingSub.setText(dto.latestWarning != null
-                        ? "Warning #" + dto.latestWarning.warningNumber + " — resolve before the deadline."
-                        : "You have an active warning.");
-            }
-            case "blacklisted" -> {
-                standingLabel.setText("Blacklisted");
-                standingLabel.getStyleClass().add("badge-danger");
-                standingSub.setText("Contact your lecturer or admin to appeal.");
-            }
-            default -> {
-                standingLabel.setText("Active");
-                standingLabel.getStyleClass().add("badge-success");
-                standingSub.setText("No unresolved warnings.");
-            }
-        }
+        boolean hasWarning = dto.standing != null && "warning".equals(dto.standing.status);
+        standingLabel.setText(dto.standing != null && dto.standing.label != null ? dto.standing.label
+                : (hasWarning ? "Warning" : "Good Standing"));
+        standingLabel.getStyleClass().add(hasWarning ? "badge-warning" : "badge-success");
+        standingSub.setText(dto.standing != null && dto.standing.sub != null ? dto.standing.sub
+                : "No active warnings on your account");
 
         if (dto.latestTopic != null) {
             latestTopicTitle.setText(dto.latestTopic.title);

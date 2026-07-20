@@ -101,57 +101,6 @@
                         <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
                             <Label fx:id="standingLabel" styleClass="badge,badge-success" text="Active"/>
-                        </MenuItem>
-                    </items>
-                </MenuButton>
-            </HBox>
-            <HBox styleClass="page-header" alignment="CENTER_LEFT">
-                <VBox spacing="2">
-                    <Label fx:id="welcomeLabel" styleClass="page-title"/>
-                    <Label text="Here's where your progress, grades, and quizzes stand today." styleClass="subtle"/>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
-            </HBox>
-        </VBox>
-    </top>
-
-    <center>
-        <ScrollPane fitToWidth="true" styleClass="content-50">
-            <VBox alignment="TOP_CENTER">
-                <VBox spacing="24" maxWidth="1120">
-
-                    <!-- Quiz alert -->
-                    <HBox fx:id="quizAlertBox" styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12">
-                        <Label fx:id="quizAlertIcon" style="-fx-text-fill:#4b5563; -fx-font-size:18px;"/>
-                        <VBox>
-                            <Label fx:id="quizAlertTitle" styleClass="label-strong"/>
-                            <Label fx:id="quizAlertSub"   styleClass="subtle"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="takeQuizBtn" text="Take Quiz"
-                                styleClass="btn,btn-primary"
-                                onAction="#onTakeQuiz"
-                                managed="false" visible="false"/>
-                    </HBox>
-
-                    <!-- Stats -->
-                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT" styleClass="eyebrow"/>
-                    <HBox spacing="16">
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="QUIZ PROGRESS" styleClass="eyebrow"/>
-                            <Label fx:id="quizProgressLabel" text="—" styleClass="metric-value"/>
-                            <ProgressBar fx:id="quizProgressBar" progress="0" maxWidth="Infinity"/>
-                            <Label fx:id="quizProgressSub" styleClass="subtle" wrapText="true"/>
-                        </VBox>
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
-                            <Label fx:id="participationLabel" text="—" styleClass="metric-value"/>
-                            <Label styleClass="subtle" text="Based on posts and replies"/>
-                        </VBox>
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
-                            <Label fx:id="standingLabel" styleClass="badge,badge-success" text="Active"/>
                             <Label fx:id="standingSub" styleClass="subtle" wrapText="true"/>
                         </VBox>
                     </HBox>
