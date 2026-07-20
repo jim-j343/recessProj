@@ -8,6 +8,7 @@ use App\Models\ActivityLog;
 use App\Models\GroupMembership;
 use App\Models\Notification;
 use App\Models\PostReport;
+use App\Models\UserEngagement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -65,6 +66,14 @@ class PostController extends Controller
             'logged_at'   => now(),
         ]);
         Auth::user()->update(['last_active_at' => now()]);
+
+        // Feed the recommender: this is the real reply path the UI uses
+        UserEngagement::create([
+            'user_id'          => Auth::id(),
+            'topic_id'         => (int) $topicId,
+            'engagement_type'  => 'reply',
+            'engaged_at'       => now(),
+        ]);
 
         return redirect()->route('topics.show', $topicId)
             ->with('success', 'Reply posted!');
