@@ -10,3 +10,7 @@ Artisan::command('inspire', function () {
 
 // SDD 5.1 Member Inactivity & Blacklisting Component — runs once a day.
 Schedule::command('members:check-inactivity')->daily();
+
+// ML recommendation engine — regenerates topic_recommendations for every
+// user from the Flask cosine-similarity service, once a day.
+Schedule::command('recommendations:generate')->daily();

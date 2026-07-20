@@ -6,8 +6,10 @@ use App\Models\Topic;
 use App\Models\Post;
 use App\Models\ActivityLog;
 use App\Models\GroupMembership;
+use App\Models\UserEngagement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 
@@ -62,11 +64,27 @@ class TopicController extends Controller
             'group_id' => ['required', 'exists:groups,group_id'],
         ]);
 
+        // Only auto-classify if the user didn't pick a category themselves —
+        // a manual choice always takes priority over the ML prediction.
+        // Falls back to 'General' if the ML service is unreachable or slow,
+        // so topic creation never breaks because Flask isn't running.
+        $category = $validated['category'] ?? null;
+        if (!$category) {
+            try {
+                $response = Http::timeout(3)->post('http://localhost:5001/classify', [
+                    'text' => $validated['title'] . ' ' . $validated['content'],
+                ]);
+                $category = $response->successful() ? $response->json('category') : 'General';
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                $category = 'General';
+            }
+        }
+
         $topic = Topic::create([
             'group_id' => $validated['group_id'],
             'creator_id' => Auth::id(),
             'title' => $validated['title'],
-            'category' => $validated['category'] ?? null,
+            'category' => $category,
         ]);
 
         Post::create([
@@ -83,6 +101,14 @@ class TopicController extends Controller
             'logged_at'   => now(),
         ]);
         Auth::user()->update(['last_active_at' => now()]);
+
+        // Feed the recommender: creating a topic is the strongest engagement signal
+        UserEngagement::create([
+            'user_id'          => Auth::id(),
+            'topic_id'         => $topic->topic_id,
+            'engagement_type'  => 'post',
+            'engaged_at'       => now(),
+        ]);
 
         return redirect()->route('topics.show', $topic->topic_id)
             ->with('success', 'Topic created successfully!');
@@ -126,6 +152,14 @@ class TopicController extends Controller
             ->get()
             ->pluck('user')
             ->filter();
+
+        // Feed the recommender: viewing a topic is the lightest engagement signal
+        UserEngagement::create([
+            'user_id'          => Auth::id(),
+            'topic_id'         => $topic->topic_id,
+            'engagement_type'  => 'view',
+            'engaged_at'       => now(),
+        ]);
 
         return view('forum.show', compact(
             'topic',
@@ -228,6 +262,7 @@ class TopicController extends Controller
         ]);
         Auth::user()->update(['last_active_at' => now()]);
 
+
         return redirect()->route('topics.show', $topic->topic_id)
             ->withFragment('post-' . $post->post_id)
             ->with('success', 'Reply posted!');
@@ -274,6 +309,14 @@ class TopicController extends Controller
             : $posts;
 
         $pdf = Pdf::loadView('exports.topic-pdf', compact('topic', 'firstPost', 'replies'));
+
+        // Feed the recommender: exporting signals strong interest in a topic
+        UserEngagement::create([
+            'user_id'          => Auth::id(),
+            'topic_id'         => $topic->topic_id,
+            'engagement_type'  => 'export',
+            'engaged_at'       => now(),
+        ]);
 
         return $pdf->download(Str::slug($topic->title) . '.pdf');
     }
