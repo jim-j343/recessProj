@@ -65,49 +65,56 @@
                 <VBox spacing="24" maxWidth="1120">
                     <VBox spacing="4">
                         <Label text="Assessment Overview" styleClass="h-lg"/>
-                        <Label text="Your real forum activity and quiz performance across the courses you've joined." styleClass="muted"/>
+                        <Label text="Detailed breakdown of your academic consistency and recent performance." styleClass="muted"/>
                     </VBox>
 
                     <HBox spacing="24">
                         <!-- Participation metrics -->
                         <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
                             <Label text="Participation Metrics" styleClass="card-title"/>
-                            <Label text="Your Real Engagement Data" styleClass="eyebrow"/>
-
-                            <Label text="Your Activity (Last 7 Days)" styleClass="subtle"/>
-                            <HBox fx:id="activityChartBox" spacing="10" alignment="BOTTOM_LEFT" prefHeight="96"/>
-                            <HBox fx:id="activityLabelsBox" spacing="10"/>
-
+                            <Label text="Consistency Score (Last 7 Days)" styleClass="subtle"/>
+                            <HBox spacing="10" alignment="BOTTOM_LEFT" prefHeight="120">
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="48"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="78"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="60"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="96"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="54"  maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-hi"  prefHeight="108" maxWidth="Infinity"/></VBox>
+                                <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="72"  maxWidth="Infinity"/></VBox>
+                            </HBox>
+                            <HBox spacing="10">
+                                <Label text="Mon" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Tue" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Wed" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Thu" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Fri" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Sat" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label text="Sun" styleClass="subtle" maxWidth="Infinity" alignment="CENTER" HBox.hgrow="ALWAYS"/>
+                            </HBox>
                             <Region styleClass="divider" prefHeight="1"/>
                             <VBox spacing="4">
-                                <HBox alignment="CENTER_LEFT">
-                                    <Label text="Forum Participation" styleClass="muted"/>
-                                    <Region HBox.hgrow="ALWAYS"/>
-                                    <Label fx:id="participationPctLabel" text="—" styleClass="label-strong"/>
-                                </HBox>
-                                <ProgressBar fx:id="participationProgressBar" progress="0" maxWidth="Infinity"/>
-                                <Label fx:id="participationSubLabel" styleClass="subtle" wrapText="true"/>
+                                <HBox alignment="CENTER_LEFT"><Label text="Forum Contribution Quality" styleClass="muted"/><Region HBox.hgrow="ALWAYS"/><Label text="94/100" styleClass="label-strong"/></HBox>
+                                <ProgressBar progress="0.94" maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <HBox alignment="CENTER_LEFT"><Label text="Peer Review Accuracy" styleClass="muted"/><Region HBox.hgrow="ALWAYS"/><Label text="88%" styleClass="label-strong"/></HBox>
+                                <ProgressBar progress="0.88" maxWidth="Infinity" style="-fx-accent:#9ca3af;"/>
                             </VBox>
                         </VBox>
 
                         <!-- Assessment history -->
                         <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
                             <Label text="Assessment History" styleClass="card-title"/>
-                            <VBox fx:id="assessmentHistoryBox" spacing="0"/>
-                            <Label fx:id="assessmentEmptyLabel" text="No completed quizzes yet."
-                                   styleClass="subtle" wrapText="true" managed="false" visible="false"/>
+                            <Label text="Your quiz results and participation scores will appear here."
+                                styleClass="subtle" wrapText="true"/>
                         </VBox>
                     </HBox>
 
-                    <!-- Lecturer's remark, or empty state -->
-                    <VBox fx:id="remarkBox" styleClass="card-dark" spacing="12" managed="false" visible="false">
-                        <Label text="Lecturer's Remark" styleClass="eyebrow-invert"/>
-                        <Label fx:id="remarkQuoteLabel" styleClass="body-invert" wrapText="true"/>
-                        <Label fx:id="remarkMetaLabel" style="-fx-text-fill:#6b7280; -fx-font-size:11px;"/>
-                    </VBox>
-                    <VBox fx:id="noRemarkBox" styleClass="card-flat" alignment="CENTER" managed="false" visible="false">
-                        <Label text="No lecturer remarks yet — these appear here once a lecturer grades your participation."
-                               styleClass="subtle" wrapText="true" style="-fx-text-alignment:center;"/>
+                    <!-- Professor's insight -->
+                    <VBox styleClass="card-dark" spacing="12">
+                        <Label text="Professor's Insight" styleClass="eyebrow-invert"/>
+                        <Label text="Your participation and engagement data will appear here once assessed by your lecturer."
+                            styleClass="body-invert" wrapText="true"/>
                     </VBox>
                 </VBox>
             </VBox>

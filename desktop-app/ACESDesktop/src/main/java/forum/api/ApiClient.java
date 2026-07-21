@@ -9,11 +9,9 @@ import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
 import forum.api.dto.AdminRemovalDto;
-import forum.api.dto.LecturerDashboardDto;
 import forum.api.dto.AdminRemovalsResponseDto;
 import forum.api.dto.AdminReportsResponseDto;
-import forum.api.dto.StudentDashboardDto;
-import forum.api.dto.StudentProgressDto;
+import forum.api.dto.LecturerDashboardDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -167,63 +165,12 @@ public class ApiClient {
         return mapper.readValue(resp.body(), TopicDetailResponse.class);
     }
 
-    /** PUT /topics/{id} — edit title/category/group + the opening post's content. */
-    public TopicDto updateTopic(String token, long topicId, String title, String category,
-                                 long groupId, String content)
-            throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("title", title);
-        body.put("category", category);
-        body.put("group_id", groupId);
-        body.put("content", content);
-        HttpResponse<String> resp = send(request("/topics/" + topicId, token)
-                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
-        ok(resp);
-        return mapper.readValue(resp.body(), TopicDto.class);
-    }
-
-    /** DELETE /topics/{id}. */
-    public void deleteTopic(String token, long topicId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/topics/" + topicId, token).DELETE().build());
-        ok(resp);
-    }
-
-    /** POST /posts/{id}/flag — report a post to a system admin. */
-    public void flagPost(String token, long postId, String reason)
-            throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("reason", reason);
-        HttpResponse<String> resp = send(request("/posts/" + postId + "/flag", token)
-                .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
-        ok(resp);
-    }
-
-    /** PUT /posts/{id} — edit a reply's text content. */
-    public PostDto updatePost(String token, long postId, String content)
-            throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("content", content);
-        HttpResponse<String> resp = send(request("/posts/" + postId, token)
-                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
-        ok(resp);
-        return mapper.readValue(resp.body(), PostDto.class);
-    }
-
-    /** DELETE /posts/{id}. */
-    public void deletePost(String token, long postId)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/posts/" + postId, token).DELETE().build());
-        ok(resp);
-    }
-
     /** POST /topics/{id}/posts — add a reply. */
-    public PostDto createPost(String token, long topicId, String content, Long parentPostId, List<Long> excludedUserIds)
+    public PostDto createPost(String token, long topicId, String content, Long parentPostId)
             throws ApiException, IOException, InterruptedException {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("content", content);
         if (parentPostId != null) body.put("parent_post_id", parentPostId);
-        if (excludedUserIds != null && !excludedUserIds.isEmpty()) body.put("excluded_users", excludedUserIds);
         HttpResponse<String> resp = send(request("/topics/" + topicId + "/posts", token)
                 .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
         ok(resp);
@@ -237,6 +184,25 @@ public class ApiClient {
         body.put("reason", reason);
         HttpResponse<String> resp = send(request("/posts/" + postId + "/report", token)
                 .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+    }
+
+    /** PUT /posts/{id} */
+    public PostDto updatePost(String token, long postId, String content)
+            throws ApiException, IOException, InterruptedException {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("content", content);
+        HttpResponse<String> resp = send(request("/posts/" + postId, token)
+                .method("PUT", HttpRequest.BodyPublishers.ofString(json(body))).build());
+        ok(resp);
+        return mapper.readValue(resp.body(), PostDto.class);
+    }
+
+    /** DELETE /posts/{id} */
+    public void deletePost(String token, long postId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/posts/" + postId, token)
+                .method("DELETE", HttpRequest.BodyPublishers.noBody()).build());
         ok(resp);
     }
 
@@ -268,14 +234,6 @@ public GroupDto createGroup(String token, String name, String description)
 public void joinGroup(String token, long groupId)
         throws ApiException, IOException, InterruptedException {
     HttpResponse<String> resp = send(request("/groups/" + groupId + "/join", token)
-            .POST(HttpRequest.BodyPublishers.noBody()).build());
-    ok(resp);
-}
-
-/** POST /api/groups/{id}/leave */
-public void leaveGroup(String token, long groupId)
-        throws ApiException, IOException, InterruptedException {
-    HttpResponse<String> resp = send(request("/groups/" + groupId + "/leave", token)
             .POST(HttpRequest.BodyPublishers.noBody()).build());
     ok(resp);
 }
@@ -335,8 +293,8 @@ public void removeMemberGroup(String token, long groupId, long userId, String re
         throws ApiException, IOException, InterruptedException {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("reason", reason);
-
-    // HTTP DELETE with body isn't fully supported by all servers/clients,
+    
+    // HTTP DELETE with body isn't fully supported by all servers/clients, 
     // but Java 11 HttpClient supports custom methods. We use method("DELETE", body).
     HttpResponse<String> resp = send(request("/groups/" + groupId + "/members/" + userId, token)
             .method("DELETE", HttpRequest.BodyPublishers.ofString(json(body))).build());
@@ -347,11 +305,11 @@ public void removeMemberGroup(String token, long groupId, long userId, String re
 //  Lecturer
 // ---------------------------------------------------------------
 
-public LecturerDashboardDto getLecturerDashboard(String token) throws ApiException, IOException, InterruptedException {
-    HttpResponse<String> resp = send(request("/lecturer/dashboard", token).GET().build());
-    ok(resp);
-    return mapper.readValue(resp.body(), LecturerDashboardDto.class);
-}
+    public LecturerDashboardDto getLecturerDashboard(String token) throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/lecturer/dashboard", token).GET().build());
+        ok(resp);
+        return mapper.readValue(resp.body(), LecturerDashboardDto.class);
+    }
 
 // ---------------------------------------------------------------
 //  Quizzes
@@ -371,34 +329,6 @@ public List<QuizDto> myQuizzes(String token)
     HttpResponse<String> resp = send(request("/quizzes/my", token).GET().build());
     ok(resp);
     return mapper.readValue(resp.body(), new TypeReference<List<QuizDto>>() {});
-}
-
-/** POST /api/quizzes — lecturer: create a quiz with its questions/answers. */
-public QuizDto createQuiz(String token, String title, String courseName, String startTime,
-                           int duration, String target, boolean publish,
-                           List<Map<String, Object>> questions)
-        throws ApiException, IOException, InterruptedException {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("title", title);
-    body.put("course_name", courseName);
-    body.put("start_time", startTime);
-    body.put("duration", duration);
-    body.put("target", target);
-    if (publish) body.put("publish", true);
-    body.put("questions", questions);
-    HttpResponse<String> resp = send(request("/quizzes", token)
-            .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
-    ok(resp);
-    return mapper.readValue(resp.body(), QuizDto.class);
-}
-
-/** POST /api/quizzes/{id}/publish */
-public QuizDto publishQuiz(String token, long quizId)
-        throws ApiException, IOException, InterruptedException {
-    HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/publish", token)
-            .POST(HttpRequest.BodyPublishers.noBody()).build());
-    ok(resp);
-    return mapper.readValue(resp.body(), QuizDto.class);
 }
 
 /** GET /api/quizzes/{id} — quiz with questions */
@@ -437,26 +367,6 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
     ok(resp);
     return mapper.readValue(resp.body(), new TypeReference<List<QuizResultDto>>() {});
 }
-
-    // ---------------------------------------------------------------
-    //  Student — dashboard/progress extras not covered by /quizzes
-    // ---------------------------------------------------------------
-
-    /** GET /api/student/dashboard — participation-by-group + community standing. */
-    public StudentDashboardDto studentDashboard(String token)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/student/dashboard", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), StudentDashboardDto.class);
-    }
-
-    /** GET /api/student/progress — full assessment history + participation breakdown. */
-    public StudentProgressDto studentProgress(String token)
-            throws ApiException, IOException, InterruptedException {
-        HttpResponse<String> resp = send(request("/student/progress", token).GET().build());
-        ok(resp);
-        return mapper.readValue(resp.body(), StudentProgressDto.class);
-    }
 
     // ---------------------------------------------------------------
     //  Admin
