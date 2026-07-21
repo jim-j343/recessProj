@@ -68,7 +68,7 @@ public class SyncService {
                     if (p == null) continue;
                     long serverTopicId = topicDao.serverIdFor(p.getTopicId());
                     if (serverTopicId <= 0) continue;   // parent topic not synced yet — retry later
-                    PostDto created = api.createPost(token, serverTopicId, p.getContent(), null, null);
+                    PostDto created = api.createPost(token, serverTopicId, p.getContent(), null);
                     postDao.markSynced(row.localId(), created.post_id);
                     cache.markSynced(row.syncId(), created.post_id);
                     pushed++;
