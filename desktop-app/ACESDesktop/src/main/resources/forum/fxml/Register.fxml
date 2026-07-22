@@ -94,12 +94,4 @@
         </ScrollPane>
     </center>
 
-    <!-- FOOTER -->
-    <bottom>
-        <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0; -fx-padding:14 32 14 32;">
-            <Label text="ACES" styleClass="subtle"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label text="(c) 2026 ACES. All rights reserved." styleClass="subtle"/>
-        </HBox>
-    </bottom>
 </BorderPane>

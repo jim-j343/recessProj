@@ -16,10 +16,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressBar; // kept for possible future use
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.FlowPane;
 
@@ -154,13 +155,13 @@ public class AdminAnalyticsController {
             name.setStyle("-fx-font-size: 12px; -fx-font-weight: 500; -fx-text-fill: #4b5563;");
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label pct = new Label(String.format("%.1f%%", row.avgPct == null ? 0 : row.avgPct));
+            double rawPct = (row.avgPct == null ? 0 : row.avgPct);
+            Label pct = new Label(String.format("%.1f%%", rawPct));
             pct.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;");
             labels.getChildren().addAll(name, spacer, pct);
 
-            ProgressBar bar = new ProgressBar((row.avgPct == null ? 0 : row.avgPct) / 100.0);
-            bar.setMaxWidth(Double.MAX_VALUE);
-            bar.setStyle("-fx-accent: #111827;");
+            // Web: bg-gray-900 fill on bg-gray-100 track, h-1.5 (6px)
+            StackPane bar = makeBar(rawPct / 100.0, "#111827");
 
             Label count = new Label(row.count + " completed quizzes");
             count.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af;");
@@ -188,9 +189,8 @@ public class AdminAnalyticsController {
             count.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;");
             labels.getChildren().addAll(name, spacer, count);
 
-            ProgressBar bar = new ProgressBar((double) row.count / Math.max(1, peak));
-            bar.setMaxWidth(Double.MAX_VALUE);
-            bar.setStyle("-fx-accent: #4f46e5;");
+            // Web: bg-indigo-600 fill on bg-gray-100 track, h-1.5 (6px)
+            StackPane bar = makeBar((double) row.count / Math.max(1, peak), "#4f46e5");
 
             VBox item = new VBox(4, labels, bar);
             VBox.setMargin(item, new Insets(0, 0, 8, 0));
@@ -266,6 +266,32 @@ public class AdminAnalyticsController {
         Session.end();
         new Thread(() -> new AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "ACES");
+    }
+
+    /**
+     * Creates a web-style progress bar: grey track (bg-gray-100) with a
+     * coloured fill, 6px tall, fully rounded — identical to Tailwind h-1.5
+     * rounded-full pattern used in the web analytics page.
+     */
+    private javafx.scene.layout.StackPane makeBar(double progress, String fillColor) {
+        Region track = new Region();
+        track.setStyle("-fx-background-color: #f3f4f6; -fx-background-radius: 999;");
+        track.setMinHeight(6); track.setPrefHeight(6); track.setMaxHeight(6);
+        track.setMaxWidth(Double.MAX_VALUE);
+
+        Region fill = new Region();
+        fill.setStyle("-fx-background-color: " + fillColor + "; -fx-background-radius: 999;");
+        fill.setMinHeight(6); fill.setPrefHeight(6); fill.setMaxHeight(6);
+
+        javafx.scene.layout.StackPane stack = new javafx.scene.layout.StackPane(track, fill);
+        stack.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        stack.setMaxWidth(Double.MAX_VALUE);
+
+        // Bind fill width to (progress * stack width)
+        fill.prefWidthProperty().bind(
+            stack.widthProperty().multiply(Math.max(0, Math.min(1, progress)))
+        );
+        return stack;
     }
 
     private Label muted(String text) {
