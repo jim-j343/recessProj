@@ -189,19 +189,24 @@ public class GroupShowController {
         String token = Session.authToken();
         if (token == null) return;
 
-        // Only admins can see the full member list via /members endpoint
-        if (!"admin".equals(group.myRole)) return;
+        // All group members can see the member list, but only admins can manage it
+        boolean isAdmin = "admin".equals(group.myRole);
 
         Thread worker = new Thread(() -> {
             try {
                 JsonNode root = api.groupMembers(token, group.groupId);
+                if (root == null) {
+                    System.err.println("[GROUP] groupMembers returned null");
+                    return;
+                }
+                
                 List<MemberRow> active  = new ArrayList<>();
                 List<MemberRow> pending = new ArrayList<>();
 
                 JsonNode activeNode  = root.get("active");
                 JsonNode pendingNode = root.get("pending");
 
-                if (activeNode != null) {
+                if (activeNode != null && activeNode.isArray()) {
                     for (JsonNode n : activeNode) {
                         active.add(new MemberRow(
                                 n.get("user_id").asLong(),
@@ -210,7 +215,7 @@ public class GroupShowController {
                                 "active"));
                     }
                 }
-                if (pendingNode != null) {
+                if (pendingNode != null && pendingNode.isArray() && isAdmin) {
                     for (JsonNode n : pendingNode) {
                         pending.add(new MemberRow(
                                 n.get("user_id").asLong(),
@@ -220,8 +225,14 @@ public class GroupShowController {
                     }
                 }
 
-                Platform.runLater(() -> renderMembers(active, pending));
+                if (!active.isEmpty()) {
+                    Platform.runLater(() -> renderMembers(active, pending));
+                } else {
+                    System.err.println("[GROUP] No active members found in response");
+                }
             } catch (Exception e) {
+                System.err.println("[GROUP] Error loading members: " + e.getMessage());
+                e.printStackTrace();
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             }
         }, "load-members");
