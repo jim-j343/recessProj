@@ -3,12 +3,12 @@ import forum.api.dto.GroupDto;
 import forum.api.dto.AdminAnalyticsDto;
 import forum.api.dto.AdminDashboardDto;
 import forum.api.dto.AdminMemberDto;
-import forum.api.dto.MemberDto;
 import forum.api.dto.NotificationDto;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizDetailResponse;
 import forum.api.dto.QuizResultDto;
-import forum.api.dto.AdminRemovalDto;
+import forum.api.dto.StudentDashboardDto;
+import forum.api.dto.StudentProgressDto;
 import forum.api.dto.AdminRemovalsResponseDto;
 import forum.api.dto.AdminReportsResponseDto;
 import forum.api.dto.LecturerDashboardDto;
@@ -366,6 +366,20 @@ public List<QuizResultDto> allQuizResults(String token, long quizId)
     HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/all-results", token).GET().build());
     ok(resp);
     return mapper.readValue(resp.body(), new TypeReference<List<QuizResultDto>>() {});
+}
+
+public StudentDashboardDto studentDashboard(String token)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/student/dashboard", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), StudentDashboardDto.class);
+}
+
+public StudentProgressDto studentProgress(String token)
+        throws ApiException, IOException, InterruptedException {
+    HttpResponse<String> resp = send(request("/student/progress", token).GET().build());
+    ok(resp);
+    return mapper.readValue(resp.body(), StudentProgressDto.class);
 }
 
     // ---------------------------------------------------------------
