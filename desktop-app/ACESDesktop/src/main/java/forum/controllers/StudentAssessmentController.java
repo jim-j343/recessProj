@@ -8,6 +8,7 @@ import forum.api.ApiClient;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
+import forum.models.Role;
 
 public class StudentAssessmentController {
 
@@ -15,6 +16,7 @@ public class StudentAssessmentController {
     @FXML private Label      userNameLabel;
     @FXML private MenuButton notifButton;
     @FXML private Label      notifBadge;
+    @FXML private Label navNewTopic;
 
     private final ApiClient api = new ApiClient();
 
@@ -29,6 +31,9 @@ public class StudentAssessmentController {
             if (userNameLabel != null)
                 userNameLabel.setText(u.displayName());
         }
+        if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
     }
 
@@ -37,6 +42,7 @@ public class StudentAssessmentController {
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
     @FXML private void onGroups()  { SceneManager.goGroups(); }
+    @FXML private void onNewTopic() { SceneManager.goTopicCreation(); }
     @FXML private void onForum()   { SceneManager.goForumDashboard(); }
     @FXML private void onProfile() { SceneManager.goProfile(); }
     @FXML private void onLogout()  {
