@@ -77,7 +77,7 @@
                 <VBox spacing="16" maxWidth="1152">
                     <!-- Search bar card -->
                     <VBox styleClass="card">
-                        <TextField promptText="Search topics..." maxWidth="Infinity"/>
+                        <TextField fx:id="searchField" promptText="Search topics..." maxWidth="Infinity"/>
                     </VBox>
 
                     <!-- Topic list (rows injected by controller) -->
