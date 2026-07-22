@@ -32,6 +32,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Topic thread — offline-first. Shows cached posts immediately, then (if the
@@ -51,6 +55,8 @@ public class TopicDetailController {
     @FXML private FlowPane hideMembersFlow;
 
     private boolean isHiddenMode = false;
+    private List<forum.api.dto.MemberDto> excludableMembers = Collections.emptyList();
+    private final Map<Long, List<String>> excludedUsernamesByPostId = new HashMap<>();
 
     private final PostDao postDao = new PostDao();
     private final TopicDao topicDao = new TopicDao();
@@ -78,9 +84,13 @@ public class TopicDetailController {
             try {
                 TopicDetailResponse detail = api.getTopic(token, serverTopicId);
                 if (detail.topic != null) topicDao.upsertFromServer(detail.topic);
-                if (detail.posts != null) for (PostDto p : detail.posts) postDao.upsertFromServer(p);
+                if (detail.posts != null) for (PostDto p : detail.posts) {
+                    cacheExcludedUsers(p);
+                    postDao.upsertFromServer(p);
+                }
                 List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                 Platform.runLater(() -> {
+                    setExcludableMembers(detail.groupMembers);
                     renderPosts(fresh);
                     scrollToBottom();
                 });
@@ -255,7 +265,15 @@ public class TopicDetailController {
         HBox metaRow = new HBox(meta);
         metaRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
         
-        bubble.getChildren().addAll(bodyNode, metaRow);
+        bubble.getChildren().add(bodyNode);
+        List<String> excludedUsers = excludedUsernamesByPostId.getOrDefault(p.getPostId(), Collections.emptyList());
+        if (isOutgoing && !excludedUsers.isEmpty()) {
+            Label excludedLabel = new Label("Hidden from: " + String.join(", ", excludedUsers));
+            excludedLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #b45309; -fx-font-style: italic;");
+            excludedLabel.setWrapText(true);
+            bubble.getChildren().add(excludedLabel);
+        }
+        bubble.getChildren().add(metaRow);
         
         HBox topButtons = new HBox(4);
         topButtons.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
@@ -318,10 +336,11 @@ public class TopicDetailController {
         if (content == null || content.isBlank()) return;
         composerField.clear();
 
-        if (isHiddenMode) {
+        List<Long> excludedUserIds = selectedExcludedUserIds();
+        if (isHiddenMode && !excludedUserIds.isEmpty()) {
             content = "[Hidden from Students] " + content;
-            toggleHideMode(); // reset after send
         }
+        if (isHiddenMode) toggleHideMode(); // reset after send
 
         User u = Session.currentUser();
         long authorId = (u != null) ? u.getUserId() : 0;
@@ -333,7 +352,8 @@ public class TopicDetailController {
             // Online — post to the server and cache the result.
             if (token != null && !token.isBlank() && serverTopicId > 0) {
                 try {
-                    PostDto dto = api.createPost(token, serverTopicId, body, null);
+                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedUserIds);
+                    cacheExcludedUsers(dto);
                     postDao.upsertFromServer(dto);
                     List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                     Platform.runLater(() -> {
@@ -394,15 +414,47 @@ public class TopicDetailController {
             hidePanel.setVisible(isHiddenMode);
             hidePanel.setManaged(isHiddenMode);
             
-            if (isHiddenMode && hideMembersFlow.getChildren().isEmpty()) {
-                List<String> members = Arrays.asList("admin", "kayongo_moses", "akello_sarah", "opio_james", "mugisha_dan", "nakato_alice");
-                for (String m : members) {
-                    CheckBox cb = new CheckBox(m);
-                    cb.setStyle("-fx-background-color: white; -fx-border-color: #fde047; -fx-border-radius: 12; -fx-padding: 4 8; -fx-text-fill: #4b5563; -fx-font-size: 13px;");
-                    hideMembersFlow.getChildren().add(cb);
-                }
+            if (isHiddenMode) populateHideMembers();
+        }
+    }
+
+    private void setExcludableMembers(List<forum.api.dto.MemberDto> members) {
+        if (members == null) {
+            excludableMembers = Collections.emptyList();
+        } else {
+            excludableMembers = members.stream()
+                    // Do not offer a group administrator or any known non-student role.
+                    .filter(member -> member.role == null || "member".equalsIgnoreCase(member.role))
+                    .toList();
+        }
+        if (isHiddenMode) populateHideMembers();
+    }
+
+    private void populateHideMembers() {
+        if (hideMembersFlow == null) return;
+        hideMembersFlow.getChildren().clear();
+        for (forum.api.dto.MemberDto member : excludableMembers) {
+            CheckBox checkBox = new CheckBox(member.username);
+            checkBox.setUserData(member.userId);
+            checkBox.setStyle("-fx-background-color: white; -fx-border-color: #fde047; -fx-border-radius: 12; -fx-padding: 4 8; -fx-text-fill: #4b5563; -fx-font-size: 13px;");
+            hideMembersFlow.getChildren().add(checkBox);
+        }
+    }
+
+    private List<Long> selectedExcludedUserIds() {
+        if (!isHiddenMode || hideMembersFlow == null) return Collections.emptyList();
+        List<Long> selected = new ArrayList<>();
+        for (Node node : hideMembersFlow.getChildren()) {
+            if (node instanceof CheckBox checkBox && checkBox.isSelected() && checkBox.getUserData() instanceof Long id) {
+                selected.add(id);
             }
         }
+        return selected;
+    }
+
+    private void cacheExcludedUsers(PostDto post) {
+        if (post == null || post.excluded_usernames == null || post.excluded_usernames.isEmpty()) return;
+        excludedUsernamesByPostId.put(post.post_id, List.copyOf(post.excluded_usernames));
     }
 
     @FXML
