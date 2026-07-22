@@ -90,6 +90,7 @@ public final class SceneManager {
     public static void goNotifications()      { show("NotificationsIndex",   "ACES — Notifications"); }
     public static void goForumDashboard()     { show("ForumDashboard",       "ACES — Forum"); }
     public static void goTopicCreation()      { show("TopicCreation",        "ACES — New Topic"); }
+    public static void goStudentAssessment()  { show("StudentAssessment",    "ACES — My Progress"); }
     public static void goQuizFocusMode()      { show("QuizFocusMode",        "ACES — Quiz"); }
     public static void goQuizResults()        { show("QuizResults",          "ACES — Results"); }
     public static void goQuizManagement()     { show("QuizManagement",       "ACES — Create Quiz"); }

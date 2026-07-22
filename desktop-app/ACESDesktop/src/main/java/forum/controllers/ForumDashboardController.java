@@ -10,11 +10,9 @@ import forum.models.User;
 import forum.services.AuthService;
 import forum.services.SyncService;
 import forum.util.NavbarHelper;
-import javafx.scene.control.MenuButton;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -76,6 +74,11 @@ public class ForumDashboardController {
 
         if (notifButton != null) {
             forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
+
+        // Wire search field listener
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldV, newV) -> onSearchTopics());
         }
 
         renderTopics(topicDao.listRecent(15));
@@ -216,6 +219,23 @@ public class ForumDashboardController {
     private void openTopic(Topic t) {
         ViewState.setSelectedTopic(t);
         SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
+    }
+
+    private void onSearchTopics() {
+        String query = searchField.getText().trim().toLowerCase();
+        if (query.isEmpty()) {
+            // Show all recent topics if search is empty
+            renderTopics(topicDao.listRecent(15));
+        } else {
+            // Search in local topics by title and category
+            List<Topic> allTopics = topicDao.listRecent(100);
+            List<Topic> filtered = allTopics.stream()
+                .filter(t -> t.getTitle().toLowerCase().contains(query) || 
+                            (t.getCategory() != null && t.getCategory().toLowerCase().contains(query)))
+                .limit(50)
+                .toList();
+            renderTopics(filtered);
+        }
     }
 
     @FXML private void onDashboard() {

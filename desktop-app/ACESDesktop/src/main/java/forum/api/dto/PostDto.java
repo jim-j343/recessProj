@@ -2,6 +2,8 @@ package forum.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 /** JSON shape of a post/reply returned by the forum API. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PostDto {
@@ -12,4 +14,5 @@ public class PostDto {
     public String  content;
     public String  created_at;
     public String  author;
+    public List<String> excluded_usernames;
 }

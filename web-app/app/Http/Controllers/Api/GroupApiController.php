@@ -116,19 +116,49 @@ class GroupApiController extends Controller
         return response()->json(['message' => 'You left ' . $group->name . '.']);
     }
 
-    /** GET /api/groups/{group}/members  (admin only) */
+    /**
+     * GET /api/groups/{group}/members.
+     *
+     * Active members may view the active roster. Only the group admin may see
+     * membership roles and pending join requests, which are management data.
+     */
     public function members(Request $request, Group $group): JsonResponse
     {
-        if ($group->admin_id !== $request->user()->user_id) {
+        $userId = $request->user()->user_id;
+        $isGroupAdmin = $group->admin_id === $userId;
+        $isActiveMember = GroupMembership::where('group_id', $group->group_id)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isGroupAdmin && ! $isActiveMember) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
-        $pending = $group->members()->wherePivot('status', 'pending')
-            ->get()->map(fn($u) => ['user_id' => $u->user_id, 'username' => $u->username, 'status' => 'pending']);
-
         $active = $group->members()->wherePivot('status', 'active')
-            ->get()->map(fn($u) => ['user_id' => $u->user_id, 'username' => $u->username,
-                'role' => $u->pivot->role, 'status' => 'active']);
+            ->get()->map(function ($user) use ($isGroupAdmin) {
+                $member = [
+                    'user_id' => $user->user_id,
+                    'username' => $user->username,
+                    'status' => 'active',
+                ];
+
+                if ($isGroupAdmin) {
+                    $member['role'] = $user->pivot->role;
+                }
+
+                return $member;
+            });
+
+        $pending = collect();
+        if ($isGroupAdmin) {
+            $pending = $group->members()->wherePivot('status', 'pending')
+                ->get()->map(fn($user) => [
+                    'user_id' => $user->user_id,
+                    'username' => $user->username,
+                    'status' => 'pending',
+                ]);
+        }
 
         return response()->json(['pending' => $pending, 'active' => $active]);
     }
