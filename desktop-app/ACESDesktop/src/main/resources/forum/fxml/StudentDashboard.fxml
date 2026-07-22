@@ -13,7 +13,8 @@
 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link,active" onMouseClicked="#onDashboard"/>
                 <Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
-                <Label text="Forum"     styleClass="nav-link"        onMouseClicked="#onForum"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
+                <Label fx:id="navNewTopic"   text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"   managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
@@ -95,7 +96,7 @@
                         <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
                             <Label fx:id="participationLabel" text="—" styleClass="metric-value"/>
-                            <Label styleClass="subtle" text="Based on posts and replies"/>
+                            <VBox fx:id="participationByGroupBox" spacing="4"/>
                         </VBox>
                         <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
@@ -114,6 +115,20 @@
                         <Label fx:id="noResultsLabel" text="No quiz results yet." styleClass="muted"
                                managed="false" visible="false"/>
                     </VBox>
+
+                    <!-- Latest and Recommended Topics -->
+                    <HBox spacing="16">
+                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" style="-fx-cursor: hand;">
+                            <Label text="LATEST TOPIC" styleClass="eyebrow"/>
+                            <Label fx:id="latestTopicTitle" text="No topics yet" styleClass="label-strong"/>
+                            <Label fx:id="latestTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS" style="-fx-cursor: hand;">
+                            <Label text="RECOMMENDED TOPIC" styleClass="eyebrow"/>
+                            <Label fx:id="recommendedTopicTitle" text="You're all caught up" styleClass="label-strong"/>
+                            <Label fx:id="recommendedTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                    </HBox>
 
                     <!-- Logout -->
                     <HBox alignment="CENTER_RIGHT">

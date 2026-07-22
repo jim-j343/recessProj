@@ -1,6 +1,7 @@
 package forum.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -9,4 +10,6 @@ import java.util.List;
 public class TopicDetailResponse {
     public TopicDto      topic;
     public List<PostDto> posts;
+    @JsonProperty("group_members")
+    public List<MemberDto> groupMembers;
 }

@@ -18,6 +18,7 @@
             <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
             <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
             <Label text="My Progress" styleClass="nav-link,active"/>
+            <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
             <Region HBox.hgrow="ALWAYS"/>
             <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                 <graphic>

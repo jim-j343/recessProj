@@ -119,7 +119,7 @@ public class GroupShowController {
         blacklistDaysLabel.setText(String.valueOf(group.blacklistDays));
 
         // Show buttons for group admin/lecturer
-        boolean isAdmin = "admin".equals(group.myRole);
+        boolean isAdmin = isGroupAdmin();
         boolean isLecturer = u != null && u.getRole() == Role.LECTURER;
         if (isAdmin || (isLecturer && group.adminId == (u != null ? u.getUserId() : -1))) {
             if (editGroupBtn != null) { editGroupBtn.setManaged(true); editGroupBtn.setVisible(true); }
@@ -189,28 +189,33 @@ public class GroupShowController {
         String token = Session.authToken();
         if (token == null) return;
 
-        // Only admins can see the full member list via /members endpoint
-        if (!"admin".equals(group.myRole)) return;
+        // All group members can see the member list, but only admins can manage it
+        boolean isAdmin = "admin".equals(group.myRole);
 
         Thread worker = new Thread(() -> {
             try {
                 JsonNode root = api.groupMembers(token, group.groupId);
+                if (root == null) {
+                    System.err.println("[GROUP] groupMembers returned null");
+                    return;
+                }
+                
                 List<MemberRow> active  = new ArrayList<>();
                 List<MemberRow> pending = new ArrayList<>();
 
                 JsonNode activeNode  = root.get("active");
                 JsonNode pendingNode = root.get("pending");
 
-                if (activeNode != null) {
+                if (activeNode != null && activeNode.isArray()) {
                     for (JsonNode n : activeNode) {
                         active.add(new MemberRow(
                                 n.get("user_id").asLong(),
                                 n.get("username").asText(),
-                                n.has("role") ? n.get("role").asText() : "member",
+                                n.has("role") ? n.get("role").asText() : null,
                                 "active"));
                     }
                 }
-                if (pendingNode != null) {
+                if (pendingNode != null && pendingNode.isArray() && isAdmin) {
                     for (JsonNode n : pendingNode) {
                         pending.add(new MemberRow(
                                 n.get("user_id").asLong(),
@@ -220,8 +225,14 @@ public class GroupShowController {
                     }
                 }
 
-                Platform.runLater(() -> renderMembers(active, pending));
+                if (!active.isEmpty()) {
+                    Platform.runLater(() -> renderMembers(active, pending));
+                } else {
+                    System.err.println("[GROUP] No active members found in response");
+                }
             } catch (Exception e) {
+                System.err.println("[GROUP] Error loading members: " + e.getMessage());
+                e.printStackTrace();
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             }
         }, "load-members");
@@ -258,17 +269,21 @@ public class GroupShowController {
         Label name = new Label(m.username);
         name.getStyleClass().add("label-strong");
 
-        Label role = new Label(capitalize(m.role));
-        role.getStyleClass().add("subtle");
-
-        VBox info = new VBox(2, name, role);
+        VBox info = new VBox(2, name);
+        // Membership roles are management information, so render them only
+        // for the group administrator's own view.
+        if (isGroupAdmin() && m.role != null && !m.role.isBlank()) {
+            Label role = new Label(capitalize(m.role));
+            role.getStyleClass().add("subtle");
+            info.getChildren().add(role);
+        }
         HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
 
         HBox row = new HBox(12, av, info);
         row.setPadding(new Insets(8, 0, 8, 0));
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        boolean isAdmin = "admin".equals(group.myRole);
+        boolean isAdmin = isGroupAdmin();
         if (showApprove) {
             Button approveBtn = new Button("Approve");
             approveBtn.getStyleClass().addAll("btn", "btn-primary");
@@ -298,6 +313,11 @@ public class GroupShowController {
         }, "approve-member");
         t.setDaemon(true);
         t.start();
+    }
+
+    private boolean isGroupAdmin() {
+        User user = Session.currentUser();
+        return group != null && user != null && group.adminId == user.getUserId();
     }
 
     @FXML private void onEditGroup() {

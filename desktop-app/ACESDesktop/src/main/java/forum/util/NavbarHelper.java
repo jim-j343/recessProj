@@ -4,6 +4,7 @@ import forum.api.ApiClient;
 import forum.api.dto.NotificationDto;
 import forum.app.SceneManager;
 import forum.app.Session;
+import forum.models.Role;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -154,5 +155,38 @@ public class NavbarHelper {
             case "quiz_announced"      -> "📝";
             default                    -> "🔔";
         };
+    }
+
+    /**
+     * Shows/hides each nav tab based on role — matches web's role rules
+     * exactly (layouts/navigation.blade.php). Pass null for any tab a given
+     * screen doesn't have; this method is null-safe per label.
+     *
+     * - My Progress: students only
+     * - New Topic: everyone except system admins
+     * - Quiz Center / Grading: lecturers only
+     * - Members / Analytics / Moderation: system admins only
+     */
+    public static void applyRoleNav(Role role,
+                                     Label navMyProgress, Label navNewTopic,
+                                     Label navQuizCenter, Label navGrading,
+                                     Label navMembers, Label navAnalytics, Label navModeration) {
+        if (role == null) return;
+
+        if (role == Role.STUDENT && navMyProgress != null) {
+            navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+        }
+        if (role != Role.SYSTEM_ADMIN && navNewTopic != null) {
+            navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+        }
+        if (role == Role.LECTURER && navQuizCenter != null && navGrading != null) {
+            navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+            navGrading.setManaged(true); navGrading.setVisible(true);
+        }
+        if (role == Role.SYSTEM_ADMIN && navMembers != null && navAnalytics != null && navModeration != null) {
+            navMembers.setManaged(true); navMembers.setVisible(true);
+            navAnalytics.setManaged(true); navAnalytics.setVisible(true);
+            navModeration.setManaged(true); navModeration.setVisible(true);
+        }
     }
 }
