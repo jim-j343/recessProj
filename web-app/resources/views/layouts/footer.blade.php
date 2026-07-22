@@ -49,9 +49,7 @@
 
         </div>
 
-        <div class="mt-6 border-t pt-4 text-center text-xs text-gray-400">
-            © {{ date('Y') }} Smart Discussion Forum. All rights reserved.
-        </div>
+
 
     </div>
 
