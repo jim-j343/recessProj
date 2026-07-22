@@ -4,9 +4,12 @@ import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizResultDto;
+import forum.api.dto.StudentDashboardDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
+import forum.models.Role;
+import forum.models.Topic;
 import forum.models.User;
 import forum.services.AuthService;
 import forum.util.NavbarHelper;
@@ -16,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -28,6 +32,8 @@ public class StudentDashboardController {
     @FXML private Label       avatarLabel;
     @FXML private Label       userNameLabel;
     @FXML private Label       welcomeLabel;
+    @FXML private Label       navMyProgress;
+    @FXML private Label       navNewTopic;
     @FXML private HBox        quizAlertBox;
     @FXML private Label       quizAlertIcon;
     @FXML private Label       quizAlertTitle;
@@ -37,12 +43,20 @@ public class StudentDashboardController {
     @FXML private ProgressBar quizProgressBar;
     @FXML private Label       quizProgressSub;
     @FXML private Label       participationLabel;
+    @FXML private VBox        participationByGroupBox;
     @FXML private Label       standingLabel;
     @FXML private Label       standingSub;
     @FXML private VBox        resultsBox;
     @FXML private Label       noResultsLabel;
 
-    @FXML private javafx.scene.control.MenuButton notifButton;
+    @FXML private VBox   latestTopicBox;
+    @FXML private Label  latestTopicTitle;
+    @FXML private Label  latestTopicMeta;
+    @FXML private VBox   recommendedTopicBox;
+    @FXML private Label  recommendedTopicTitle;
+    @FXML private Label  recommendedTopicMeta;
+
+    @FXML private MenuButton notifButton;
     @FXML private Label notifBadge;
 
     private final ApiClient api = new ApiClient();
@@ -54,11 +68,20 @@ public class StudentDashboardController {
             avatarLabel.setText(initial(u.displayName()));
             userNameLabel.setText(u.displayName());
             welcomeLabel.setText("Welcome back, " + u.displayName() + " 👋");
+
+            // Matches web's nav role rules exactly (layouts/navigation.blade.php)
+            if (u.getRole() == Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
         }
         if (notifButton != null) {
-            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+            NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
+        loadDashboardExtras();
     }
 
     private void loadInBackground() {
@@ -70,7 +93,6 @@ public class StudentDashboardController {
                 List<QuizDto> quizzes = api.listQuizzes(token);
                 Platform.runLater(() -> renderQuizAlert(quizzes));
 
-                // stats
                 int total     = quizzes.size();
                 int completed = 0;
                 Platform.runLater(() -> resultsBox.getChildren().clear());
@@ -105,6 +127,72 @@ public class StudentDashboardController {
         }, "student-dashboard-load");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /** Participation, community standing, and the two topic cards. */
+    private void loadDashboardExtras() {
+        String token = Session.authToken();
+        if (token == null) return;
+
+        Thread worker = new Thread(() -> {
+            try {
+                StudentDashboardDto dto = api.studentDashboard(token);
+                Platform.runLater(() -> renderExtras(dto));
+            } catch (ApiException | java.io.IOException | InterruptedException e) {
+                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            }
+        }, "student-dashboard-extras");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void renderExtras(StudentDashboardDto dto) {
+        participationLabel.setText(Math.round(dto.participationAvg) + "%");
+
+        // Render participation breakdown by group
+        if (participationByGroupBox != null && dto.participationByGroup != null && !dto.participationByGroup.isEmpty()) {
+            participationByGroupBox.getChildren().clear();
+            for (StudentDashboardDto.ParticipationByGroup group : dto.participationByGroup) {
+                Label groupLabel = new Label(group.groupName + " " + Math.round(group.pct) + "%");
+                groupLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6b7280;");
+                participationByGroupBox.getChildren().add(groupLabel);
+            }
+        }
+
+        standingLabel.getStyleClass().removeAll("badge-success", "badge-warning", "badge-danger");
+        boolean hasWarning = dto.standing != null && "warning".equals(dto.standing.status);
+        standingLabel.setText(dto.standing != null && dto.standing.label != null ? dto.standing.label
+                : (hasWarning ? "Warning" : "Good Standing"));
+        standingLabel.getStyleClass().add(hasWarning ? "badge-warning" : "badge-success");
+        standingSub.setText(dto.standing != null && dto.standing.sub != null ? dto.standing.sub
+                : "No active warnings on your account");
+
+        if (dto.latestTopic != null) {
+            latestTopicTitle.setText(dto.latestTopic.title);
+            latestTopicMeta.setText(dto.latestTopic.groupName + " · " + dto.latestTopic.postsCount
+                    + " replies · " + dto.latestTopic.createdAtHuman);
+            latestTopicBox.setOnMouseClicked(e -> openTopic(dto.latestTopic));
+        } else {
+            latestTopicTitle.setText("No topics yet");
+            latestTopicMeta.setText("Nothing posted in your groups yet.");
+        }
+
+        if (dto.recommendedTopic != null) {
+            recommendedTopicTitle.setText(dto.recommendedTopic.title);
+            recommendedTopicMeta.setText(dto.recommendedTopic.groupName + " · " + dto.recommendedTopic.postsCount + " replies");
+            recommendedTopicBox.setOnMouseClicked(e -> openTopic(dto.recommendedTopic));
+        } else {
+            recommendedTopicTitle.setText("You're all caught up");
+            recommendedTopicMeta.setText("No unread recommendations right now.");
+        }
+    }
+
+    private void openTopic(StudentDashboardDto.TopicSummary summary) {
+        Topic t = new Topic();
+        t.setTopicId(summary.topicId);
+        t.setTitle(summary.title);
+        ViewState.setSelectedTopic(t);
+        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + summary.title);
     }
 
     private void renderQuizAlert(List<QuizDto> quizzes) {
@@ -163,9 +251,11 @@ public class StudentDashboardController {
         resultsBox.getChildren().add(row);
     }
 
-    @FXML private void onDashboard() { SceneManager.goStudentDashboard(); }
-    @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onForum()     { SceneManager.goForumDashboard(); }
+    @FXML private void onDashboard()   { SceneManager.goStudentDashboard(); }
+    @FXML private void onGroups()      { SceneManager.goGroups(); }
+    @FXML private void onMyProgress()  { SceneManager.goStudentAssessment(); }
+    @FXML private void onNewTopic()    { SceneManager.goTopicCreation(); }
+    @FXML private void onForum() { SceneManager.goForumDashboard(); }
 
     @FXML
     private void onTakeQuiz() {
