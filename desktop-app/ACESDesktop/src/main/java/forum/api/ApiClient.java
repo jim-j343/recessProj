@@ -168,9 +168,19 @@ public class ApiClient {
     /** POST /topics/{id}/posts — add a reply. */
     public PostDto createPost(String token, long topicId, String content, Long parentPostId)
             throws ApiException, IOException, InterruptedException {
+        return createPost(token, topicId, content, parentPostId, List.of());
+    }
+
+    /** POST /topics/{id}/posts, optionally hiding the reply from selected students. */
+    public PostDto createPost(String token, long topicId, String content, Long parentPostId,
+                              List<Long> excludedUserIds)
+            throws ApiException, IOException, InterruptedException {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("content", content);
         if (parentPostId != null) body.put("parent_post_id", parentPostId);
+        if (excludedUserIds != null && !excludedUserIds.isEmpty()) {
+            body.put("excluded_users", excludedUserIds);
+        }
         HttpResponse<String> resp = send(request("/topics/" + topicId + "/posts", token)
                 .POST(HttpRequest.BodyPublishers.ofString(json(body))).build());
         ok(resp);
