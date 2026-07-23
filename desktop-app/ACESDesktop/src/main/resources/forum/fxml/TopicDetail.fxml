@@ -13,8 +13,6 @@
               style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:0 0 1 0; -fx-padding:12 24 12 24;">
             <Hyperlink text="← Back" onAction="#onBack" styleClass="muted"/>
             <Label fx:id="topicTitleLabel" text="Topic" styleClass="label-strong"/>
-            <Button fx:id="editTopicBtn" text="✎ Edit" styleClass="btn-sm,btn-outline" onAction="#onEditTopic" managed="false" visible="false"/>
-            <Button fx:id="deleteTopicBtn" text="🗑 Delete" styleClass="btn-sm,btn-outline" onAction="#onDeleteTopic" managed="false" visible="false"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline" onAction="#onExportPdf"/>
             <Button text="↗ Share" styleClass="btn-sm,btn-outline" onAction="#onShare"/>

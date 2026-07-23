@@ -7,12 +7,19 @@ import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.*;
 
 public class QuizManagementController {
@@ -21,7 +28,7 @@ public class QuizManagementController {
     @FXML private Label    userNameLabel;
     @FXML private Label    statusLabel;
     @FXML private TextField titleField;
-    @FXML private ComboBox<String> groupCombo; // course name, editable — mirrors web's <input list="course-options">
+    @FXML private ComboBox<GroupItem> groupCombo;
     @FXML private TextField startTimeField;
     @FXML private TextField durationField;
     @FXML private TextField categoryField;
@@ -40,30 +47,28 @@ public class QuizManagementController {
                 avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
         }
-        if (groupCombo != null) groupCombo.setEditable(true);
-        loadCourseNames();
+        loadGroups();
         onAddQuestion(); // start with one question
     }
 
-    /** Every distinct course unit in the system — mirrors QuizController::create() on
-     *  web, which lets a lecturer target a course they don't personally belong to. */
-    private void loadCourseNames() {
+    private void loadGroups() {
         String token = Session.authToken();
         if (token == null) return;
         Thread t = new Thread(() -> {
             try {
                 List<GroupDto> groups = api.listGroups(token);
-                List<String> courseNames = groups.stream()
-                        .map(g -> g.courseName)
-                        .filter(c -> c != null && !c.isBlank())
-                        .distinct()
-                        .sorted()
+                List<GroupItem> items = groups.stream()
+                        .filter(g -> "active".equals(g.myStatus))
+                        .map(g -> new GroupItem(g.groupId, g.name))
                         .toList();
-                Platform.runLater(() -> groupCombo.setItems(FXCollections.observableArrayList(courseNames)));
+                Platform.runLater(() -> {
+                    groupCombo.setItems(FXCollections.observableArrayList(items));
+                    if (!items.isEmpty()) groupCombo.getSelectionModel().selectFirst();
+                });
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             }
-        }, "load-course-names");
+        }, "load-groups-quiz");
         t.setDaemon(true);
         t.start();
     }
@@ -89,15 +94,13 @@ public class QuizManagementController {
         String token = Session.authToken();
         if (token == null) { showStatus("Not authenticated."); return; }
 
-        String title      = titleField.getText().trim();
-        String start      = startTimeField.getText().trim();
-        String duration   = durationField.getText().trim();
-        String courseName = groupCombo.getEditor() != null
-                ? groupCombo.getEditor().getText().trim()
-                : (groupCombo.getValue() == null ? "" : groupCombo.getValue().trim());
+        String title    = titleField.getText().trim();
+        String start    = startTimeField.getText().trim();
+        String duration = durationField.getText().trim();
+        GroupItem group = groupCombo.getValue();
 
-        if (title.isEmpty() || start.isEmpty() || duration.isEmpty() || courseName.isEmpty()) {
-            showStatus("Please fill in all required fields (title, course, start time, duration).");
+        if (title.isEmpty() || start.isEmpty() || duration.isEmpty() || group == null) {
+            showStatus("Please fill in all required fields.");
             return;
         }
         if (questions.isEmpty()) {
@@ -113,37 +116,56 @@ public class QuizManagementController {
 
         showStatus("Saving...");
 
-        int durationMinutes;
-        try {
-            durationMinutes = Integer.parseInt(duration);
-        } catch (NumberFormatException e) {
-            showStatus("Duration must be a whole number of minutes.");
-            return;
-        }
+        // Build JSON payload matching web quiz/store
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("title",    title);
+        body.put("group_id", group.id);
+        body.put("start_time", start);
+        body.put("duration", Integer.parseInt(duration));
+        body.put("target",   categoryField.getText().trim());
+        if (publish) body.put("publish", true);
 
         List<Map<String, Object>> qList = new ArrayList<>();
         for (QuestionEntry q : questions) {
             Map<String, Object> qMap = new LinkedHashMap<>();
             qMap.put("text", q.questionText());
-            qMap.put("answers", q.answerTexts());
+            List<String> answers = q.answerTexts();
+            qMap.put("answers", answers);
             qMap.put("correct_answer", q.correctIndex());
             qList.add(qMap);
         }
+        body.put("questions", qList);
 
         Thread worker = new Thread(() -> {
             try {
-                api.createQuiz(token, title, courseName, start, durationMinutes,
-                        categoryField.getText().trim(), publish, qList);
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writeValueAsString(body);
+
+                HttpClient http = HttpClient.newBuilder()
+                        .connectTimeout(Duration.ofSeconds(10)).build();
+                HttpRequest req = HttpRequest.newBuilder(
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
+                                .replace("/api", "") + "/quiz/store"))
+                        .header("Authorization", "Bearer " + token)
+                        .header("Accept", "application/json")
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .build();
+
+                HttpResponse<String> resp = http.send(req,
+                        HttpResponse.BodyHandlers.ofString());
 
                 Platform.runLater(() -> {
-                    showStatus(publish ? "✓ Quiz published!" : "✓ Saved as draft.");
-                    new Thread(() -> {
-                        try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
-                        Platform.runLater(SceneManager::goLecturerDashboard);
-                    }).start();
+                    if (resp.statusCode() == 200 || resp.statusCode() == 302) {
+                        showStatus(publish ? "✓ Quiz published!" : "✓ Saved as draft.");
+                        new Thread(() -> {
+                            try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
+                            Platform.runLater(SceneManager::goLecturerDashboard);
+                        }).start();
+                    } else {
+                        showStatus("Failed (HTTP " + resp.statusCode() + "). Check your inputs.");
+                    }
                 });
-            } catch (ApiException e) {
-                Platform.runLater(() -> showStatus("Failed: " + e.getMessage()));
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
                 Platform.runLater(() -> showStatus("Error: " + e.getMessage()));
@@ -173,6 +195,10 @@ public class QuizManagementController {
     }
 
     // ── Inner helpers ──────────────────────────────────────────
+
+    record GroupItem(long id, String name) {
+        @Override public String toString() { return name; }
+    }
 
     static class QuestionEntry {
         final int number;
