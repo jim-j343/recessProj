@@ -64,6 +64,7 @@
                 </Button>
             </HBox>
             </HBox>
+            <fx:include source="Footer.fxml"/>
         </VBox>
     </bottom>
 </BorderPane>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.SupportController"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-border-width: 1;"
+            prefWidth="672" prefHeight="400">
+
+    <top>
+        <VBox style="-fx-border-color: #e5e7eb; -fx-border-width: 0 0 1 0; -fx-padding: 20 32 20 32;">
+            <Label text="Support" style="-fx-font-weight: bold; -fx-text-fill: #1f2937; -fx-font-size: 16px;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" style="-fx-background-color: transparent; -fx-padding: 24 32 24 32;">
+            <VBox spacing="16" style="-fx-background-color: transparent;">
+                <Label text="Having trouble logging in, joining a group, or using the forum? Reach out to your group administrator first — they can reset memberships, review blacklist status, and fix most account issues directly." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                <Label text="For platform-wide issues, contact the system administrator at support@smartforum.local." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-border-color: #e5e7eb; -fx-border-width: 1 0 0 0; -fx-background-color: #f9fafb; -fx-padding: 16 32 16 32; -fx-background-radius: 0 0 8 8;">
+            <Button text="Close" onAction="#onClose" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-padding: 8 16 8 16; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
