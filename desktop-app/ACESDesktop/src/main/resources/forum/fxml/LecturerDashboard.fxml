@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.LecturerDashboardController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+                <Label text="Dashboard"   styleClass="nav-link,active"/>
+                <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"/>
+                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
+                <Label text="Grading"     styleClass="nav-link" onMouseClicked="#onGrading"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                    </items>
+                </MenuButton>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text=""/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Lecturer Dashboard" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ New Quiz" styleClass="btn,btn-primary" onAction="#onQuizCenter"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1120">
+
+                    <!-- Stats -->
+                    <HBox spacing="16">
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="quizCountLabel"
+                                   style="-fx-text-fill:#4f46e5; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Quizzes created" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="groupCountLabel"
+                                   style="-fx-text-fill:#16a34a; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Groups joined" styleClass="muted"/>
+                        </VBox>
+                        <VBox styleClass="card" alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="topicCountLabel"
+                                   style="-fx-text-fill:#374151; -fx-font-size:26px; -fx-font-weight:bold;"
+                                   text="—"/>
+                            <Label text="Topics created" styleClass="muted"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="24">
+                        <!-- My quizzes -->
+                        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 12 0;">
+                                <Label text="My Quizzes" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Hyperlink text="+ New" onAction="#onQuizCenter" style="-fx-text-fill: #4f46e5; -fx-font-weight: bold; -fx-font-size: 13px; -fx-border-color: transparent;"/>
+                            </HBox>
+                            <VBox fx:id="quizListBox" spacing="0"/>
+                            <Label fx:id="noQuizzesLabel" text="No quizzes yet. Create your first one."
+                                   styleClass="muted" managed="false" visible="false"/>
+                        </VBox>
+
+                        <!-- Quick actions -->
+                        <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
+                            <Label text="Quick Actions" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                            <!-- Each button: left-aligned icon + text, matching web -->
+                            <Button styleClass="btn,btn-secondary" maxWidth="Infinity" onAction="#onQuizCenter">
+                                <graphic>
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <javafx.scene.shape.SVGPath content="M16.862 4.487l1.651-1.652a2.121 2.121 0 113 3L10.582 16.767a4.5 4.5 0 01-1.897 1.13L6 18l.103-2.685a4.5 4.5 0 011.13-1.897L16.862 4.487z" stroke="#4f46e5" strokeWidth="2" strokeLineCap="ROUND" strokeLineJoin="ROUND" fill="transparent"/>
+                                        <Label text="Create a new quiz" style="-fx-font-size: 13px; -fx-text-fill: #374151;"/>
+                                    </HBox>
+                                </graphic>
+                            </Button>
+                            <Button styleClass="btn,btn-secondary" maxWidth="Infinity" onAction="#onNewTopic">
+                                <graphic>
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <javafx.scene.shape.SVGPath content="M8 10h8M8 14h5m-8 6l-4-4V5a2 2 0 012-2h14a2 2 0 012 2v11a2 2 0 01-2 2H7l-3 3z" stroke="#2563eb" strokeWidth="2" strokeLineCap="ROUND" strokeLineJoin="ROUND" fill="transparent"/>
+                                        <Label text="Post a new topic" style="-fx-font-size: 13px; -fx-text-fill: #374151;"/>
+                                    </HBox>
+                                </graphic>
+                            </Button>
+                            <Button styleClass="btn,btn-secondary" maxWidth="Infinity" onAction="#onForum">
+                                <graphic>
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <javafx.scene.shape.SVGPath content="M2.458 12C3.732 7.943 7.523 5 12 5 c4.478 0 8.268 2.943 9.542 7 -1.274 4.057-5.064 7-9.542 7 -4.477 0-8.268-2.943-9.542-7z M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="#9333ea" strokeWidth="2" strokeLineCap="ROUND" strokeLineJoin="ROUND" fill="transparent"/>
+                                        <Label text="View forum" style="-fx-font-size: 13px; -fx-text-fill: #374151;"/>
+                                    </HBox>
+                                </graphic>
+                            </Button>
+                            <Button styleClass="btn,btn-secondary" maxWidth="Infinity" onAction="#onGrading">
+                                <graphic>
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <javafx.scene.shape.SVGPath content="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4zm10 1h3a2 2 0 010 4h-3M7 5H4a2 2 0 000 4h3" stroke="#eab308" strokeWidth="2" strokeLineCap="ROUND" strokeLineJoin="ROUND" fill="transparent"/>
+                                        <Label text="Award participation marks" style="-fx-font-size: 13px; -fx-text-fill: #374151;"/>
+                                    </HBox>
+                                </graphic>
+                            </Button>
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
+</BorderPane>
+

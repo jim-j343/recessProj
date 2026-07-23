@@ -2,46 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Group;
 use App\Models\GroupMembership;
+use App\Models\GroupRemoval;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
 {
-    // List all groups
     public function index()
     {
-        $groups = Group::withCount('memberships')->latest()->get();
-        $myGroups = GroupMembership::where('user_id', Auth::id())
-                        ->where('status', 'active')
-                        ->pluck('group_id');
-        return view('groups.index', compact('groups', 'myGroups'));
+        $groups = Group::with('admin')
+            ->withCount('memberships')
+            ->withCount('topics')
+            ->latest()
+            ->get();
+
+        return view('groups.index', compact('groups'));
     }
 
-    // Show create form
     public function create()
     {
         return view('groups.create');
     }
 
-    // Store new group
     public function store(Request $request)
     {
-        $request->validate([
-            'name'        => 'required|string|max:120|unique:groups,name',
-            'description' => 'nullable|string',
+        $validated = $request->validate([
+            'name'                    => ['required', 'string', 'max:120', 'unique:groups,name'],
+            'course_name'             => ['required', 'string', 'max:150'],
+            'description'             => ['nullable', 'string', 'max:500'],
+            'inactivity_warning_days' => ['required', 'integer', 'min:1'],
+            'blacklist_duration_days' => ['required', 'integer', 'min:1'],
         ]);
 
         $group = Group::create([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'admin_id'    => Auth::user()->user_id,
+            'admin_id'                => Auth::id(),
+            'name'                    => $validated['name'],
+            'course_name'             => $validated['course_name'],
+            'description'             => $validated['description'] ?? null,
+            'inactivity_warning_days' => $validated['inactivity_warning_days'],
+            'blacklist_duration_days' => $validated['blacklist_duration_days'],
         ]);
 
-        // Creator auto-joins as admin
         GroupMembership::create([
-            'user_id'   => Auth::user()->user_id,
+            'user_id'   => Auth::id(),
             'group_id'  => $group->group_id,
             'role'      => 'admin',
             'status'    => 'active',
@@ -49,115 +57,195 @@ class GroupController extends Controller
         ]);
 
         return redirect()->route('groups.show', $group->group_id)
-                         ->with('success', 'Group created successfully.');
+            ->with('success', 'Group created successfully!');
     }
 
-    // Show single group
-    public function show($id)
+    public function show(Group $group)
     {
-        $group = Group::with(['members' => function ($q) {
-            $q->wherePivot('status', 'active');
-        }])->findOrFail($id);
+        $group->load(['admin', 'topics.creator', 'memberships.user']);
+        $isMember = $group->isMember(Auth::id());
 
-        $membership = GroupMembership::where('user_id', Auth::user()->user_id)
-                          ->where('group_id', $id)
-                          ->first();
+        // Recent "X was removed" / "X was added" announcements,
+        // WhatsApp-style, for everyone still in the group to see
+        $removalAnnouncements = ActivityLog::where('group_id', $group->group_id)
+            ->where('action_type', 'member_removed')
+            ->with('user')
+            ->latest('logged_at')
+            ->take(10)
+            ->get();
 
-        return view('groups.show', compact('group', 'membership'));
+        $additionAnnouncements = ActivityLog::where('group_id', $group->group_id)
+            ->where('action_type', 'member_added')
+            ->with('user')
+            ->latest('logged_at')
+            ->take(10)
+            ->get();
+
+        return view('groups.show', compact('group', 'isMember', 'removalAnnouncements', 'additionAnnouncements'));
     }
 
-    // Request to join a group
-    public function join($id)
+    public function join(Group $group)
     {
-        $existing = GroupMembership::where('user_id', Auth::user()->user_id)
-                        ->where('group_id', $id)->first();
-
-        if ($existing) {
-            return back()->with('info', 'You already have a membership record for this group.');
+        if ($group->isMember(Auth::id())) {
+            return back()->with('info', 'You are already a member.');
         }
 
         GroupMembership::create([
-            'user_id'   => Auth::user()->user_id,
-            'group_id'  => $id,
+            'user_id'   => Auth::id(),
+            'group_id'  => $group->group_id,
             'role'      => 'member',
-            'status'    => 'pending',
+            'status'    => 'active',
             'joined_at' => now(),
         ]);
 
-        return back()->with('success', 'Join request sent. Awaiting approval.');
+        return back()->with('success', 'You joined ' . $group->name . '!');
     }
 
-    // Leave a group
-    public function leave($id)
+    public function leave(Group $group)
     {
-        GroupMembership::where('user_id', Auth::user()->user_id)
-            ->where('group_id', $id)
-            ->delete();
-
-        return redirect()->route('groups.index')->with('success', 'You have left the group.');
-    }
-
-    // Show pending members (group admin only)
-    public function members($id)
-    {
-        $group = Group::findOrFail($id);
-        $this->authorizeGroupAdmin($group);
-
-        $pending = $group->members()->wherePivot('status', 'pending')->get();
-        $active  = $group->members()->wherePivot('status', 'active')->get();
-
-        return view('groups.members', compact('group', 'pending', 'active'));
-    }
-
-    // Approve a pending member
-    public function approve($groupId, $userId)
-    {
-        $group = Group::findOrFail($groupId);
-        $this->authorizeGroupAdmin($group);
-
-        GroupMembership::where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->update(['status' => 'active']);
-
-        return back()->with('success', 'Member approved.');
-    }
-
-    // Remove/reject a member
-    public function removeMember($groupId, $userId)
-    {
-        $group = Group::findOrFail($groupId);
-        $this->authorizeGroupAdmin($group);
-
-        GroupMembership::where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->delete();
-
-        return back()->with('success', 'Member removed.');
-    }
-
-    // Promote a member to moderator
-    public function promote($groupId, $userId)
-    {
-        $group = Group::findOrFail($groupId);
-        $this->authorizeGroupAdmin($group);
-
-        GroupMembership::where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->update(['role' => 'moderator']);
-
-        return back()->with('success', 'Member promoted to moderator.');
-    }
-
-    // Helper: abort if current user is not group admin
-    private function authorizeGroupAdmin(Group $group)
-    {
-        $membership = GroupMembership::where('user_id', Auth::user()->user_id)
-                          ->where('group_id', $group->group_id)
-                          ->where('role', 'admin')
-                          ->first();
-
-        if (!$membership && Auth::user()->system_role !== 'system_admin') {
-            abort(403, 'Only the group admin can do this.');
+        if ($group->admin_id === Auth::id()) {
+            return back()->with('error', 'Group admin cannot leave.');
         }
+
+        GroupMembership::where('user_id', Auth::id())
+            ->where('group_id', $group->group_id)
+            ->delete();
+
+        return redirect()->route('groups.index')
+            ->with('success', 'You left ' . $group->name . '.');
+    }
+
+    public function edit(Group $group)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        return view('groups.edit', compact('group'));
+    }
+
+    public function update(Request $request, Group $group)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name'                    => ['required', 'string', 'max:120', 'unique:groups,name,' . $group->group_id . ',group_id'],
+            'course_name'             => ['required', 'string', 'max:150'],
+            'description'             => ['nullable', 'string', 'max:500'],
+            'inactivity_warning_days' => ['required', 'integer', 'min:1'],
+            'blacklist_duration_days' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $group->update($validated);
+
+        return redirect()->route('groups.show', $group->group_id)
+            ->with('success', 'Group settings updated.');
+    }
+
+    public function removeMember(Request $request, Group $group, User $user)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        if ($user->user_id === $group->admin_id) {
+            return back()->with('error', 'The group admin cannot be removed.');
+        }
+
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $wasMember = GroupMembership::where('user_id', $user->user_id)
+            ->where('group_id', $group->group_id)
+            ->exists();
+
+        if (! $wasMember) {
+            return back()->with('error', 'That user is not a member of this group.');
+        }
+
+        GroupMembership::where('user_id', $user->user_id)
+            ->where('group_id', $group->group_id)
+            ->delete();
+
+        // Removing a member is NOT blacklisting them — it just files a
+        // report for the system admin to review, per the design decision
+        // that group admins don't have blacklist power.
+        GroupRemoval::create([
+            'group_id'        => $group->group_id,
+            'removed_user_id' => $user->user_id,
+            'removed_by'      => Auth::id(),
+            'reason'          => $validated['reason'] ?? null,
+            'reviewed'        => false,
+        ]);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $group->group_id,
+            'action_type' => 'member_removed',
+            'meta'        => [
+                'removed_user_id'  => $user->user_id,
+                'removed_username' => $user->username,
+            ],
+            'logged_at'   => now(),
+        ]);
+
+        return back()->with('success', "{$user->username} was removed from the group.");
+    }
+
+    public function addMember(Request $request, Group $group)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'username' => ['required', 'string', 'exists:users,username'],
+        ]);
+
+        $newMember = User::where('username', $validated['username'])->first();
+
+        if ($newMember->user_id === Auth::id()) {
+            return back()->with('error', 'You are already the group admin.');
+        }
+
+        if ($group->isMember($newMember->user_id)) {
+            return back()->with('error', "{$newMember->username} is already a member of this group.");
+        }
+
+        GroupMembership::create([
+            'user_id'   => $newMember->user_id,
+            'group_id'  => $group->group_id,
+            'role'      => 'member',
+            'status'    => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Notification::notify($newMember->user_id, 'added_to_group', null, null, $group->group_id);
+
+        ActivityLog::create([
+            'user_id'     => Auth::id(),
+            'group_id'    => $group->group_id,
+            'action_type' => 'member_added',
+            'meta'        => [
+                'added_user_id'  => $newMember->user_id,
+                'added_username' => $newMember->username,
+            ],
+            'logged_at'   => now(),
+        ]);
+
+        return back()->with('success', "{$newMember->username} was added to the group.");
+    }
+
+    public function destroy(Group $group)
+    {
+        if ($group->admin_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        $group->delete();
+        return redirect()->route('groups.index')
+            ->with('success', 'Group deleted.');
     }
 }

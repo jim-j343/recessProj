@@ -17,6 +17,9 @@ class Post extends Model
         'author_id',
         'parent_post_id',
         'content',
+        'attachment',
+        'attachment_type',
+        'attachment_name',
         'is_flagged',
         'is_synced',
     ];
@@ -51,5 +54,12 @@ class Post extends Model
     public function replies()
     {
         return $this->hasMany(Post::class, 'parent_post_id', 'post_id');
+    }
+
+    // Group members this specific post is hidden from — lets a member
+    // post in a topic while excluding a few chosen people from seeing it
+    public function excludedUsers()
+    {
+        return $this->belongsToMany(User::class, 'post_exclusions', 'post_id', 'excluded_user_id');
     }
 }

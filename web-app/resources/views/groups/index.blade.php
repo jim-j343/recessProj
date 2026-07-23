@@ -1,44 +1,73 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Discussion Groups</h2>
+            <a href="{{ route('groups.create') }}"
+               class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                + New Group
+            </a>
+        </div>
+    </x-slot>
 
-@section('content')
-<div class="max-w-5xl mx-auto py-8 px-4">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Discussion Groups</h1>
-        <a href="{{ route('groups.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            + New Group
-        </a>
-    </div>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-    @if(session('success'))
-        <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">{{ session('success') }}</div>
-    @endif
+            @if(session('success'))
+                <div class="mb-4 bg-green-100 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="mb-4 bg-red-100 text-red-700 px-4 py-3 rounded">{{ session('error') }}</div>
+            @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        @forelse($groups as $group)
-            <div class="border rounded-lg p-4 bg-white shadow-sm">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 class="text-lg font-semibold">{{ $group->name }}</h2>
-                        <p class="text-gray-500 text-sm mt-1">{{ $group->description ?? 'No description.' }}</p>
-                        <p class="text-xs text-gray-400 mt-2">{{ $group->memberships_count }} member(s)</p>
+            @if($groups->isEmpty())
+                <div class="bg-white p-8 rounded-lg shadow-sm text-center text-gray-500">
+                    No groups exist yet.
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($groups as $group)
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">{{ $group->name }}</h3>
+                            @if($group->course_name)
+                                <p class="text-xs font-semibold text-indigo-600 mt-0.5">{{ $group->course_name }}</p>
+                            @endif
+                        </div>
+                        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-medium">
+                            {{ $group->memberships_count }} members
+                        </span>
                     </div>
-                    <div class="ml-4 flex flex-col gap-2">
+                    <p class="text-sm text-gray-500 mb-4">
+                        {{ $group->description ?? 'No description provided.' }}
+                    </p>
+                    <div class="flex items-center justify-between text-xs text-gray-400 mb-4">
+                        <span>{{ $group->topics_count }} topics</span>
+                        <span>Admin: {{ $group->admin->username ?? 'Unknown' }}</span>
+                    </div>
+                    <div class="flex gap-2">
                         <a href="{{ route('groups.show', $group->group_id) }}"
-                           class="text-blue-600 text-sm hover:underline">View</a>
-                        @if($myGroups->contains($group->group_id))
-                            <span class="text-xs text-green-600 font-medium">Joined</span>
-                        @else
-                            <form method="POST" action="{{ route('groups.join', $group->group_id) }}">
+                           class="flex-1 text-center bg-gray-100 text-gray-700 px-3 py-2 rounded text-sm font-medium hover:bg-gray-200">
+                            View
+                        </a>
+                        @if(!$group->isMember(auth()->id()))
+                            <form method="POST" action="{{ route('groups.join', $group->group_id) }}" class="flex-1">
                                 @csrf
-                                <button class="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200">Join</button>
+                                <button type="submit"
+                                    class="w-full bg-indigo-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-indigo-700">
+                                    Join
+                                </button>
                             </form>
+                        @else
+                            <span class="flex-1 text-center bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-medium">
+                                ✓ Joined
+                            </span>
                         @endif
                     </div>
                 </div>
+                @endforeach
             </div>
-        @empty
-            <p class="text-gray-500 col-span-2">No groups yet. Be the first to create one!</p>
-        @endforelse
+        </div>
     </div>
-</div>
-@endsection
+</x-app-layout>

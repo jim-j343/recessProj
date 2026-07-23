@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Verify Email — mirrors web auth/verify-email.blade.php -->
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+           stylesheets="@../css/aces.css" styleClass="root,auth-canvas"
+           prefWidth="900" prefHeight="600">
+    <VBox alignment="CENTER" maxWidth="448" spacing="16">
+        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+        <javafx.scene.image.ImageView fitWidth="90" fitHeight="90" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+        <VBox styleClass="auth-card" spacing="16" maxWidth="448">
+            <Label text="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another." styleClass="muted" wrapText="true"/>
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Button text="RESEND VERIFICATION EMAIL" styleClass="btn,btn-dark"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Hyperlink text="Log Out" styleClass="muted"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>
+

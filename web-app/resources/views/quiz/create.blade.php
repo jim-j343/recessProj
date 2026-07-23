@@ -1,135 +1,157 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-900">Quiz Configuration</h2>
-                <p class="text-sm text-gray-400 mt-0.5">
-                    Set up your assessment parameters and preview student experience.
-                </p>
-            </div>
-            <nav class="flex items-center gap-6 text-sm">
-                <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-900">Dashboard</a>
-                <a href="#" class="text-gray-900 font-semibold border-b-2 border-gray-900 pb-0.5">Quiz Center</a>
-                <a href="#" class="text-gray-500 hover:text-gray-900">Students</a>
-            </nav>
+            <h2 class="font-semibold text-xl text-gray-900">Create Quiz</h2>
+            <a href="{{ route('lecturer.dashboard') }}"
+               class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
+                ← Back to Dashboard
+            </a>
         </div>
     </x-slot>
 
     <div class="py-8 bg-gray-50 min-h-screen">
         <div class="max-w-3xl mx-auto px-4 space-y-6">
 
-            <form method="POST" action="/quiz/store">
+            @if($errors->any())
+                <div class="bg-red-100 text-red-700 px-4 py-3 rounded">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('quiz.store') }}" id="quiz-form">
                 @csrf
 
-                {{-- SECTION 1: General Details --}}
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-900 mb-5 flex items-center gap-2">
-                        ⚙ General Details
-                    </h3>
+                {{-- General Details --}}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                    <h3 class="font-semibold text-gray-900 mb-5">⚙ General Details</h3>
 
-                    {{-- Quiz Title --}}
                     <div class="mb-4">
-                        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
-                            Quiz Title
-                        </label>
-                        <input type="text" name="title"
-                            value="Advanced Macroeconomics Midterm"
-                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm
-                                   focus:outline-none focus:border-gray-400 transition-colors bg-white" />
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Quiz Title *</label>
+                        <input type="text" name="title" value="{{ old('title') }}" required
+                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
                     </div>
 
-                    {{-- Start Date + Duration --}}
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Course Unit *</label>
+                        <input type="text" name="course_name" list="course-options" value="{{ old('course_name') }}" required
+                            placeholder="e.g. CS201: Database Systems"
+                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
+                        <datalist id="course-options">
+                            @foreach($courseNames as $courseName)
+                                <option value="{{ $courseName }}">
+                            @endforeach
+                        </datalist>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Applies to every group teaching this course — you don't need to be a member of each one.
+                        </p>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
-                                Start Date & Time
-                            </label>
-                            <input type="datetime-local" name="start_time"
-                                class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm
-                                       focus:outline-none focus:border-gray-400 transition-colors bg-white" />
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Start Date & Time *</label>
+                            <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required
+                                class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
-                                Duration (Minutes)
-                            </label>
-                            <input type="number" name="duration" value="60"
-                                class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm
-                                       focus:outline-none focus:border-gray-400 transition-colors bg-white" />
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Duration (Minutes) *</label>
+                            <input type="number" name="duration" value="{{ old('duration', 30) }}" min="1" required
+                                class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
                         </div>
                     </div>
 
-                    {{-- Student Category --}}
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
-                            Student Category
-                        </label>
-                        <select name="target"
-                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm
-                                   focus:outline-none focus:border-gray-400 transition-colors bg-white">
-                            <option>Undergraduate - Level 3</option>
-                            <option>Undergraduate - Level 1</option>
-                            <option>Undergraduate - Level 2</option>
-                            <option>All Students</option>
-                        </select>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Student Category</label>
+                        <input type="text" name="target" value="{{ old('target') }}"
+                            placeholder="e.g. Year 2 Computer Science"
+                            class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400" />
                     </div>
                 </div>
 
-                {{-- SECTION 2: Student View Preview --}}
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-gray-900 flex items-center gap-2">
-                            👁 Student View Preview
-                        </h3>
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
-                            LIVE PREVIEW
-                        </span>
+                {{-- Questions --}}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="font-semibold text-gray-900">📝 Questions</h3>
+                        <button type="button" onclick="addQuestion()"
+                            class="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                            + Add Question
+                        </button>
                     </div>
 
-                    {{-- Preview Card --}}
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        {{-- Red Timer Bar --}}
-                        <div class="bg-red-600 px-4 py-3 flex justify-between items-center">
-                            <div class="flex items-center gap-2">
-                                <span class="text-white text-sm">⏱</span>
-                                <span class="text-white text-xs font-bold uppercase tracking-wide">
-                                    Time Remaining
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="text-white text-xl font-bold font-mono">14:32</span>
-                                <span class="text-white text-xs">MIN</span>
-                            </div>
-                        </div>
-                        {{-- Preview Body --}}
-                        <div class="p-4 bg-gray-50 space-y-2">
-                            <div class="h-3 bg-gray-200 rounded w-3/4"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-                            <div class="mt-4 grid grid-cols-2 gap-2">
-                                <div class="h-10 bg-white border border-gray-200 rounded"></div>
-                                <div class="h-10 bg-white border border-gray-200 rounded"></div>
-                            </div>
-                        </div>
+                    <div id="questions-container" class="space-y-6">
+                        {{-- Questions added dynamically --}}
                     </div>
-                    <p class="text-xs text-gray-400 italic mt-3">
-                        The red alert banner triggers when 15 minutes remain to create psychological urgency for completion.
+
+                    <p id="no-questions" class="text-sm text-gray-400 text-center py-4">
+                        No questions yet. Click "Add Question" to begin.
                     </p>
                 </div>
 
-                {{-- DEPLOY + SAVE BUTTONS --}}
-                <button type="submit"
-                    class="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold
-                           flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors">
-                    🚀 Deploy Assessment
-                </button>
-
-                <button type="button"
-                    class="w-full bg-white border border-gray-200 text-gray-700 py-4 rounded-lg
-                           font-semibold flex items-center justify-center gap-2
-                           hover:bg-gray-50 transition-colors">
-                    💾 Save as Draft
-                </button>
+                {{-- Submit buttons --}}
+                <div class="flex gap-4">
+                    <button type="submit" name="publish" value="1"
+                        class="flex-1 bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-700">
+                        🚀 Publish Quiz
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-white border border-gray-200 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-50">
+                        💾 Save as Draft
+                    </button>
+                </div>
 
             </form>
         </div>
     </div>
+
+    <script>
+    let questionCount = 0;
+
+    function addQuestion() {
+        const container = document.getElementById('questions-container');
+        const noQ = document.getElementById('no-questions');
+        noQ.classList.add('hidden');
+
+        const index = questionCount++;
+        const div = document.createElement('div');
+        div.className = 'border border-gray-200 rounded-lg p-5 bg-gray-50';
+        div.id = `question-${index}`;
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-semibold text-gray-700">Question ${index + 1}</span>
+                <button type="button" onclick="removeQuestion(${index})"
+                    class="text-red-500 text-xs hover:underline">Remove</button>
+            </div>
+            <div class="mb-3">
+                <input type="text" name="questions[${index}][text]" required
+                    placeholder="Enter your question here..."
+                    class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gray-400 bg-white" />
+            </div>
+            <div class="space-y-2 mb-3" id="answers-${index}">
+                ${[0,1,2,3].map(a => `
+                <div class="flex items-center gap-3">
+                    <input type="radio" name="questions[${index}][correct_answer]" value="${a}" ${a===0?'checked':''} class="w-4 h-4 accent-indigo-600" />
+                    <input type="text" name="questions[${index}][answers][${a}]" required
+                        placeholder="Answer option ${a+1}"
+                        class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-400 bg-white" />
+                </div>`).join('')}
+            </div>
+            <p class="text-xs text-gray-400">Select the radio button next to the correct answer.</p>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeQuestion(index) {
+        const el = document.getElementById(`question-${index}`);
+        if (el) el.remove();
+        if (document.getElementById('questions-container').children.length === 0) {
+            document.getElementById('no-questions').classList.remove('hidden');
+        }
+    }
+
+    // Add first question automatically
+    addQuestion();
+    </script>
 </x-app-layout>

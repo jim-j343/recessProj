@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="forum.controllers.FooterController"
+      style="-fx-background-color: white; -fx-border-color: #e5e7eb transparent transparent transparent; -fx-padding: 20 24;"
+      alignment="CENTER">
+    <HBox maxWidth="1280" alignment="CENTER_LEFT" spacing="24">
+        <VBox alignment="CENTER_LEFT" spacing="8" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/logo.jpg"/>
+                    </image>
+                </ImageView>
+                <Label text="ACES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #4338ca;"/>
+            </HBox>
+            <Label text="Academic Collaboration and Evaluation system" style="-fx-font-size: 14px; -fx-text-fill: #6b7280;"/>
+        </VBox>
+        <HBox alignment="CENTER_RIGHT" spacing="32">
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="footer-link">
+                <SVGPath content="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z" fill="transparent" stroke="#4b5563" strokeWidth="2"/>
+                <Hyperlink text="Privacy Policy" onAction="#onPrivacyPolicy" style="-fx-text-fill: #4b5563; -fx-font-size: 14px; -fx-border-color: transparent; -fx-underline: false; -fx-padding: 0;"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="footer-link">
+                <SVGPath content="M9 12h6m-6 4h6M8 4h8a2 2 0 012 2v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6a2 2 0 012-2z" fill="transparent" stroke="#4b5563" strokeWidth="2"/>
+                <Hyperlink text="Platform Rules" onAction="#onPlatformRules" style="-fx-text-fill: #4b5563; -fx-font-size: 14px; -fx-border-color: transparent; -fx-underline: false; -fx-padding: 0;"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="footer-link">
+                <SVGPath content="M8 10h8M8 14h5m8-2a9 9 0 11-18 0 9 9 0 0118 0z" fill="transparent" stroke="#4b5563" strokeWidth="2"/>
+                <Hyperlink text="Support" onAction="#onSupport" style="-fx-text-fill: #4b5563; -fx-font-size: 14px; -fx-border-color: transparent; -fx-underline: false; -fx-padding: 0;"/>
+            </HBox>
+        </HBox>
+    </HBox>
+</VBox>

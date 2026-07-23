@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Member Management — mirrors web admin/members.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.AdminMembersController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+
+    <top>
+        <VBox>
+            <!-- Navigation bar -->
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+                <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+                <Label text="Dashboard"  onMouseClicked="#onDashboard"  styleClass="nav-link"/>
+                <Label text="Groups"     onMouseClicked="#onGroups"     styleClass="nav-link"/>
+
+                <Label text="Members"    onMouseClicked="#onMembers"    styleClass="nav-link,active"/>
+                <Label text="Analytics"  onMouseClicked="#onAnalytics"  styleClass="nav-link"/>
+                <Label text="Moderation"   onMouseClicked="#onModeration"   styleClass="nav-link"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Notification bell — populated dynamically from backend -->
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                        <!-- Items populated by NavbarHelper.loadNotifications() -->
+                    </items>
+                </MenuButton>
+
+                <!-- Profile Dropdown -->
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                    </items>
+                </MenuButton>
+            </HBox>
+
+            <!-- Page header -->
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Member Management" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="896">
+                    <Label text="Manage flagged accounts and issue warnings or restrictions."
+                           styleClass="muted"/>
+
+                    <!-- Status feedback label -->
+                    <Label fx:id="statusLabel" text="" managed="false" visible="false"
+                           styleClass="muted" wrapText="true"/>
+
+                    <!-- Search field -->
+                    <TextField fx:id="searchField"
+                               promptText="Search by username or email…"
+                               maxWidth="1.7976931348623157E308"
+                               onKeyReleased="#onSearch"/>
+
+                    <!-- Filter tabs -->
+                    <HBox styleClass="segmented" alignment="CENTER_LEFT" spacing="8">
+                        <fx:define><ToggleGroup fx:id="filterGroup"/></fx:define>
+                        <ToggleButton fx:id="btnAll"         text="All"         toggleGroup="$filterGroup" selected="true"/>
+                        <ToggleButton fx:id="btnBlacklisted" text="Blacklisted" toggleGroup="$filterGroup"/>
+                        <ToggleButton fx:id="btnWarning"     text="Warning"     toggleGroup="$filterGroup"/>
+                        <ToggleButton fx:id="btnActive"      text="Active"      toggleGroup="$filterGroup"/>
+                    </HBox>
+
+                    <!-- Dynamic members list — populated by controller -->
+                    <VBox fx:id="membersListBox" spacing="0"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
+</BorderPane>
+
+

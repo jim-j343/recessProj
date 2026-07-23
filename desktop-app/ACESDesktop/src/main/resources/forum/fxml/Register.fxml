@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import forum.ui.RevealPasswordField?>
+<?import forum.ui.IconTextField?>
+
+<!-- Register / Onboarding - mirrors web auth/register.blade.php (full-width) -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.RegisterController"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white;"
+            prefWidth="960" prefHeight="760">
+    <!-- TOP NAV -->
+    <top>
+        <HBox alignment="CENTER_LEFT" style="-fx-background-color:white; -fx-border-color:#f3f4f6; -fx-border-width:0 0 1 0; -fx-padding:16 32 16 32;">
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                    <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                        <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                    </javafx.scene.image.ImageView>
+                    <Label text="ACES" styleClass="brand"/>
+                </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Hyperlink text="Help" styleClass="muted"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color:white;">
+            <VBox alignment="TOP_CENTER" style="-fx-background-color:white;">
+                <VBox maxWidth="576" spacing="0">
+                    <padding><Insets top="40" right="24" bottom="40" left="24"/></padding>
+
+                    <Label text="Initialize Your Account" styleClass="h-lg"/>
+                    <Label text="Complete the onboarding to gain access to the ACES." styleClass="muted" wrapText="true">
+                        <VBox.margin><Insets top="4" bottom="24"/></VBox.margin>
+                    </Label>
+
+                    <!-- Full name -->
+                    <VBox spacing="6">
+                        <VBox.margin><Insets bottom="16"/></VBox.margin>
+                        <Label text="Full Legal Name" styleClass="field-label"/>
+                        <IconTextField fx:id="fullNameField" icon="user" promptText="Johnathan Doe" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Email -->
+                    <VBox spacing="6">
+                        <VBox.margin><Insets bottom="16"/></VBox.margin>
+                        <Label text="Email Address" styleClass="field-label"/>
+                        <IconTextField fx:id="emailField" icon="mail" promptText="j.doe@university.ac.ug" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Role -->
+                    <VBox spacing="6">
+                        <VBox.margin><Insets bottom="16"/></VBox.margin>
+                        <Label text="I am a..." styleClass="field-label"/>
+                        <ComboBox fx:id="roleComboBox" promptText="Select your role" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Password -->
+                    <VBox spacing="6">
+                        <VBox.margin><Insets bottom="16"/></VBox.margin>
+                        <Label text="Password" styleClass="field-label"/>
+                        <RevealPasswordField fx:id="passwordField" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Confirm Password -->
+                    <VBox spacing="6">
+                        <VBox.margin><Insets bottom="16"/></VBox.margin>
+                        <Label text="Confirm Password" styleClass="field-label"/>
+                        <RevealPasswordField fx:id="confirmField" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Terms -->
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <VBox.margin><Insets top="4"/></VBox.margin>
+                        <CheckBox fx:id="agreeTerms"/>
+                        <Label text="I have read and accepted the" styleClass="muted"/>
+                        <Hyperlink text="Terms of Service" onAction="#onTerms"/>
+                    </HBox>
+
+                    <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;">
+                        <VBox.margin><Insets top="8"/></VBox.margin>
+                    </Label>
+
+                    <!-- Actions -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <VBox.margin><Insets top="24"/></VBox.margin>
+                        <Hyperlink text="Already registered?" onAction="#onSignIn" styleClass="subtle"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="DECLINE" styleClass="btn,btn-outline" onAction="#onSignIn"/>
+                        <Button fx:id="registerButton" text="AGREE &amp; REGISTER" styleClass="btn,btn-dark" onAction="#onRegister"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

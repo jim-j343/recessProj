@@ -3,206 +3,168 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Quiz | Smart Discussion Forum</title>
+    <title>{{ $quiz->title }} | ACES</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        .blur-backdrop {
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-        }
-        .timer-glow {
-            text-shadow: 0 0 10px rgba(186, 26, 26, 0.3);
-        }
-        .quiz-shadow {
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-gray-100 overflow-hidden">
+<body class="bg-gradient-to-br from-indigo-50 via-white to-indigo-50 min-h-screen overflow-hidden">
 
-    {{-- BLURRED BACKGROUND: Bento Grid --}}
-    <div class="fixed inset-0 p-10 grid grid-cols-12 gap-6 opacity-40 blur-xl pointer-events-none select-none">
-        <div class="col-span-full h-16 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-8 h-64 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-4 h-64 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-3 h-40 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-3 h-40 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-3 h-40 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-3 h-40 bg-white border border-gray-200 rounded-lg"></div>
-        <div class="col-span-full h-48 bg-white border border-gray-200 rounded-lg"></div>
-    </div>
+    <div class="fixed inset-0 z-40 flex flex-col items-center justify-center p-6">
 
-    {{-- OVERLAY --}}
-    <div class="fixed inset-0 bg-white/60 blur-backdrop z-40 flex flex-col items-center justify-center p-6">
-
-        {{-- TIMER --}}
+        {{-- Timer — calm by default, only turns urgent in the final minute --}}
         <div class="fixed top-8 right-8 z-50 text-right">
-            <div class="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-full border border-red-200 quiz-shadow">
-                <span class="text-red-600">⏱</span>
-                <span id="countdown"
-                    class="text-3xl font-bold text-red-600 tracking-tight timer-glow font-mono">
-                    24:59
+            <div id="timer-pill" class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-md transition-colors duration-500">
+                <span id="timer-icon">⏱</span>
+                <span id="countdown" class="text-2xl font-bold text-gray-800 tracking-tight font-mono">
+                    {{ str_pad(intdiv($timeLeft, 60), 2, '0', STR_PAD_LEFT) }}:{{ str_pad($timeLeft % 60, 2, '0', STR_PAD_LEFT) }}
                 </span>
             </div>
-            <p class="text-red-600 text-xs font-bold uppercase tracking-widest mt-1">
-                Time Remaining
-            </p>
+            <p id="timer-label" class="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1 text-right">Time Remaining</p>
         </div>
 
-        {{-- QUIZ MODAL --}}
-        <section class="w-full max-w-xl bg-white quiz-shadow rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+        {{-- Quiz form --}}
+        <form id="quiz-form" method="POST" action="{{ route('quiz.submit', $quiz->quiz_id) }}">
+            @csrf
+            <input type="hidden" name="auto_submit" id="auto-submit-flag" value="0">
 
-            {{-- Progress Bar --}}
-            <div class="w-full h-1 bg-gray-100">
-                <div class="h-full bg-gray-900 transition-all duration-1000" id="progress-bar" style="width: 40%"></div>
-            </div>
+            <section class="w-full max-w-3xl bg-white shadow-2xl shadow-indigo-100 rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
 
-            {{-- Modal Header --}}
-            <header class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
-                <div>
-                    <h2 class="font-semibold text-gray-900">Advanced Web Systems</h2>
-                    <p class="text-xs text-gray-400 mt-0.5">
-                        Question <span id="current-q">12</span> of 30 • Multiple Choice
-                    </p>
+                {{-- Progress bar --}}
+                <div class="w-full h-1.5 bg-gray-100">
+                    <div class="h-full bg-indigo-600 transition-all duration-500" id="progress-bar" style="width: 0%"></div>
                 </div>
-                <div class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full border border-gray-200">
-                    <span class="text-xs">🔒</span>
-                    <span class="text-xs font-bold uppercase tracking-wide text-gray-700">Locked</span>
+
+                {{-- Header --}}
+                <header class="px-8 py-5 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-semibold text-gray-900 text-lg">{{ $quiz->title }}</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            Question <span id="current-q">1</span> of {{ $quiz->questions->count() }} · Multiple Choice
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 rounded-full border border-indigo-100">
+                        <span class="text-xs">🔒</span>
+                        <span class="text-xs font-bold uppercase tracking-wide text-indigo-700">Locked</span>
+                    </div>
+                </header>
+
+                {{-- Questions --}}
+                @foreach($quiz->questions as $qIndex => $question)
+                <div class="question-slide px-10 py-10 flex-grow {{ $qIndex > 0 ? 'hidden' : '' }}"
+                     data-index="{{ $qIndex }}">
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-8 leading-snug">
+                        {{ $question->content }}
+                    </h3>
+                    <div class="space-y-3">
+                        @foreach($question->answers as $answer)
+                        <label class="flex items-center p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 transition-all has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
+                            <input type="radio"
+                                name="answers[{{ $question->question_id }}]"
+                                value="{{ $answer->answer_id }}"
+                                class="w-5 h-5 accent-indigo-600" />
+                            <span class="ml-4 text-sm text-gray-700">{{ $answer->content }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                 </div>
-            </header>
+                @endforeach
 
-            {{-- Question Body --}}
-            <div class="px-8 py-8 flex-grow">
-                <h3 class="text-xl font-semibold text-gray-900 mb-6 leading-snug">
-                    What is the primary benefit of using a Virtual DOM in modern web frameworks?
-                </h3>
-
-                {{-- Options --}}
-                <div class="space-y-3" id="options-container">
-                    <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-gray-900 transition-all">
-                        <input type="radio" name="answer" value="A" class="w-5 h-5 accent-gray-900" />
-                        <span class="ml-4 text-sm text-gray-700">Faster initial render</span>
-                    </label>
-                    <label class="flex items-center p-4 border-2 border-gray-900 rounded-lg cursor-pointer bg-gray-50">
-                        <input type="radio" name="answer" value="B" checked class="w-5 h-5 accent-gray-900" />
-                        <span class="ml-4 text-sm text-gray-900 font-semibold">
-                            Efficient updates by minimizing direct DOM manipulation
-                        </span>
-                    </label>
-                    <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-gray-900 transition-all">
-                        <input type="radio" name="answer" value="C" class="w-5 h-5 accent-gray-900" />
-                        <span class="ml-4 text-sm text-gray-700">Automatic SEO optimization</span>
-                    </label>
-                    <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-gray-900 transition-all">
-                        <input type="radio" name="answer" value="D" class="w-5 h-5 accent-gray-900" />
-                        <span class="ml-4 text-sm text-gray-700">Native browser support</span>
-                    </label>
-                </div>
-            </div>
-
-            {{-- Modal Footer --}}
-            <footer class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                <button class="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-500 text-sm rounded-lg hover:bg-gray-100 transition-colors">
-                    🚩 Review Later
-                </button>
-                <div class="flex gap-3">
-                    <button onclick="prevQuestion()"
-                        class="px-4 py-2 text-sm text-gray-400 font-semibold rounded-lg opacity-50 cursor-not-allowed">
-                        Previous
+                {{-- Footer --}}
+                <footer class="px-8 py-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                    <button type="button" onclick="prevQuestion()"
+                        class="px-4 py-2.5 text-sm text-gray-500 font-semibold rounded-lg hover:bg-gray-100 transition-colors" id="prev-btn">
+                        ← Previous
                     </button>
-                    <button onclick="nextQuestion()" id="next-btn"
-                        class="flex items-center gap-2 px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition-all active:scale-95">
-                        Next Question →
-                    </button>
-                    <button onclick="submitQuiz()" id="submit-btn"
-                        class="hidden items-center gap-2 px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-all active:scale-95">
-                        ✅ Submit Quiz
-                    </button>
-                </div>
-            </footer>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="nextQuestion()" id="next-btn"
+                            class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">
+                            Next →
+                        </button>
+                        <button type="submit" id="submit-btn"
+                            class="hidden px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                            onclick="return confirm('Submit your quiz? This cannot be undone.')">
+                            ✅ Submit Quiz
+                        </button>
+                    </div>
+                </footer>
 
-        </section>
+            </section>
+        </form>
 
-        {{-- PROCTORING BAR --}}
-        <div class="mt-6 flex flex-col items-center gap-2">
-            <div class="flex items-center gap-2 text-gray-400 text-xs">
-                <span>👁</span>
-                <span>Proctoring Active: Screen Recording & Tab Locking Enabled</span>
-            </div>
-            <div class="w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-gray-400 rounded-full" id="heartbeat" style="width: 30%"></div>
-            </div>
-        </div>
-
+        <p class="mt-5 text-xs text-gray-400">
+            👁 Navigation disabled during assessment
+        </p>
     </div>
 
-    {{-- Navigation lock toast --}}
+    {{-- Lock toast --}}
     <div id="lock-toast"
         class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-6 py-2
-               rounded-full text-xs font-semibold flex items-center gap-2 quiz-shadow
-               opacity-0 transition-opacity duration-300">
+               rounded-full text-xs font-semibold opacity-0 transition-opacity duration-300">
         🔒 Navigation is disabled during the assessment
     </div>
 
     <script>
-        // Timer
-        let timeLeft = 24 * 60 + 59;
+        const totalQuestions = {{ $quiz->questions->count() }};
+        // Cast defensively on the JS side too, so this can never regress
+        // even if the server-side value isn't a clean int for any reason
+        let timeLeft = Math.floor({{ $timeLeft }});
+        let currentQuestion = 0;
+
         const countdownEl = document.getElementById('countdown');
-        const interval = setInterval(() => {
+        const timerPill = document.getElementById('timer-pill');
+        const timerIcon = document.getElementById('timer-icon');
+        const timerLabel = document.getElementById('timer-label');
+
+        function renderTimer() {
+            const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            const s = String(Math.floor(timeLeft % 60)).padStart(2, '0');
+            countdownEl.textContent = `${m}:${s}`;
+
+            // Calm by default — only turns urgent in the final 60 seconds,
+            // instead of glowing red for the entire quiz
+            if (timeLeft <= 60) {
+                timerPill.classList.add('border-red-300', 'bg-red-50');
+                countdownEl.classList.add('text-red-600', 'animate-pulse');
+                timerLabel.classList.add('text-red-500');
+                timerIcon.textContent = '⚠';
+            }
+        }
+
+        const timerInterval = setInterval(() => {
             if (timeLeft <= 0) {
-                clearInterval(interval);
-                submitQuiz();
+                clearInterval(timerInterval);
+                document.getElementById('auto-submit-flag').value = '1';
+                document.getElementById('quiz-form').submit();
                 return;
             }
             timeLeft--;
-            const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-            const s = String(timeLeft % 60).padStart(2, '0');
-            countdownEl.textContent = `${m}:${s}`;
-            if (timeLeft < 300) countdownEl.classList.add('animate-pulse');
+            renderTimer();
         }, 1000);
 
-        // Question navigation
-        let currentQuestion = 12;
-        const totalQuestions = 30;
-
-        function updateProgress() {
-            document.getElementById('current-q').textContent = currentQuestion;
+        function updateView() {
+            document.querySelectorAll('.question-slide').forEach((el, i) => {
+                el.classList.toggle('hidden', i !== currentQuestion);
+            });
+            document.getElementById('current-q').textContent = currentQuestion + 1;
             document.getElementById('progress-bar').style.width =
-                ((currentQuestion / totalQuestions) * 100) + '%';
+                ((currentQuestion + 1) / totalQuestions * 100) + '%';
 
-            // Toggle Next/Submit buttons on last question
-            const nextBtn = document.getElementById('next-btn');
-            const submitBtn = document.getElementById('submit-btn');
-            if (currentQuestion === totalQuestions) {
-                nextBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-                submitBtn.classList.add('flex');
-            } else {
-                nextBtn.classList.remove('hidden');
-                nextBtn.classList.add('flex');
-                submitBtn.classList.add('hidden');
-                submitBtn.classList.remove('flex');
-            }
-        }
+            document.getElementById('prev-btn').style.opacity = currentQuestion === 0 ? '0.3' : '1';
 
-        function submitQuiz() {
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '✅ Submitted';
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            // Later: send answers to backend via fetch/axios
-            alert('Quiz submitted! Your answers have been recorded.');
+            const isLast = currentQuestion === totalQuestions - 1;
+            document.getElementById('next-btn').classList.toggle('hidden', isLast);
+            document.getElementById('submit-btn').classList.toggle('hidden', !isLast);
         }
 
         function nextQuestion() {
-            if (currentQuestion < totalQuestions) { currentQuestion++; updateProgress(); }
+            if (currentQuestion < totalQuestions - 1) { currentQuestion++; updateView(); }
         }
 
         function prevQuestion() {
-            if (currentQuestion > 1) { currentQuestion--; updateProgress(); }
+            if (currentQuestion > 0) { currentQuestion--; updateView(); }
         }
 
-        // Prevent tab navigation
+        // Prevent tab/escape
         const toast = document.getElementById('lock-toast');
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' || e.key === 'Escape') {
@@ -213,15 +175,8 @@
         });
         document.addEventListener('contextmenu', e => e.preventDefault());
 
-        // Heartbeat animation
-        let dir = 1, w = 30;
-        const hb = document.getElementById('heartbeat');
-        setInterval(() => {
-            w += 5 * dir;
-            if (w > 90 || w < 10) dir *= -1;
-            hb.style.width = w + '%';
-        }, 150);
+        renderTimer();
+        updateView();
     </script>
-
 </body>
 </html>

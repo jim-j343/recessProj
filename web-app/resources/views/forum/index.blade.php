@@ -18,8 +18,20 @@
 
             {{-- Search bar --}}
             <div class="bg-white p-4 rounded-lg shadow-sm">
-                <input type="text" placeholder="Search topics..."
-                       class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <form method="GET" action="{{ route('forum.index') }}" class="flex gap-2">
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Search topics..."
+                           class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="submit"
+                        class="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                        Search
+                    </button>
+                    @if($search)
+                        <a href="{{ route('forum.index') }}"
+                           class="shrink-0 flex items-center px-3 text-sm text-gray-500 hover:text-gray-700">
+                            Clear
+                        </a>
+                    @endif
+                </form>
             </div>
 
             {{-- Empty state --}}

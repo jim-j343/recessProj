@@ -3,20 +3,18 @@
 
         {{-- TOP NAV --}}
         <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100">
-            <h1 class="text-lg font-bold text-gray-800">Smart Discussion Forum</h1>
+            <h1 class="text-lg font-bold text-gray-800">ACES</h1>
             <div class="flex gap-3">
                 <a href="/" class="text-gray-500 hover:text-gray-700 text-sm">Help</a>
             </div>
         </div>
 
         {{-- MAIN CONTENT --}}
-        <div class="flex flex-1 overflow-hidden">
-
-            {{-- LEFT: Form --}}
-            <div class="w-1/2 px-16 py-10 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto">
+            <div class="max-w-xl mx-auto px-6 py-10">
                 <h2 class="text-3xl font-bold text-gray-900 mb-1">Initialize Your Account</h2>
                 <p class="text-sm text-gray-500 mb-6">
-                    Complete the onboarding to gain access to the Smart Discussion Forum.
+                    Complete the onboarding to gain access to the ACES.
                 </p>
 
                 <form method="POST" action="{{ route('register') }}">
@@ -90,22 +88,23 @@
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                     </div>
 
-                    {{-- Terms checkbox --}}
+                    {{-- Terms checkbox — rules are accessed via modal, not a permanently visible panel --}}
                     <div class="flex items-center gap-2 mt-4">
                         <input type="checkbox" name="rules_accepted" id="rules_accepted" required
                             class="rounded border-gray-300 text-indigo-600
                                    shadow-sm focus:ring-indigo-500" />
                         <label for="rules_accepted" class="text-sm text-gray-600">
-                            I have read and agree to the
-                            <a href="/rules" class="text-indigo-600 underline hover:text-indigo-800">
-                                Platform Rules
-                            </a>
-                            and Terms of Service.
+                            I have read and accepted the
+                            <button type="button" x-data=""
+                                x-on:click.prevent="$dispatch('open-modal', 'rules')"
+                                class="text-indigo-600 underline hover:text-indigo-800 font-medium">
+                                Terms of Service
+                            </button>
                         </label>
                     </div>
 
                     {{-- Action buttons --}}
-                    <div class="flex items-center justify-between mt-4 gap-3">
+                    <div class="flex items-center justify-between mt-6 gap-3">
                         <a href="{{ route('login') }}"
                             class="text-sm text-gray-500 hover:text-gray-700 underline">
                             Already registered?
@@ -129,100 +128,104 @@
 
                 </form>
             </div>
-
-            {{-- RIGHT: Terms of Service --}}
-            <div class="w-1/2 border-l border-gray-200 flex flex-col overflow-hidden">
-                <div class="px-8 py-5 border-b border-gray-200 flex-shrink-0">
-                    <h3 class="font-semibold text-gray-800">Platform Rules and Terms of Service</h3>
-                    <p class="text-xs text-gray-400 mt-1">Version 1.0.0 · Last Updated June 2026</p>
-                </div>
-
-                {{-- Scrollable ToS content — starts at top of section 1 --}}
-                <div class="flex-1 overflow-y-auto px-8 py-6 space-y-6 text-sm text-gray-600">
-
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">1. Acceptable Use Policy</h4>
-                        <p class="mb-2">Users of the Smart Discussion Forum are strictly prohibited
-                            from utilizing the system for any purpose other than authorized academic
-                            discussion and learning.</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500">
-                            <li>All identity information provided must be verifiable through
-                                official university records.</li>
-                            <li>Automated scripts or bot interactions are strictly prohibited.</li>
-                            <li>Users are responsible for maintaining the confidentiality
-                                of their credentials.</li>
-                            <li>Data scraping of internal content is a violation of this policy.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">2. Data Privacy &amp; Processing</h4>
-                        <p class="mb-2">The Smart Discussion Forum processes submitted data under
-                            applicable data protection frameworks. Your identification and email
-                            are encrypted at rest.</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500">
-                            <li>Data is stored for the duration of your academic tenure.</li>
-                            <li>Personal data is never shared with third-party vendors.</li>
-                            <li>System logs include IP address and interaction timestamps
-                                for security auditing.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">3. Academic Integrity</h4>
-                        <p class="mb-2">All forum contributions must represent the student's own
-                            thoughts and ideas.</p>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500">
-                            <li>Plagiarism or copying of other students' posts is prohibited.</li>
-                            <li>Respectful and constructive engagement is required at all times.</li>
-                            <li>Offensive, abusive, or discriminatory content will result in
-                                immediate account suspension.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">4. Quiz Conduct</h4>
-                        <ul class="list-disc list-inside space-y-1 text-gray-500">
-                            <li>Quiz sessions are timed and monitored.</li>
-                            <li>Attempting to share quiz questions or answers is strictly
-                                prohibited.</li>
-                            <li>Any form of cheating will result in a zero grade and
-                                disciplinary action.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-gray-800 mb-2">5. Account Termination</h4>
-                        <p class="text-gray-500">The administration reserves the right to suspend
-                            or permanently remove any account that violates these terms without
-                            prior notice.</p>
-                    </div>
-
-                </div>
-
-                {{-- Bottom reminder --}}
-                <div class="px-8 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-                    <p class="text-xs text-gray-500">
-                        Please read all terms before registering. Use <strong>Decline</strong> if you do not agree.
-                    </p>
-                </div>
-            </div>
-
         </div>
-
 
         {{-- FOOTER --}}
         <div class="border-t border-gray-100 px-8 py-4 flex justify-between text-xs text-gray-400 flex-shrink-0">
-            <span>Smart Discussion Forum</span>
+            <span>ACES</span>
             <div class="flex gap-4">
-                <a href="#" class="hover:text-gray-600">Privacy Policy</a>
-                <a href="#" class="hover:text-gray-600">Platform Rules</a>
-                <a href="#" class="hover:text-gray-600">Support</a>
+                <a href="{{ route('privacy') }}" class="hover:text-gray-600">Privacy Policy</a>
+                <button type="button" x-data=""
+                    x-on:click.prevent="$dispatch('open-modal', 'rules')"
+                    class="hover:text-gray-600">
+                    Platform Rules
+                </button>
+                <a href="{{ route('support') }}" class="hover:text-gray-600">Support</a>
             </div>
-            <span>© 2026 Smart Discussion Forum. All rights reserved.</span>
+            <div></div>
         </div>
 
     </div>
+
+    {{-- PLATFORM RULES / TERMS OF SERVICE MODAL --}}
+    <x-modal name="rules" maxWidth="2xl">
+        <div class="px-8 py-5 border-b border-gray-200">
+            <h3 class="font-semibold text-gray-800">Platform Rules and Terms of Service</h3>
+            <p class="text-xs text-gray-400 mt-1">Version 1.0.0 · Last Updated June 2026</p>
+        </div>
+
+        <div class="max-h-[60vh] overflow-y-auto px-8 py-6 space-y-6 text-sm text-gray-600">
+
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-2">1. Acceptable Use Policy</h4>
+                <p class="mb-2">Users of the ACES are strictly prohibited
+                    from utilizing the system for any purpose other than authorized academic
+                    discussion and learning.</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-500">
+                    <li>All identity information provided must be verifiable through
+                        official university records.</li>
+                    <li>Automated scripts or bot interactions are strictly prohibited.</li>
+                    <li>Users are responsible for maintaining the confidentiality
+                        of their credentials.</li>
+                    <li>Data scraping of internal content is a violation of this policy.</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-2">2. Data Privacy &amp; Processing</h4>
+                <p class="mb-2">The ACES processes submitted data under
+                    applicable data protection frameworks. Your identification and email
+                    are encrypted at rest.</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-500">
+                    <li>Data is stored for the duration of your academic tenure.</li>
+                    <li>Personal data is never shared with third-party vendors.</li>
+                    <li>System logs include IP address and interaction timestamps
+                        for security auditing.</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-2">3. Academic Integrity</h4>
+                <p class="mb-2">All forum contributions must represent the student's own
+                    thoughts and ideas.</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-500">
+                    <li>Plagiarism or copying of other students' posts is prohibited.</li>
+                    <li>Respectful and constructive engagement is required at all times.</li>
+                    <li>Offensive, abusive, or discriminatory content will result in
+                        immediate account suspension.</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-2">4. Quiz Conduct</h4>
+                <ul class="list-disc list-inside space-y-1 text-gray-500">
+                    <li>Quiz sessions are timed and monitored.</li>
+                    <li>Attempting to share quiz questions or answers is strictly
+                        prohibited.</li>
+                    <li>Any form of cheating will result in a zero grade and
+                        disciplinary action.</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-2">5. Account Termination</h4>
+                <p class="text-gray-500">The administration reserves the right to suspend
+                    or permanently remove any account that violates these terms without
+                    prior notice.</p>
+            </div>
+
+        </div>
+
+        <div class="px-8 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+            <p class="text-xs text-gray-500">
+                Please read all terms before checking the box on the registration form.
+            </p>
+            <button type="button" x-on:click="$dispatch('close')"
+                class="bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-700">
+                Close
+            </button>
+        </div>
+    </x-modal>
 
     {{-- Show/hide Student Number --}}
     <script>

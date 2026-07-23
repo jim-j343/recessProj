@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Discussion Forum — mirrors web forum/index.blade.php (top-nav layout) -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.ForumDashboardController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <VBox>
+            <!-- NAV BAR -->
+            <HBox styleClass="navbar" alignment="CENTER_LEFT">
+<javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+                <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
+                <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
+                <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
+                <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
+                <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
+                <Label fx:id="navMembers" text="Members" styleClass="nav-link" onMouseClicked="#onMembers" managed="false" visible="false"/>
+                <Label fx:id="navAnalytics" text="Analytics" styleClass="nav-link" onMouseClicked="#onAnalytics" managed="false" visible="false"/>
+                <Label fx:id="navModeration" text="Moderation" styleClass="nav-link" onMouseClicked="#onModeration" managed="false" visible="false"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                    <graphic>
+                        <StackPane>
+                            <Label text="🔔" style="-fx-font-size: 16px;"/>
+                            <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                                   style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                                   StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                                   managed="false" visible="false"/>
+                        </StackPane>
+                    </graphic>
+                    <items>
+                    </items>
+                </MenuButton>
+                <MenuButton styleClass="btn-ghost" text="">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                            <Label fx:id="userNameLabel" text="Signed in"/>
+                            <Label fx:id="userMetaLabel" text="Student" visible="false" managed="false"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                    </items>
+                </MenuButton>
+            </HBox>
+            <!-- HEADER BAND -->
+            <HBox styleClass="page-header" alignment="CENTER_LEFT">
+                <Label text="Discussion Forum" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ New Topic" styleClass="btn,btn-primary" onAction="#onNewTopic"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="16" maxWidth="1152">
+                    <!-- Search bar card -->
+                    <VBox styleClass="card">
+                        <TextField fx:id="searchField" promptText="Search topics..." maxWidth="Infinity"/>
+                    </VBox>
+
+                    <!-- Topic list (rows injected by controller) -->
+                    <VBox styleClass="card" spacing="0">
+                        <Label text="Recent Discussions" styleClass="card-title"/>
+                        <Region styleClass="divider" prefHeight="1"><VBox.margin><Insets top="14" bottom="6"/></VBox.margin></Region>
+                        <VBox fx:id="discussionList" spacing="0"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
+</BorderPane>
+
+

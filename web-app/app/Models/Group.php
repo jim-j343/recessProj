@@ -12,13 +12,9 @@ class Group extends Model
     protected $primaryKey = 'group_id';
 
     protected $fillable = [
-        'admin_id',
-        'name',
-        'description',
-        'inactivity_warning_days',
-        'blacklist_duration_days',
+        'admin_id', 'name', 'course_name', 'description',
+        'inactivity_warning_days', 'blacklist_duration_days',
     ];
-
     public function topics()
     {
         return $this->hasMany(Topic::class, 'group_id', 'group_id');
@@ -29,13 +25,24 @@ class Group extends Model
         return $this->hasMany(GroupMembership::class, 'group_id', 'group_id');
     }
 
+    public function members()
+    {
+        return $this->belongsToMany(
+            User::class, 'group_membership',
+            'group_id', 'user_id', 'group_id', 'user_id'
+        )->withPivot('role', 'status', 'joined_at');
+    }
+
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id', 'user_id');
     }
-    public function members()
+
+    public function isMember(int $userId): bool
     {
-        return $this->belongsToMany(User::class, 'group_membership', 'group_id', 'user_id')
-                    ->withPivot('role', 'status', 'joined_at');
+        return $this->memberships()
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
     }
 }

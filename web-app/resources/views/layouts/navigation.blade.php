@@ -15,16 +15,23 @@
                         Dashboard
                     </x-nav-link>
 
-                    @if(auth()->user()->role === 'student')
+                    <x-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.*')">
+                        Groups
+                    </x-nav-link>
+
+                    @if(auth()->user()->system_role === 'student')
                         <x-nav-link :href="route('participation.index')" :active="request()->routeIs('participation.index')">
                             My Progress
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->role === 'lecturer')
-                        <x-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
-                            New Topic
-                        </x-nav-link>
+                        @if(auth()->user()->system_role !== 'system_admin')
+                            <x-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
+                                New Topic
+                            </x-nav-link>
+                        @endif
+
+                    @if(auth()->user()->system_role === 'lecturer')
                         <x-nav-link :href="route('quiz.create')" :active="request()->routeIs('quiz.create')">
                             Quiz Center
                         </x-nav-link>
@@ -33,23 +40,70 @@
                         </x-nav-link>
                     @endif
 
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->system_role === 'system_admin')
                         <x-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                             Members
                         </x-nav-link>
                         <x-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                             Analytics
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                            Moderation
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
 
-            {{-- DESKTOP: Profile Dropdown --}}
-            <div class="hidden lg:flex lg:items-center lg:ms-6">
+            {{-- DESKTOP: Notifications + Profile --}}
+            <div class="hidden lg:flex lg:items-center lg:ms-6 lg:gap-1">
+                <x-dropdown align="right" width="w-80">
+                    <x-slot name="trigger">
+                        <button class="relative inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none transition ease-in-out duration-150">
+                            <x-icon name="bell" class="w-5 h-5" />
+                            @if($unreadNotificationsCount > 0)
+                                <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-4 min-w-[1rem] px-1 rounded-full bg-red-500 text-white text-[10px] leading-none">
+                                    {{ $unreadNotificationsCount > 9 ? '9+' : $unreadNotificationsCount }}
+                                </span>
+                            @endif
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        <div class="px-4 py-2 flex items-center justify-between border-b border-gray-100">
+                            <span class="text-sm font-semibold text-gray-700">Notifications</span>
+                            @if($unreadNotificationsCount > 0)
+                                <form method="POST" action="{{ route('notifications.readAll') }}">
+                                    @csrf
+                                    <button type="submit" class="text-xs text-indigo-600 hover:text-indigo-800">
+                                        Mark all read
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+
+                        @forelse($unreadNotifications as $notification)
+                            <form method="POST" action="{{ route('notifications.read', $notification) }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2.5 flex items-start gap-2.5 hover:bg-gray-50">
+                                    <x-icon :name="$notification->icon()" class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                                    <span class="text-sm text-gray-600">{{ $notification->message() }}</span>
+                                </button>
+                            </form>
+                        @empty
+                            <div class="px-4 py-3 text-sm text-gray-400">You're all caught up.</div>
+                        @endforelse
+
+                        <x-dropdown-link :href="route('notifications.index')">
+                            <span class="text-indigo-600">View all notifications</span>
+                        </x-dropdown-link>
+                    </x-slot>
+                </x-dropdown>
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                        <button class="inline-flex items-center gap-2 px-2 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <x-avatar :name="Auth::user()->username" size="w-8 h-8" />
+                            <div>{{ Auth::user()->username }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -59,12 +113,20 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.edit')">
+                            <span class="inline-flex items-center gap-2">
+                                <x-icon name="badge-check" class="w-4 h-4 text-gray-400" />
+                                Profile
+                            </span>
+                        </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();">
-                                Log Out
+                                <span class="inline-flex items-center gap-2">
+                                    <x-icon name="logout" class="w-4 h-4 text-gray-400" />
+                                    Log Out
+                                </span>
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -89,17 +151,34 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 🏠 Dashboard
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.*')">
+                👥 Groups
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+                <span class="inline-flex items-center gap-2">
+                    🔔 Notifications
+                    @if($unreadNotificationsCount > 0)
+                        <span class="inline-flex items-center justify-center h-4 min-w-[1rem] px-1 rounded-full bg-red-500 text-white text-[10px] leading-none">
+                            {{ $unreadNotificationsCount > 9 ? '9+' : $unreadNotificationsCount }}
+                        </span>
+                    @endif
+                </span>
+            </x-responsive-nav-link>
 
-            @if(auth()->user()->role === 'student')
+            @if(auth()->user()->system_role === 'student')
                 <x-responsive-nav-link :href="route('participation.index')" :active="request()->routeIs('participation.index')">
                     📊 My Progress
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->role === 'lecturer')
-                <x-responsive-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
-                    ✏️ New Topic
-                </x-responsive-nav-link>
+                @if(auth()->user()->system_role !== 'system_admin')
+                    <x-responsive-nav-link :href="route('topics.create')" :active="request()->routeIs('topics.create')">
+                        ✏️ New Topic
+                    </x-responsive-nav-link>
+                @endif
+
+            @if(auth()->user()->system_role === 'lecturer')
+
                 <x-responsive-nav-link :href="route('quiz.create')" :active="request()->routeIs('quiz.create')">
                     📝 Quiz Center
                 </x-responsive-nav-link>
@@ -108,32 +187,44 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(auth()->user()->role === 'admin')
+            @if(auth()->user()->system_role === 'system_admin')
                 <x-responsive-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')">
                     👥 Members
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.analytics')" :active="request()->routeIs('admin.analytics')">
                     📈 Analytics
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.removals')" :active="request()->routeIs('admin.removals') || request()->routeIs('admin.reports')">
+                    🛡️ Moderation
+                </x-responsive-nav-link>
             @endif
         </div>
 
         {{-- MOBILE: Profile --}}
         <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            <div class="px-4 flex items-center gap-3">
+                <x-avatar :name="Auth::user()->username" size="w-10 h-10" />
+                <div>
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->username }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    Profile
+                    <span class="inline-flex items-center gap-2">
+                        <x-icon name="badge-check" class="w-4 h-4 text-gray-400" />
+                        Profile
+                    </span>
                 </x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
                         onclick="event.preventDefault(); this.closest('form').submit();">
-                        Log Out
+                        <span class="inline-flex items-center gap-2">
+                            <x-icon name="logout" class="w-4 h-4 text-gray-400" />
+                            Log Out
+                        </span>
                     </x-responsive-nav-link>
                 </form>
             </div>

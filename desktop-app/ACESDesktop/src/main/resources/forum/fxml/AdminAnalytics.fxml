@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Admin Analytics — mirrors web admin/analytics.blade.php -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="forum.controllers.AdminAnalyticsController"
+            stylesheets="@../css/aces.css" styleClass="root"
+            prefWidth="1280" prefHeight="820">
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT">
+            <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+            <Label text="Dashboard" onMouseClicked="#onDashboard" styleClass="nav-link"/>
+            <Label text="Groups" onMouseClicked="#onGroups" styleClass="nav-link"/>
+
+            <Label text="Members" onMouseClicked="#onMembers" styleClass="nav-link"/>
+            <Label text="Analytics" onMouseClicked="#onAnalytics" styleClass="nav-link,active"/>
+            <Label text="Moderation" onMouseClicked="#onModeration" styleClass="nav-link"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <!-- Notification bell -->
+            <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
+                <graphic>
+                    <StackPane>
+                        <Label text="🔔" style="-fx-font-size: 16px;"/>
+                        <Label fx:id="notifBadge" text="" styleClass="badge,badge-danger"
+                               style="-fx-font-size: 9px; -fx-padding: 0 4; -fx-background-radius: 10;"
+                               StackPane.alignment="TOP_RIGHT" translateY="-4" translateX="4"
+                               managed="false" visible="false"/>
+                    </StackPane>
+                </graphic>
+                <items>
+                    <!-- Items populated by NavbarHelper.loadNotifications() -->
+                </items>
+            </MenuButton>
+
+            <!-- Profile Dropdown -->
+            <MenuButton styleClass="btn-ghost" text="">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label fx:id="avatarLabel" styleClass="avatar" minWidth="32" minHeight="32" text="?"/>
+                        <Label fx:id="userNameLabel" text="Signed in"/>
+                    </HBox>
+                </graphic>
+                <items>
+                    <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                </items>
+            </MenuButton>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="content-50">
+            <VBox alignment="TOP_CENTER">
+                <VBox spacing="24" maxWidth="1152">
+
+                    <!-- Heading row -->
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="4">
+                            <Label text="Academic Insights" styleClass="h-lg"/>
+                            <Label text="Real-time performance metrics for the current semester." styleClass="muted"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                    </HBox>
+
+                    <!-- Stat cards -->
+                    <HBox spacing="16">
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="TOTAL MEMBERS" styleClass="eyebrow"/>
+                            <Label fx:id="totalMembersLabel" text="-" styleClass="metric-value"/>
+                        </VBox>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="ACTIVE THIS WEEK" styleClass="eyebrow"/>
+                            <Label fx:id="activeThisWeekLabel" text="-" styleClass="metric-value"/>
+                            <Label fx:id="activeThisWeekMetaLabel" text="-" styleClass="subtle"/>
+                        </VBox>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="WARNINGS THIS WEEK" styleClass="eyebrow"/>
+                            <Label fx:id="warningsThisWeekLabel" text="-" styleClass="metric-value"/>
+                        </VBox>
+                        <VBox styleClass="card-flat" spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="ACTIVE BLACKLISTS" styleClass="eyebrow"/>
+                            <Label fx:id="activeBlacklistsLabel" text="-" styleClass="metric-value"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Chart + system status -->
+                    <HBox spacing="24">
+                        <VBox styleClass="card-flat" spacing="16" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT">
+                                <VBox><Label text="Post Volume Traffic" styleClass="card-title"/><Label text="Engagement across all modules this week" styleClass="subtle"/></VBox>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="● Live" style="-fx-text-fill:#16a34a; -fx-font-size:12px; -fx-font-weight:600;"/>
+                            </HBox>
+                            <VBox fx:id="postVolumeBox" spacing="8"/>
+                        </VBox>
+
+                        <VBox spacing="16" prefWidth="300" minWidth="300">
+                            <VBox styleClass="card-flat" spacing="4">
+                                <Label text="GROUP AVERAGE PERFORMANCE" styleClass="eyebrow"/>
+                                <VBox fx:id="groupPerformanceBox" spacing="6"/>
+                            </VBox>
+                            <VBox styleClass="card-flat" spacing="4">
+                                <Label text="GROUP ACTIVITY" styleClass="eyebrow"/>
+                                <VBox fx:id="groupActivityBox" spacing="6"/>
+                            </VBox>
+                            <Label fx:id="statusLabel" text="Loading..." managed="false" visible="false" styleClass="muted" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Lecturer Performance -->
+                    <VBox styleClass="card-flat" spacing="16">
+                        <VBox>
+                            <Label text="Lecturer Performance" styleClass="card-title"/>
+                            <Label text="Quiz average and grading activity per lecturer" styleClass="subtle"/>
+                        </VBox>
+                        <TableView fx:id="lecturerTable" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="colLecturer" text="LECTURER" prefWidth="200"/>
+                                <TableColumn fx:id="colLecturerCourses" text="COURSE(S)" prefWidth="350"/>
+                                <TableColumn fx:id="colLecturerQuizzes" text="QUIZZES SET" prefWidth="120"/>
+                                <TableColumn fx:id="colLecturerAvg" text="AVG SCORE" prefWidth="200"/>
+                                <TableColumn fx:id="colLecturerGraded" text="STUDENTS GRADED" prefWidth="150"/>
+                            </columns>
+                            <placeholder><Label text="No lecturer data available." styleClass="muted"/></placeholder>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Trending + activity -->
+                    <HBox spacing="24">
+                        <VBox styleClass="card-flat" spacing="16" HBox.hgrow="ALWAYS">
+                            <VBox><Label text="Groups" styleClass="card-title"/><Label text="Topic count per group" styleClass="subtle"/></VBox>
+                            <FlowPane fx:id="groupsBox" hgap="8" vgap="8"/>
+                        </VBox>
+
+                        <VBox styleClass="card-flat" spacing="16" prefWidth="360" minWidth="360">
+                            <HBox alignment="CENTER_LEFT"><Label text="Recent Activity" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/></HBox>
+                            <VBox fx:id="recentActivityBox" spacing="8"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
+</BorderPane>
+
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+           fx:controller="forum.controllers.QuizFocusModeController"
+           stylesheets="@../css/aces.css" styleClass="root,focus-bg"
+           prefWidth="1000" prefHeight="720">
+
+    <!-- Timer -->
+    <VBox alignment="TOP_RIGHT" StackPane.alignment="TOP_RIGHT" maxHeight="120">
+        <padding><Insets top="24" right="32"/></padding>
+        <HBox fx:id="timerBox" alignment="CENTER_RIGHT" spacing="8"
+              style="-fx-background-color:white; -fx-background-radius:999;
+                     -fx-border-color:#fecaca; -fx-border-width:1;
+                     -fx-padding:8 16 8 16;">
+            <Label text="⏱" style="-fx-text-fill:#dc2626;"/>
+            <Label fx:id="timerLabel" text="--:--" styleClass="timer-danger"/>
+        </HBox>
+        <Label text="TIME REMAINING"
+               style="-fx-text-fill:#dc2626; -fx-font-size:11px; -fx-font-weight:bold;"/>
+    </VBox>
+
+    <!-- Quiz card -->
+    <VBox fx:id="quizCard" styleClass="quiz-card"
+          maxWidth="576" maxHeight="560" spacing="0"
+          StackPane.alignment="CENTER">
+
+        <!-- Progress bar: indigo fill on gray track, 4px, fully rounded (matches web) -->
+        <StackPane fx:id="progressBarPane" maxWidth="Infinity" minHeight="4" prefHeight="4" maxHeight="4" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #f3f4f6;" minHeight="4" prefHeight="4" maxHeight="4" maxWidth="Infinity"/>
+            <Region fx:id="progressFill" style="-fx-background-color: #4f46e5;" minHeight="4" prefHeight="4" maxHeight="4" prefWidth="0" maxWidth="0"/>
+        </StackPane>
+
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-padding:16 24 16 24; -fx-border-color:#f3f4f6;
+                     -fx-border-width:0 0 1 0;">
+            <VBox>
+                <Label fx:id="quizTitleLabel" styleClass="card-title"/>
+                <Label fx:id="questionIndexLabel" styleClass="subtle"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="🔒 LOCKED" styleClass="badge,badge-neutral"/>
+        </HBox>
+
+        <!-- Question -->
+        <VBox spacing="20" style="-fx-padding:32;">
+            <Label fx:id="questionTextLabel" styleClass="h-md" wrapText="true"/>
+            <VBox fx:id="answersBox" spacing="12"/>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Footer -->
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-padding:16 24 16 24; -fx-background-color:#f9fafb;
+                     -fx-border-color:#f3f4f6; -fx-border-width:1 0 0 0;">
+            <Button fx:id="prevBtn" text="← Previous"
+                    styleClass="btn,btn-ghost" onAction="#onPrev"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="nextBtn" text="Next →"
+                    styleClass="btn,btn-dark"  onAction="#onNext"/>
+            <Button fx:id="submitBtn" text="Submit Quiz"
+                    styleClass="btn,btn-primary"
+                    onAction="#onSubmit"
+                    managed="false" visible="false"/>
+        </HBox>
+    </VBox>
+
+    <VBox alignment="BOTTOM_CENTER" StackPane.alignment="BOTTOM_CENTER"
+          pickOnBounds="false">
+        <padding><Insets bottom="16"/></padding>
+        <Label text="👁 Navigation disabled during assessment" styleClass="subtle"/>
+    </VBox>
+</StackPane>

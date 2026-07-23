@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.SVGPath?>
+<?import forum.ui.RevealPasswordField?>
+<?import forum.ui.IconTextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<!-- Login screen — mirrors web auth/login.blade.php (centered Breeze card) -->
+<StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.LoginController"
+           stylesheets="@../css/aces.css" styleClass="root,auth-canvas"
+           prefWidth="900" prefHeight="680">
+    <!-- role ToggleGroup retained for controller wiring; role is resolved from the account -->
+    <fx:define>
+        <ToggleGroup fx:id="role"/>
+    </fx:define>
+
+    <VBox alignment="CENTER" maxWidth="448" spacing="16">
+        <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+        <VBox styleClass="auth-card" spacing="0" maxWidth="448">
+
+            <VBox alignment="CENTER" spacing="4">
+                <padding><Insets bottom="24"/></padding>
+                <ImageView fitWidth="110" fitHeight="110" preserveRatio="true">
+                    <VBox.margin><Insets bottom="12"/></VBox.margin>
+                    <image><Image url="@../images/logo.jpg"/></image>
+                </ImageView>
+                <Label text="Sign in to continue to your account" styleClass="muted"/>
+            </VBox>
+
+            <!-- Email -->
+            <VBox spacing="6">
+                <VBox.margin><Insets bottom="16"/></VBox.margin>
+                <Label text="Email address" styleClass="field-label"/>
+                <IconTextField fx:id="emailField" icon="mail" promptText="j.doe@university.ac.ug" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Password -->
+            <VBox spacing="6">
+                <VBox.margin><Insets bottom="16"/></VBox.margin>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Password" styleClass="field-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Hyperlink text="Forgot password?" onAction="#onForgotPassword" styleClass="subtle"/>
+                </HBox>
+                <RevealPasswordField fx:id="passwordField" promptText="Enter your password" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Remember me -->
+            <HBox alignment="CENTER_LEFT">
+                <padding><Insets bottom="20"/></padding>
+                <CheckBox fx:id="rememberMe" text="Keep me signed in"/>
+            </HBox>
+
+            <Label fx:id="errorLabel" wrapText="true" managed="false" visible="false" style="-fx-text-fill:#dc2626; -fx-font-size:13px;">
+                <VBox.margin><Insets bottom="10"/></VBox.margin>
+            </Label>
+
+            <!-- Submit -->
+            <Button fx:id="signInButton" text="SIGN IN" styleClass="btn,btn-dark" maxWidth="Infinity" onAction="#onSignIn"/>
+
+            <!-- Divider -->
+            <HBox alignment="CENTER" spacing="12">
+                <padding><Insets top="20" bottom="20"/></padding>
+                <Region styleClass="divider-or" HBox.hgrow="ALWAYS"/>
+                <Label text="or" styleClass="subtle"/>
+                <Region styleClass="divider-or" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <!-- Register link -->
+            <HBox alignment="CENTER" spacing="4">
+                <Label text="New to the forum?" styleClass="muted"/>
+                <Hyperlink fx:id="signUpLink" text="Create an account" onAction="#onSignUp"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>
+

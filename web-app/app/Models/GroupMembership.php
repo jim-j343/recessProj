@@ -1,5 +1,4 @@
 <?php
-// app/Models/GroupMembership.php
 
 namespace App\Models;
 
@@ -12,7 +11,11 @@ class GroupMembership extends Model
     protected $primaryKey = null;
     public $incrementing = false;
 
-    protected $fillable = ['user_id', 'group_id', 'role', 'status', 'joined_at'];
+    protected $fillable = [
+        'user_id', 'group_id', 'role', 'status', 'joined_at',
+    ];
+
+    protected $casts = ['joined_at' => 'datetime'];
 
     public function user()
     {
