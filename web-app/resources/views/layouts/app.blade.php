@@ -32,6 +32,7 @@
         </main>
 
         @include('layouts.footer')
+        @include('layouts.platform-rules-modal')
 
     </div>
 
