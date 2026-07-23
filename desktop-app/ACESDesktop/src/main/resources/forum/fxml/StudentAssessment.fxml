@@ -18,6 +18,7 @@
             <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
             <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
             <Label text="My Progress" styleClass="nav-link,active"/>
+            <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
             <Region HBox.hgrow="ALWAYS"/>
             <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                 <graphic>
@@ -70,44 +71,52 @@
 
                     <HBox spacing="24">
                         <!-- Participation metrics -->
-                        <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
-                            <Label text="Participation Metrics" styleClass="card-title"/>
-                            <Label text="Your Real Engagement Data" styleClass="eyebrow"/>
-
-                            <Label text="Your Activity (Last 7 Days)" styleClass="subtle"/>
-                            <HBox fx:id="activityChartBox" spacing="10" alignment="BOTTOM_LEFT" prefHeight="96"/>
-                            <HBox fx:id="activityLabelsBox" spacing="10"/>
-
-                            <Region styleClass="divider" prefHeight="1"/>
+                        <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS" prefWidth="500">
                             <VBox spacing="4">
+                                <Label text="Participation Metrics" styleClass="card-title" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                <Label text="YOUR REAL ENGAGEMENT DATA" styleClass="subtle" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                            </VBox>
+                            <Label text="Your Activity (Last 7 Days)" styleClass="muted" style="-fx-padding: 10 0 0 0;"/>
+                            <!-- Dynamic chart: bars populated by controller from API -->
+                            <HBox fx:id="activityChartBox" spacing="10" alignment="BOTTOM_LEFT" prefHeight="140" style="-fx-padding: 0 10 0 10;"/>
+                            <HBox fx:id="activityLabelsBox" spacing="10" style="-fx-padding: 0 10 0 10;"/>
+                            <Region styleClass="divider" prefHeight="1" style="-fx-background-color: transparent;"/>
+                            <VBox spacing="4" style="-fx-padding: 10 0 0 0;">
+                                <!-- Participation row: label + % + custom bar -->
                                 <HBox alignment="CENTER_LEFT">
-                                    <Label text="Forum Participation" styleClass="muted"/>
+                                    <Label text="Forum Participation" styleClass="muted" style="-fx-text-fill: #334155;"/>
                                     <Region HBox.hgrow="ALWAYS"/>
-                                    <Label fx:id="participationPctLabel" text="—" styleClass="label-strong"/>
+                                    <Label fx:id="participationPctLabel" text="—" styleClass="label-strong" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                                 </HBox>
-                                <ProgressBar fx:id="participationProgressBar" progress="0" maxWidth="Infinity"/>
-                                <Label fx:id="participationSubLabel" styleClass="subtle" wrapText="true"/>
+                                <!-- Custom bar: dark fill on gray track, 6px —- matches web -->
+                                <StackPane fx:id="participationBarPane" maxWidth="Infinity" minHeight="6" prefHeight="6" maxHeight="6" alignment="CENTER_LEFT">
+                                    <Region style="-fx-background-color: #e2e8f0; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" maxWidth="Infinity"/>
+                                    <Region fx:id="participationBarFill" style="-fx-background-color: #1e293b; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" prefWidth="0" maxWidth="0"/>
+                                </StackPane>
+                                <Label fx:id="participationSubLabel" text="Loading..." styleClass="subtle" style="-fx-font-size: 11px;"/>
                             </VBox>
                         </VBox>
 
                         <!-- Assessment history -->
-                        <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
-                            <Label text="Assessment History" styleClass="card-title"/>
+                        <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS" prefWidth="600">
+                            <Label text="Assessment History" styleClass="card-title" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="QUIZ" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="300" HBox.hgrow="ALWAYS"/>
+                                <Label text="SCORE" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="80" alignment="CENTER"/>
+                                <Label text="VS PEER AVG" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="100" alignment="CENTER"/>
+                            </HBox>
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <!-- Dynamic rows populated by controller from API -->
                             <VBox fx:id="assessmentHistoryBox" spacing="0"/>
-                            <Label fx:id="assessmentEmptyLabel" text="No completed quizzes yet."
-                                   styleClass="subtle" wrapText="true" managed="false" visible="false"/>
                         </VBox>
                     </HBox>
 
-                    <!-- Lecturer's remark, or empty state -->
-                    <VBox fx:id="remarkBox" styleClass="card-dark" spacing="12" managed="false" visible="false">
-                        <Label text="Lecturer's Remark" styleClass="eyebrow-invert"/>
-                        <Label fx:id="remarkQuoteLabel" styleClass="body-invert" wrapText="true"/>
-                        <Label fx:id="remarkMetaLabel" style="-fx-text-fill:#6b7280; -fx-font-size:11px;"/>
-                    </VBox>
-                    <VBox fx:id="noRemarkBox" styleClass="card-flat" alignment="CENTER" managed="false" visible="false">
-                        <Label text="No lecturer remarks yet — these appear here once a lecturer grades your participation."
-                               styleClass="subtle" wrapText="true" style="-fx-text-alignment:center;"/>
+                    <!-- Lecturer's remark: dynamic from API -->
+                    <VBox styleClass="card-dark" spacing="12" style="-fx-background-color: #0f172a; -fx-background-radius: 8; -fx-padding: 24;">
+                        <Label text="Lecturer's Remark" styleClass="eyebrow-invert" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label fx:id="remarkLabel" text="No remarks yet."
+                            styleClass="body-invert" wrapText="true" style="-fx-text-fill: #cbd5e1; -fx-font-style: italic; -fx-font-size: 14px;"/>
+                        <Label fx:id="remarkMetaLabel" text="" styleClass="subtle" style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
                     </VBox>
                 </VBox>
             </VBox>

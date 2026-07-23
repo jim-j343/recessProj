@@ -20,7 +20,7 @@ public class PostDao {
     public List<Post> listByTopic(long topicId) {
         String sql = """
             SELECT p.post_id, p.topic_id, p.author_id, p.parent_post_id, p.content,
-                   p.is_synced, p.created_at, COALESCE(u.username, u.email) AS author
+                   p.is_synced, p.created_at, COALESCE(p.author_name, COALESCE(u.username, u.email)) AS author
             FROM posts p LEFT JOIN users u ON u.user_id = p.author_id
             WHERE p.topic_id = ?
             ORDER BY p.created_at ASC, p.post_id ASC""";
@@ -39,13 +39,15 @@ public class PostDao {
 
     /** Create a reply locally (is_synced = 0) and queue it for sync. */
     public Post create(long topicId, long authorId, Long parentPostId, String content) {
-        String sql = "INSERT INTO posts(topic_id, author_id, parent_post_id, content, is_synced) VALUES(?,?,?,?,0)";
+        String authorName = getAuthorName(authorId);
+        String sql = "INSERT INTO posts(topic_id, author_id, parent_post_id, content, author_name, is_synced) VALUES(?,?,?,?,?,0)";
         try (Connection c = SQLiteConnection.get();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, topicId);
             ps.setLong(2, authorId);
             if (parentPostId == null) ps.setNull(3, Types.INTEGER); else ps.setLong(3, parentPostId);
             ps.setString(4, content);
+            ps.setString(5, authorName);
             ps.executeUpdate();
             long id = 0;
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -55,6 +57,7 @@ public class PostDao {
             Post p = new Post();
             p.setPostId(id); p.setTopicId(topicId); p.setAuthorId(authorId);
             p.setParentPostId(parentPostId); p.setContent(content); p.setSynced(false);
+            p.setAuthorName(authorName);
             return p;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,13 +71,15 @@ public class PostDao {
      * so the post must not be uploaded again as a duplicate reply.
      */
     public Post createLocalOnly(long topicId, long authorId, Long parentPostId, String content) {
-        String sql = "INSERT INTO posts(topic_id, author_id, parent_post_id, content, is_synced) VALUES(?,?,?,?,0)";
+        String authorName = getAuthorName(authorId);
+        String sql = "INSERT INTO posts(topic_id, author_id, parent_post_id, content, author_name, is_synced) VALUES(?,?,?,?,?,0)";
         try (Connection c = SQLiteConnection.get();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, topicId);
             ps.setLong(2, authorId);
             if (parentPostId == null) ps.setNull(3, Types.INTEGER); else ps.setLong(3, parentPostId);
             ps.setString(4, content);
+            ps.setString(5, authorName);
             ps.executeUpdate();
             long id = 0;
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -83,6 +88,7 @@ public class PostDao {
             Post p = new Post();
             p.setPostId(id); p.setTopicId(topicId); p.setAuthorId(authorId);
             p.setParentPostId(parentPostId); p.setContent(content); p.setSynced(false);
+            p.setAuthorName(authorName);
             return p;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,7 +99,7 @@ public class PostDao {
     /** A single local post by id (used when pushing a queued reply). */
     public Post findById(long postId) {
         String sql = "SELECT p.post_id, p.topic_id, p.author_id, p.parent_post_id, p.content, "
-                + "p.is_synced, p.created_at, COALESCE(u.username, u.email) AS author "
+                + "p.is_synced, p.created_at, COALESCE(p.author_name, COALESCE(u.username, u.email)) AS author "
                 + "FROM posts p LEFT JOIN users u ON u.user_id = p.author_id WHERE p.post_id = ?";
         try (Connection c = SQLiteConnection.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -110,7 +116,7 @@ public class PostDao {
     /** Insert or update a post pulled from the server (keyed by server id, marked synced). */
     public void upsertFromServer(PostDto dto) {
         String update = "UPDATE posts SET topic_id = ?, author_id = ?, parent_post_id = ?, "
-                + "content = ?, is_synced = 1, server_id = ?, created_at = COALESCE(?, created_at) "
+                + "content = ?, author_name = ?, is_synced = 1, server_id = ?, created_at = COALESCE(?, created_at) "
                 + "WHERE server_id = ?";
         try (Connection c = SQLiteConnection.get()) {
             int rows;
@@ -119,23 +125,25 @@ public class PostDao {
                 ps.setLong(2, dto.author_id);
                 if (dto.parent_post_id == null) ps.setNull(3, Types.INTEGER); else ps.setLong(3, dto.parent_post_id);
                 ps.setString(4, dto.content);
-                ps.setLong(5, dto.post_id);
-                ps.setString(6, dto.created_at);
-                ps.setLong(7, dto.post_id);
+                ps.setString(5, dto.author);
+                ps.setLong(6, dto.post_id);
+                ps.setString(7, dto.created_at);
+                ps.setLong(8, dto.post_id);
                 rows = ps.executeUpdate();
             }
             if (rows == 0) {
                 String insert = "INSERT OR REPLACE INTO posts"
-                        + "(post_id, topic_id, author_id, parent_post_id, content, is_synced, server_id, created_at) "
-                        + "VALUES(?,?,?,?,?,1,?,?)";
+                        + "(post_id, topic_id, author_id, parent_post_id, content, author_name, is_synced, server_id, created_at) "
+                        + "VALUES(?,?,?,?,?,?,1,?,?)";
                 try (PreparedStatement pi = c.prepareStatement(insert)) {
                     pi.setLong(1, dto.post_id);
                     pi.setLong(2, dto.topic_id);
                     pi.setLong(3, dto.author_id);
                     if (dto.parent_post_id == null) pi.setNull(4, Types.INTEGER); else pi.setLong(4, dto.parent_post_id);
                     pi.setString(5, dto.content);
-                    pi.setLong(6, dto.post_id);
-                    pi.setString(7, dto.created_at);
+                    pi.setString(6, dto.author);
+                    pi.setLong(7, dto.post_id);
+                    pi.setString(8, dto.created_at);
                     pi.executeUpdate();
                 }
             }
@@ -157,29 +165,6 @@ public class PostDao {
         }
     }
 
-    /** Removes a post from the local cache after it's been deleted server-side. */
-    public void deleteLocal(long postId) {
-        try (Connection c = SQLiteConnection.get();
-             PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE post_id = ?")) {
-            ps.setLong(1, postId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /** Updates a post's cached content after a successful server-side edit. */
-    public void updateContentLocal(long postId, String content) {
-        try (Connection c = SQLiteConnection.get();
-             PreparedStatement ps = c.prepareStatement("UPDATE posts SET content = ? WHERE post_id = ?")) {
-            ps.setString(1, content);
-            ps.setLong(2, postId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     private Post map(ResultSet rs) throws SQLException {
         Post p = new Post();
         p.setPostId(rs.getLong("post_id"));
@@ -192,6 +177,23 @@ public class PostDao {
         p.setCreatedAt(rs.getString("created_at"));
         p.setAuthorName(rs.getString("author"));
         return p;
+    }
+
+    private String getAuthorName(long userId) {
+        String sql = "SELECT COALESCE(username, email) AS name FROM users WHERE user_id = ?";
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("name");
+                    return (name != null && !name.isBlank()) ? name : null;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void deleteLocally(long postId) {

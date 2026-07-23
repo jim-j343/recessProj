@@ -1,22 +1,25 @@
 package forum.controllers;
 
 import forum.api.ApiClient;
-import forum.api.ApiException;
 import forum.api.dto.StudentProgressDto;
 import forum.app.SceneManager;
 import forum.app.Session;
+import forum.models.Role;
 import forum.models.User;
 import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
 
 public class StudentAssessmentController {
 
@@ -24,20 +27,22 @@ public class StudentAssessmentController {
     @FXML private Label      userNameLabel;
     @FXML private MenuButton notifButton;
     @FXML private Label      notifBadge;
+    @FXML private Label      navNewTopic;
 
-    @FXML private HBox        activityChartBox;
-    @FXML private HBox        activityLabelsBox;
-    @FXML private Label       participationPctLabel;
-    @FXML private ProgressBar participationProgressBar;
-    @FXML private Label       participationSubLabel;
+    // ── Participation card ────────────────────────────────────────────
+    @FXML private HBox    activityChartBox;
+    @FXML private HBox    activityLabelsBox;
+    @FXML private Label   participationPctLabel;
+    @FXML private StackPane participationBarPane;
+    @FXML private Region  participationBarFill;
+    @FXML private Label   participationSubLabel;
 
-    @FXML private VBox  assessmentHistoryBox;
-    @FXML private Label assessmentEmptyLabel;
+    // ── Assessment history ────────────────────────────────────────────
+    @FXML private VBox    assessmentHistoryBox;
 
-    @FXML private VBox  remarkBox;
-    @FXML private Label remarkQuoteLabel;
-    @FXML private Label remarkMetaLabel;
-    @FXML private VBox  noRemarkBox;
+    // ── Lecturer's remark ─────────────────────────────────────────────
+    @FXML private Label   remarkLabel;
+    @FXML private Label   remarkMetaLabel;
 
     private final ApiClient api = new ApiClient();
 
@@ -47,10 +52,14 @@ public class StudentAssessmentController {
         if (u != null) {
             if (avatarLabel != null) {
                 String name = u.displayName();
-                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+                avatarLabel.setText(name == null || name.isBlank() ? "?" :
+                    String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
-            if (userNameLabel != null)
-                userNameLabel.setText(u.displayName());
+            if (userNameLabel != null) userNameLabel.setText(u.displayName());
+            if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true);
+                navNewTopic.setVisible(true);
+            }
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadProgress();
@@ -59,119 +68,133 @@ public class StudentAssessmentController {
     private void loadProgress() {
         String token = Session.authToken();
         if (token == null) return;
-
-        Thread worker = new Thread(() -> {
+        new Thread(() -> {
             try {
                 StudentProgressDto dto = api.studentProgress(token);
                 Platform.runLater(() -> render(dto));
-            } catch (ApiException | java.io.IOException | InterruptedException e) {
+            } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             }
-        }, "student-progress-load");
-        worker.setDaemon(true);
-        worker.start();
+        }, "assessment-load").start();
     }
 
     private void render(StudentProgressDto dto) {
-        renderActivityChart(dto);
+        // ── 1. Activity bar chart (last 7 days) ─────────────────────
+        renderActivityChart(dto.activityByDay);
 
-        int pct = (int) Math.round(dto.participationPct);
-        participationPctLabel.setText(pct + "%");
-        participationProgressBar.setProgress(pct / 100.0);
-        int countedReplies = Math.min(dto.replyCount, 10);
-        participationSubLabel.setText(dto.replyCount + (dto.replyCount == 1 ? " reply" : " replies")
-                + " out of " + dto.postCount + " total posts ("
-                + countedReplies + "/10 replies counted — 10 or more reaches 100%)");
+        // ── 2. Participation bar ─────────────────────────────────────
+        double pct = dto.participationPct;
+        if (participationPctLabel != null)
+            participationPctLabel.setText(String.format("%.0f%%", pct));
 
-        renderAssessmentHistory(dto);
-        renderRemark(dto);
+        if (participationBarFill != null && participationBarPane != null) {
+            final double ratio = Math.min(1.0, pct / 100.0);
+            participationBarFill.prefWidthProperty().bind(
+                participationBarPane.widthProperty().multiply(ratio));
+            participationBarFill.maxWidthProperty().bind(
+                participationBarPane.widthProperty().multiply(ratio));
+        }
+
+        if (participationSubLabel != null) {
+            participationSubLabel.setText(
+                dto.replyCount + " replies out of " + dto.postCount + " total posts");
+        }
+
+        // ── 3. Assessment history rows ───────────────────────────────
+        renderAssessmentHistory(dto.assessmentHistory);
+
+        // ── 4. Lecturer's remark ─────────────────────────────────────
+        if (dto.latestRemark != null) {
+            if (remarkLabel != null)
+                remarkLabel.setText("\u201c" + dto.latestRemark.criteria + "\u201d");
+            if (remarkMetaLabel != null)
+                remarkMetaLabel.setText(
+                    String.format("Score: %.1f  \u00B7  %s",
+                        dto.latestRemark.score,
+                        dto.latestRemark.createdAtHuman));
+        }
     }
 
-    private void renderActivityChart(StudentProgressDto dto) {
+    private void renderActivityChart(List<StudentProgressDto.ActivityDay> days) {
+        if (activityChartBox == null || activityLabelsBox == null) return;
         activityChartBox.getChildren().clear();
         activityLabelsBox.getChildren().clear();
-        if (dto.activityByDay == null || dto.activityByDay.isEmpty()) return;
+        if (days == null || days.isEmpty()) return;
 
-        int peak = 1;
-        for (var day : dto.activityByDay) peak = Math.max(peak, day.count);
-
-        for (var day : dto.activityByDay) {
-            double heightPct = Math.max(0.06, (double) day.count / peak);
+        int peak = days.stream().mapToInt(d -> d.count).max().orElse(1);
+        for (StudentProgressDto.ActivityDay day : days) {
+            double heightRatio = (double) day.count / Math.max(1, peak);
+            double barH = Math.max(6, heightRatio * 120); // max 120px
 
             Region bar = new Region();
-            bar.getStyleClass().add("bar");
-            bar.getStyleClass().add(day.count > 0 ? "bar-hi" : "bar-dim");
-            bar.setPrefHeight(96 * heightPct);
+            boolean isToday = day.label != null && day.label.toLowerCase().contains("today");
+            bar.setStyle("-fx-background-color: " + (day.count > 0 ? "#1e293b" : "#e2e8f0")
+                + "; -fx-background-radius: 4 4 0 0;");
+            bar.setPrefHeight(barH);
             bar.setMaxWidth(Double.MAX_VALUE);
 
             VBox col = new VBox(bar);
-            col.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
-            HBox.setHgrow(col, javafx.scene.layout.Priority.ALWAYS);
+            col.setAlignment(Pos.BOTTOM_CENTER);
+            col.setFillWidth(true);
+            HBox.setHgrow(col, Priority.ALWAYS);
             activityChartBox.getChildren().add(col);
 
-            Label label = new Label(day.label);
-            label.getStyleClass().add("subtle");
-            label.setMaxWidth(Double.MAX_VALUE);
-            label.setAlignment(javafx.geometry.Pos.CENTER);
-            HBox.setHgrow(label, javafx.scene.layout.Priority.ALWAYS);
-            activityLabelsBox.getChildren().add(label);
+            Label lbl = new Label(day.label);
+            lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af;");
+            lbl.setMaxWidth(Double.MAX_VALUE);
+            lbl.setAlignment(javafx.geometry.Pos.CENTER);
+            HBox.setHgrow(lbl, Priority.ALWAYS);
+            activityLabelsBox.getChildren().add(lbl);
         }
     }
 
-    private void renderAssessmentHistory(StudentProgressDto dto) {
+    private void renderAssessmentHistory(List<StudentProgressDto.AssessmentItem> items) {
+        if (assessmentHistoryBox == null) return;
         assessmentHistoryBox.getChildren().clear();
-        boolean empty = dto.assessmentHistory == null || dto.assessmentHistory.isEmpty();
-        assessmentEmptyLabel.setManaged(empty);
-        assessmentEmptyLabel.setVisible(empty);
-        if (empty) return;
-
-        for (var item : dto.assessmentHistory) {
-            Label title = new Label(item.title);
-            title.getStyleClass().add("label-strong");
-            Label completed = new Label("Completed " + item.submittedAtHuman);
-            completed.getStyleClass().add("subtle");
-            VBox left = new VBox(2, title, completed);
-
-            Label score = new Label(item.scorePct + "%");
-            score.getStyleClass().add("label-strong");
-
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-
-            HBox row = new HBox(left, spacer, score);
-            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-            if (item.vsPeerPct != null) {
-                boolean positive = item.vsPeerPct >= 0;
-                Label vsPeer = new Label((positive ? "+" : "") + item.vsPeerPct + "%");
-                vsPeer.getStyleClass().add(positive ? "badge-success" : "badge-danger");
-                vsPeer.getStyleClass().add("badge");
-                row.getChildren().add(vsPeer);
-            }
-
-            VBox wrapper = new VBox(row);
-            wrapper.setPadding(new Insets(10, 0, 10, 0));
-
-            if (!assessmentHistoryBox.getChildren().isEmpty()) {
-                Region div = new Region();
-                div.getStyleClass().add("divider");
-                div.setPrefHeight(1);
-                assessmentHistoryBox.getChildren().add(div);
-            }
-            assessmentHistoryBox.getChildren().add(wrapper);
+        if (items == null || items.isEmpty()) {
+            Label empty = new Label("No assessments completed yet.");
+            empty.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 13px; -fx-padding: 8 0;");
+            assessmentHistoryBox.getChildren().add(empty);
+            return;
         }
-    }
+        for (StudentProgressDto.AssessmentItem item : items) {
+            HBox row = new HBox(10);
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setStyle("-fx-padding: 8 0;");
 
-    private void renderRemark(StudentProgressDto dto) {
-        boolean has = dto.latestRemark != null;
-        remarkBox.setManaged(has);
-        remarkBox.setVisible(has);
-        noRemarkBox.setManaged(!has);
-        noRemarkBox.setVisible(!has);
+            VBox titleCol = new VBox(2);
+            Label title = new Label(item.title);
+            title.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
+            Label sub = new Label("Completed " + (item.submittedAtHuman != null ? item.submittedAtHuman : ""));
+            sub.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af;");
+            titleCol.getChildren().addAll(title, sub);
+            HBox.setHgrow(titleCol, Priority.ALWAYS);
+            titleCol.setPrefWidth(300);
 
-        if (has) {
-            remarkQuoteLabel.setText("\"" + dto.latestRemark.criteria + "\"");
-            remarkMetaLabel.setText("Score awarded: " + dto.latestRemark.score + " · " + dto.latestRemark.createdAtHuman);
+            Label score = new Label(String.format("%.1f%%", item.scorePct));
+            score.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-alignment: center;");
+            score.setPrefWidth(80);
+
+            HBox peerBox = new HBox();
+            peerBox.setAlignment(Pos.CENTER);
+            peerBox.setPrefWidth(100);
+            if (item.vsPeerPct != null) {
+                boolean above = item.vsPeerPct >= 0;
+                Label peer = new Label(String.format("%+.1f%%", item.vsPeerPct));
+                peer.setStyle(above
+                    ? "-fx-text-fill: #10b981; -fx-background-color: #d1fae5; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"
+                    : "-fx-text-fill: #ef4444; -fx-background-color: #fee2e2; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;");
+                peerBox.getChildren().add(peer);
+            }
+
+            row.getChildren().addAll(titleCol, score, peerBox);
+            assessmentHistoryBox.getChildren().add(row);
+
+            // Divider between rows
+            Region divider = new Region();
+            divider.setStyle("-fx-background-color: #f3f4f6;");
+            divider.setPrefHeight(1);
+            assessmentHistoryBox.getChildren().add(divider);
         }
     }
 
@@ -179,10 +202,11 @@ public class StudentAssessmentController {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onGroups()  { SceneManager.goGroups(); }
-    @FXML private void onForum()   { SceneManager.goForumDashboard(); }
-    @FXML private void onProfile() { SceneManager.goProfile(); }
-    @FXML private void onLogout()  {
+    @FXML private void onGroups()    { SceneManager.goGroups(); }
+    @FXML private void onNewTopic()  { SceneManager.goTopicCreation(); }
+    @FXML private void onForum()     { SceneManager.goForumDashboard(); }
+    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onLogout()    {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
