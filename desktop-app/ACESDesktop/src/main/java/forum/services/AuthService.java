@@ -23,8 +23,13 @@ import java.io.IOException;
  */
 public class AuthService {
 
-    /** When offline and the email isn't cached, accept it (dev convenience). */
-    private static final boolean MOCK_MODE = true;
+    /**
+     * Mock accounts are useful while developing the UI, but they cannot access
+     * authenticated API features such as groups. Keep them opt-in so a normal
+     * desktop launch never looks like a successful online sign-in without a
+     * Sanctum token. Enable explicitly with {@code -Daces.mockMode=true}.
+     */
+    private static final boolean MOCK_MODE = Boolean.getBoolean("aces.mockMode");
 
     private final UserDao userDao = new UserDao();
     private final ApiClient api = new ApiClient();

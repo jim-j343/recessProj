@@ -12,11 +12,7 @@ public class PostDto {
     public long    author_id;
     public Long    parent_post_id;   // nullable
     public String  content;
-    public boolean is_flagged;
     public String  created_at;
     public String  author;
-
-    // Only present when the caller is this post's own author — mirrors the
-    // "🔒 Hidden from ..." badge on web (forum/show.blade.php).
     public List<String> excluded_usernames;
 }

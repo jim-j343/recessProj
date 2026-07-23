@@ -1,7 +1,5 @@
 package forum.models;
 
-import java.util.List;
-
 /** A post / threaded reply (mirrors the web-app posts table, incl. is_synced). */
 public class Post {
     private long postId;
@@ -14,11 +12,6 @@ public class Post {
 
     // transient
     private String authorName;
-
-    // transient, in-memory only — not persisted to the local cache. Populated
-    // straight from the server response for posts you authored; not saved to
-    // SQLite, so it only reflects what's been fetched this session.
-    private List<String> excludedUsernames;
 
     public Post() { }
 
@@ -38,6 +31,4 @@ public class Post {
     public void setCreatedAt(String v)  { this.createdAt = v; }
     public String getAuthorName()      { return authorName; }
     public void setAuthorName(String v){ this.authorName = v; }
-    public List<String> getExcludedUsernames()      { return excludedUsernames; }
-    public void setExcludedUsernames(List<String> v){ this.excludedUsernames = v; }
 }

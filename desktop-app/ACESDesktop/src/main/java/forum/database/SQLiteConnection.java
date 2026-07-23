@@ -70,6 +70,7 @@ public final class SQLiteConnection {
                 post_id        INTEGER PRIMARY KEY AUTOINCREMENT,
                 topic_id       INTEGER NOT NULL,
                 author_id      INTEGER NOT NULL,
+                author_name    TEXT,
                 parent_post_id INTEGER,
                 content        TEXT NOT NULL,
                 is_flagged     INTEGER NOT NULL DEFAULT 0,
@@ -98,6 +99,12 @@ public final class SQLiteConnection {
             
             try {
                 st.execute("ALTER TABLE topics ADD COLUMN reply_count INTEGER NOT NULL DEFAULT 0");
+            } catch (SQLException ignore) {
+                // column likely already exists
+            }
+            
+            try {
+                st.execute("ALTER TABLE posts ADD COLUMN author_name TEXT");
             } catch (SQLException ignore) {
                 // column likely already exists
             }

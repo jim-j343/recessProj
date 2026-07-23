@@ -67,7 +67,10 @@ public class GroupsIndexController {
 
     private void loadGroups() {
         String token = Session.authToken();
-        if (token == null) { showStatus("Offline — cannot load groups."); return; }
+        if (token == null || token.isBlank()) {
+            showStatus("Groups require an online session. Start the API, then log out and sign in again.");
+            return;
+        }
 
         Thread worker = new Thread(() -> {
             try {

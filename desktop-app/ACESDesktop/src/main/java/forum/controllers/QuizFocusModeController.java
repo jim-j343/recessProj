@@ -12,6 +12,8 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -21,8 +23,9 @@ import java.util.Map;
 
 public class QuizFocusModeController {
 
-    @FXML private Label       timerLabel;
-    @FXML private ProgressBar progressBar;
+    @FXML private Label     timerLabel;
+    @FXML private StackPane progressBarPane;  // outer container (gray track)
+    @FXML private Region    progressFill;     // indigo fill
     @FXML private Label       quizTitleLabel;
     @FXML private Label       questionIndexLabel;
     @FXML private Label       questionTextLabel;
@@ -86,7 +89,16 @@ public class QuizFocusModeController {
                 + " · Multiple Choice");
         questionTextLabel.setText(q.content);
 
-        progressBar.setProgress((double)(index + 1) / questions.size());
+        // Update indigo progress fill — bind width to ratio of questions answered
+        if (progressFill != null && progressBarPane != null) {
+            double ratio = (double)(index + 1) / questions.size();
+            progressFill.prefWidthProperty().unbind();
+            progressFill.maxWidthProperty().unbind();
+            progressFill.prefWidthProperty().bind(
+                progressBarPane.widthProperty().multiply(ratio));
+            progressFill.maxWidthProperty().bind(
+                progressBarPane.widthProperty().multiply(ratio));
+        }
 
         answersBox.getChildren().clear();
         ToggleGroup group = new ToggleGroup();

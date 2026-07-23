@@ -127,42 +127,10 @@ public class LecturerDashboardController {
         Label badge = new Label(q.isPublished ? "Published" : "Draft");
         badge.getStyleClass().addAll("badge", q.isPublished ? "badge-success" : "badge-neutral");
 
-        HBox row;
-        if (!q.isPublished) {
-            javafx.scene.control.Button publishBtn = new javafx.scene.control.Button("Publish");
-            publishBtn.getStyleClass().addAll("btn-sm", "btn-outline");
-            publishBtn.setOnAction(e -> onPublishQuiz(q, publishBtn));
-            row = new HBox(10, info, badge, publishBtn);
-        } else {
-            row = new HBox(info, badge);
-        }
+        HBox row = new HBox(info, badge);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         row.setPadding(new Insets(10, 0, 10, 0));
         return row;
-    }
-
-    private void onPublishQuiz(QuizDto q, javafx.scene.control.Button sourceBtn) {
-        String token = Session.authToken();
-        if (token == null) return;
-        sourceBtn.setDisable(true);
-        Thread t = new Thread(() -> {
-            try {
-                api.publishQuiz(token, q.quizId);
-                Platform.runLater(this::loadInBackground); // refresh the whole list
-            } catch (ApiException e) {
-                Platform.runLater(() -> {
-                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(
-                            javafx.scene.control.Alert.AlertType.ERROR, e.getMessage());
-                    a.setHeaderText("Couldn't publish quiz");
-                    a.showAndWait();
-                    sourceBtn.setDisable(false);
-                });
-            } catch (Exception e) {
-                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            }
-        }, "publish-quiz-api");
-        t.setDaemon(true);
-        t.start();
     }
 
     @FXML private void onGroups()     { SceneManager.goGroups(); }
