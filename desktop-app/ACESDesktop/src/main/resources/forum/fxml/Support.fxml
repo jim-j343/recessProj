@@ -2,6 +2,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.text.Text?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.SupportController"
             stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-border-width: 1;"
@@ -17,7 +19,11 @@
         <ScrollPane fitToWidth="true" styleClass="scroll-pane" style="-fx-background-color: transparent; -fx-padding: 24 32 24 32;">
             <VBox spacing="16" style="-fx-background-color: transparent;">
                 <Label text="Having trouble logging in, joining a group, or using the forum? Reach out to your group administrator first — they can reset memberships, review blacklist status, and fix most account issues directly." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
-                <Label text="For platform-wide issues, contact the system administrator at support@smartforum.local." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                <TextFlow>
+                    <Text text="For platform-wide issues, contact the system administrator at " style="-fx-fill: #4b5563; -fx-font-size: 14px;"/>
+                    <Hyperlink fx:id="supportEmailLink" onAction="#onEmailClick" style="-fx-text-fill: #4f46e5; -fx-font-size: 14px; -fx-border-color: transparent; -fx-padding: 0;"/>
+                    <Text text="." style="-fx-fill: #4b5563; -fx-font-size: 14px;"/>
+                </TextFlow>
             </VBox>
         </ScrollPane>
     </center>

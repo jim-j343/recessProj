@@ -23,5 +23,8 @@ public final class AppConstants {
     public static final String QUALITY_MEDIUM = "Medium";
     public static final String QUALITY_LOW = "Low";
 
+    // System Settings
+    public static final String SUPPORT_EMAIL = "support@smartforum.local";
+
     private AppConstants() {}
 }
