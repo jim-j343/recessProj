@@ -3,6 +3,7 @@ package forum.controllers;
 import forum.api.ApiClient;
 import forum.app.SceneManager;
 import forum.app.Session;
+import forum.models.Role;
 import forum.models.User;
 import forum.services.AuthService;
 import forum.util.NavbarHelper;
@@ -21,6 +22,10 @@ public class ProfileController {
     @FXML private Label      userNameLabel;
     @FXML private MenuButton notifButton;
     @FXML private Label      notifBadge;
+    @FXML private Label      navMyProgress;
+    @FXML private Label      navNewTopic;
+    @FXML private Label      navQuizCenter;
+    @FXML private Label      navGrading;
 
     // ── Profile Information form ─────────────────────────────────────────────
     @FXML private TextField usernameField;
@@ -46,6 +51,18 @@ public class ProfileController {
             // Profile form — populate with real credentials from session
             if (usernameField != null) usernameField.setText(u.getUsername() != null ? u.getUsername() : "");
             if (emailField != null)    emailField.setText(u.getEmail() != null ? u.getEmail() : "");
+
+            // Role-based nav tabs — matches web layouts/navigation.blade.php
+            if (u.getRole() == Role.STUDENT && navMyProgress != null) {
+                navMyProgress.setManaged(true); navMyProgress.setVisible(true);
+            }
+            if (u.getRole() != Role.SYSTEM_ADMIN && navNewTopic != null) {
+                navNewTopic.setManaged(true); navNewTopic.setVisible(true);
+            }
+            if (u.getRole() == Role.LECTURER && navQuizCenter != null && navGrading != null) {
+                navQuizCenter.setManaged(true); navQuizCenter.setVisible(true);
+                navGrading.setManaged(true); navGrading.setVisible(true);
+            }
         }
 
         // Load real notifications from backend
@@ -132,10 +149,12 @@ public class ProfileController {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
-    @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
-    @FXML private void onProfile()   { /* Already here */ }
+    @FXML private void onGroups()     { SceneManager.goGroups(); }
+    @FXML private void onMyProgress() { SceneManager.goStudentAssessment(); }
+    @FXML private void onNewTopic()   { SceneManager.goTopicCreation(); }
+    @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()    { SceneManager.goParticipationGrading(); }
+    @FXML private void onProfile()    { /* Already here */ }
 
     @FXML
     private void onLogout() {
