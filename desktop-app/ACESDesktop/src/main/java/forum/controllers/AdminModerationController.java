@@ -183,8 +183,8 @@ public class AdminModerationController {
                     Label badge = new Label("Needs review");
                     badge.setStyle("-fx-background-color: #fef9c3; -fx-text-fill: #a16207; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
                     
-                    Label btn = new Label("Mark\nReviewed"); // Two lines like the web
-                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px; -fx-alignment: center-left;");
+                    Label btn = new Label("Mark Reviewed");
+                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px;");
                     btn.setOnMouseClicked(e -> markReportReviewed(row.id));
                     
                     box.getChildren().addAll(badge, btn);
@@ -254,8 +254,8 @@ public class AdminModerationController {
                     Label badge = new Label("Needs review");
                     badge.setStyle("-fx-background-color: #fef9c3; -fx-text-fill: #a16207; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
                     
-                    Label btn = new Label("Mark\nReviewed"); // Two lines like the web
-                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px; -fx-alignment: center-left;");
+                    Label btn = new Label("Mark Reviewed");
+                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px;");
                     btn.setOnMouseClicked(e -> markRemovalReviewed(row.id));
                     
                     box.getChildren().addAll(badge, btn);

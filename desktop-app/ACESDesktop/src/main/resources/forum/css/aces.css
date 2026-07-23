@@ -97,10 +97,10 @@
 /* ---------- Header band (white shadow strip under nav) ---------- */
 .page-header {
     -fx-background-color: -surface;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 10, 0, 0, 2);
     -fx-padding: 24 32 24 32;
 }
-.page-title { -fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: -ink-800; }
+.page-title { -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937; }
 
 /* ---------- Content canvas ---------- */
 .content { -fx-padding: 32px; -fx-background-color: -bg; }
@@ -376,6 +376,30 @@
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow,
 .scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
 
+/* ---------- Icon boxes — mirrors web's w-10 h-10 rounded-lg bg-{color}-100 ---------- */
+/* Standard 40x40 icon box (w-10 h-10, rounded-lg = 8px) */
+.icon-box {
+    -fx-min-width: 40;  -fx-min-height: 40;
+    -fx-max-width: 40;  -fx-max-height: 40;
+    -fx-background-radius: 8;
+    -fx-alignment: center;
+}
+/* Smaller 28x28 icon box for sidebars (w-7 h-7, rounded-md = 6px) */
+.icon-box-sm {
+    -fx-min-width: 28;  -fx-min-height: 28;
+    -fx-max-width: 28;  -fx-max-height: 28;
+    -fx-background-radius: 6;
+    -fx-alignment: center;
+}
+/* Color variants — exact Tailwind bg-{color}-100 hex values */
+.icon-box-blue    { -fx-background-color: #dbeafe; } /* bg-blue-100    */
+.icon-box-pink    { -fx-background-color: #fce7f3; } /* bg-pink-100    */
+.icon-box-green   { -fx-background-color: #dcfce7; } /* bg-green-100   */
+.icon-box-emerald { -fx-background-color: #d1fae5; } /* bg-emerald-100 */
+.icon-box-indigo  { -fx-background-color: #e0e7ff; } /* bg-indigo-100  */
+.icon-box-amber   { -fx-background-color: #fef3c7; } /* bg-amber-100   */
+.icon-box-gray    { -fx-background-color: #f3f4f6; } /* bg-gray-100    */
+
 .hyperlink { -fx-text-fill: -indigo; -fx-border-color: transparent; -fx-padding: 0; -fx-underline: false; }
 .hyperlink:hover { -fx-underline: true; -fx-text-fill: -indigo-700; }
 
@@ -482,3 +506,8 @@
 .check-box:selected:hover .box { -fx-background-color: -indigo-700; }
 .check-box:selected .mark { -fx-background-color: white; }
 .check-box:disabled { -fx-opacity: 1; }
+
+.quiz-progress { -fx-min-height: 8px; -fx-pref-height: 8px; -fx-max-height: 8px; }
+.quiz-progress > .track { -fx-background-color: #f3f4f6; -fx-background-radius: 6; }
+.quiz-progress > .bar { -fx-background-color: #4f46e5; -fx-background-radius: 6; -fx-padding: 4px; }
+

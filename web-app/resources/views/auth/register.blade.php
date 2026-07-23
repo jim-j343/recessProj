@@ -142,7 +142,7 @@
                 </button>
                 <a href="{{ route('support') }}" class="hover:text-gray-600">Support</a>
             </div>
-            <span>© 2026 ACES. All rights reserved.</span>
+            <div></div>
         </div>
 
     </div>
