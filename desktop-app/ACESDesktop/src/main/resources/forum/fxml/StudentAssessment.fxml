@@ -10,11 +10,11 @@
     <top>
         <HBox styleClass="navbar" alignment="CENTER_LEFT">
             <HBox alignment="CENTER_LEFT" spacing="8">
-                    <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
-                        <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
-                    </javafx.scene.image.ImageView>
-                    <Label text="ACES" styleClass="brand"/>
-                </HBox>
+                <javafx.scene.image.ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                    <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                </javafx.scene.image.ImageView>
+                <Label text="ACES" styleClass="brand"/>
+            </HBox>
             <Label text="Dashboard"   styleClass="nav-link" onMouseClicked="#onDashboard"/>
             <Label text="Groups"      styleClass="nav-link" onMouseClicked="#onGroups"/>
             <Label text="My Progress" styleClass="nav-link,active"/>
@@ -42,19 +42,19 @@
                 </graphic>
                 <items>
                     <MenuItem text="Profile" onAction="#onProfile">
-                            <graphic>
-                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
-                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
-                                </javafx.scene.layout.StackPane>
-                            </graphic>
-                        </MenuItem>
-                        <MenuItem text="Log Out" onAction="#onLogout">
-                            <graphic>
-                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
-                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
-                                </javafx.scene.layout.StackPane>
-                            </graphic>
-                        </MenuItem>
+                        <graphic>
+                            <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </javafx.scene.layout.StackPane>
+                        </graphic>
+                    </MenuItem>
+                    <MenuItem text="Log Out" onAction="#onLogout">
+                        <graphic>
+                            <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </javafx.scene.layout.StackPane>
+                        </graphic>
+                    </MenuItem>
                 </items>
             </MenuButton>
         </HBox>
@@ -64,7 +64,7 @@
         <ScrollPane fitToWidth="true" styleClass="content-50" style="-fx-background-color: transparent;">
             <HBox spacing="0" alignment="TOP_LEFT">
 
-                <!-- ═══════════════════ LEFT SIDEBAR (256px = w-64) — mirrors web participation/index.blade.php ═══════════════════ -->
+                <!-- ═══════════════ LEFT SIDEBAR (256px = w-64) — mirrors web participation/index.blade.php ═══════════════ -->
                 <VBox spacing="4" prefWidth="256" minWidth="256" maxWidth="256"
                       style="-fx-background-color: #ffffff; -fx-border-color: #e5e7eb;
                              -fx-border-width: 0 1 0 0; -fx-padding: 24;">
@@ -97,159 +97,61 @@
                     </HBox>
                 </VBox>
 
-<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
-<VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS" style="-fx-padding: 32;">
-    <VBox spacing="24" maxWidth="1120">
+                <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+                <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS" style="-fx-padding: 32;">
+                    <VBox spacing="24" maxWidth="1120">
 
-        <VBox spacing="4">
-            <Label text="Assessment Overview" styleClass="h-lg"/>
-            <Label text="Your real forum activity and quiz performance across the courses you've joined."
-                   styleClass="muted"/>
-        </VBox>
+                        <VBox spacing="4">
+                            <Label text="Assessment Overview" styleClass="h-lg"/>
+                            <Label text="Your real forum activity and quiz performance across the courses you've joined." styleClass="muted"/>
+                        </VBox>
 
-        <HBox spacing="24">
+                        <HBox spacing="24">
 
-            <!-- Participation metrics -->
-            <VBox styleClass="card-flat"
-                  spacing="12"
-                  HBox.hgrow="ALWAYS"
-                  prefWidth="540">
+                            <!-- Participation metrics -->
+                            <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS" prefWidth="540">
+                                <VBox spacing="4">
+                                    <Label text="Participation Metrics" styleClass="card-title" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="YOUR REAL ENGAGEMENT DATA" styleClass="subtle" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                                </VBox>
+                                <Label text="Your Activity (Last 7 Days)" styleClass="muted" style="-fx-padding: 10 0 0 0;"/>
+                                <HBox fx:id="activityChartBox" spacing="10" alignment="BOTTOM_LEFT" prefHeight="140" style="-fx-padding: 0 10 0 10;"/>
+                                <HBox fx:id="activityLabelsBox" spacing="10" style="-fx-padding: 0 10 0 10;"/>
+                                <Region prefHeight="1" style="-fx-background-color: transparent;"/>
+                                <VBox spacing="4" style="-fx-padding: 10 0 0 0;">
+                                    <HBox alignment="CENTER_LEFT">
+                                        <Label text="Forum Participation" styleClass="muted" style="-fx-text-fill: #334155;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="participationPctLabel" text="—" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <StackPane fx:id="participationBarPane" alignment="CENTER_LEFT" minHeight="6" prefHeight="6" maxHeight="6">
+                                        <Region style="-fx-background-color: #e2e8f0; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" maxWidth="Infinity"/>
+                                        <Region fx:id="participationBarFill" style="-fx-background-color: #1e293b; -fx-background-radius: 999;" prefWidth="0" maxWidth="0" minHeight="6" prefHeight="6" maxHeight="6"/>
+                                    </StackPane>
+                                    <Label fx:id="participationSubLabel" text="Loading..." styleClass="subtle"/>
+                                </VBox>
+                            </VBox>
 
-                <VBox spacing="4">
-                    <Label text="Participation Metrics"
-                           styleClass="card-title"/>
-                    <Label text="YOUR REAL ENGAGEMENT DATA"
-                           styleClass="subtle"/>
-                </VBox>
+                            <!-- Assessment history -->
+                            <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS" prefWidth="620">
+                                <Label text="Assessment History" styleClass="card-title" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Label text="QUIZ" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="320" minWidth="0" HBox.hgrow="ALWAYS"/>
+                                    <Label text="SCORE" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="80" minWidth="80" maxWidth="80" alignment="CENTER"/>
+                                    <Label text="VS PEER AVG" styleClass="subtle" style="-fx-font-size: 11px;" prefWidth="100" minWidth="100" maxWidth="100" alignment="CENTER"/>
+                                </HBox>
+                                <Region styleClass="divider" prefHeight="1"/>
+                                <VBox fx:id="assessmentHistoryBox" spacing="0"/>
+                            </VBox>
+                        </HBox>
 
-                <Label text="Your Activity (Last 7 Days)"
-                       styleClass="muted"
-                       style="-fx-padding:10 0 0 0;"/>
-
-                <HBox fx:id="activityChartBox"
-                      spacing="10"
-                      alignment="BOTTOM_LEFT"
-                      prefHeight="140"
-                      style="-fx-padding:0 10 0 10;"/>
-
-                <HBox fx:id="activityLabelsBox"
-                      spacing="10"
-                      style="-fx-padding:0 10 0 10;"/>
-
-                <Region prefHeight="1"
-                        style="-fx-background-color:transparent;"/>
-
-                <VBox spacing="4" style="-fx-padding:10 0 0 0;">
-
-                    <HBox alignment="CENTER_LEFT">
-                        <Label text="Forum Participation"
-                               styleClass="muted"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="participationPctLabel"
-                               text="—"
-                               style="-fx-font-size:14px; -fx-font-weight:bold;"/>
-                    </HBox>
-
-                    <StackPane fx:id="participationBarPane"
-                               alignment="CENTER_LEFT"
-                               minHeight="6"
-                               prefHeight="6"
-                               maxHeight="6">
-
-                        <Region
-                                style="-fx-background-color:#e2e8f0;
-                                       -fx-background-radius:999;"
-                                minHeight="6"
-                                prefHeight="6"
-                                maxHeight="6"
-                                maxWidth="Infinity"/>
-
-                        <Region fx:id="participationBarFill"
-                                style="-fx-background-color:#1e293b;
-                                       -fx-background-radius:999;"
-                                prefWidth="0"
-                                maxWidth="0"
-                                minHeight="6"
-                                prefHeight="6"
-                                maxHeight="6"/>
-                    </StackPane>
-
-                    <Label fx:id="participationSubLabel"
-                           text="Loading..."
-                           styleClass="subtle"/>
-
-                </VBox>
-
-            </VBox>
-
-            <!-- Assessment History -->
-            <VBox styleClass="card-flat"
-                  spacing="12"
-                  HBox.hgrow="ALWAYS"
-                  prefWidth="620">
-
-                <Label text="Assessment History"
-                       styleClass="card-title"/>
-
-                <HBox alignment="CENTER_LEFT"
-                      spacing="10">
-
-                    <Label text="QUIZ"
-                           prefWidth="320"
-                           minWidth="0"
-                           HBox.hgrow="ALWAYS"
-                           styleClass="subtle"/>
-
-                    <Label text="SCORE"
-                           prefWidth="80"
-                           minWidth="80"
-                           maxWidth="80"
-                           alignment="CENTER"
-                           styleClass="subtle"/>
-
-                    <Label text="VS PEER AVG"
-                           prefWidth="100"
-                           minWidth="100"
-                           maxWidth="100"
-                           alignment="CENTER"
-                           styleClass="subtle"/>
-
-                </HBox>
-
-                <VBox fx:id="assessmentHistoryBox"
-                      spacing="0"/>
-
-            </VBox>
-
-        </HBox>
-
-        <!-- Lecturer Remark -->
-        <VBox style="-fx-background-color:#0f172a;
-                     -fx-background-radius:8;
-                     -fx-padding:26 24 26 24;"
-              spacing="12">
-
-            <Label text="Lecturer's Remark"
-                   style="-fx-font-size:16px;
-                          -fx-font-weight:bold;
-                          -fx-text-fill:white;"/>
-
-            <Label fx:id="remarkLabel"
-                   text="No remarks yet."
-                   wrapText="true"
-                   style="-fx-text-fill:#cbd5e1;
-                          -fx-font-size:14px;
-                          -fx-font-style:italic;"/>
-
-            <Label fx:id="remarkMetaLabel"
-                   text=""
-                   style="-fx-text-fill:#64748b;
-                          -fx-font-size:11px;"/>
-
-        </VBox>
-
-    </VBox>
-</VBox>
+                        <!-- Lecturer's remark: dynamic from API -->
+                        <VBox spacing="12" style="-fx-background-color: #0f172a; -fx-background-radius: 8; -fx-padding: 26 24 26 24;">
+                            <Label text="Lecturer's Remark" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            <Label fx:id="remarkLabel" text="No remarks yet." wrapText="true" style="-fx-text-fill: #cbd5e1; -fx-font-style: italic; -fx-font-size: 14px;"/>
+                            <Label fx:id="remarkMetaLabel" text="" style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+                        </VBox>
+                    </VBox>
                 </VBox>
             </HBox>
         </ScrollPane>
