@@ -12,21 +12,50 @@
                 </div>
                 <nav class="space-y-1">
                     <a href="{{ route('dashboard') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
-                        ⊞ Dashboard
-                    </a>
-                    <a href="{{ route('groups.index') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
-                        📚 Courses
-                    </a>
-                    <a href="{{ route('participation.index') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-blue-50 text-blue-700 font-semibold">
-                        📊 Assessment Overview
-                    </a>
-                    <a href="{{ route('dashboard') }}"
-                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
-                        📝 Quiz Center
-                    </a>
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+    <!-- Dashboard Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 12l9-9 9 9M4.5 10.5V20a1 1 0 001 1h5.5v-6h2v6H18.5a1 1 0 001-1v-9.5" />
+    </svg>
+    Dashboard
+</a>
+
+<a href="{{ route('groups.index') }}"
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+    <!-- Courses Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6.253l8 4.747-8 4.747L4 11l8-4.747z" />
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 11v6l8 4.747L20 17v-6" />
+    </svg>
+    Courses
+</a>
+
+<a href="{{ route('participation.index') }}"
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-blue-50 text-blue-700 font-semibold">
+    <!-- Assessment Overview Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-700" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 17v-6m4 6V7m4 10v-3M5 21h14" />
+    </svg>
+    Assessment Overview
+</a>
+
+<a href="{{ route('dashboard') }}"
+    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50">
+    <!-- Quiz Center Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 5h6M9 9h6M5 5h.01M5 9h.01M5 13h.01M9 13h6M5 17h.01M9 17h6" />
+    </svg>
+    Quiz Center
+</a>
                 </nav>
             </aside>
 
