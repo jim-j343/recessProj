@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.geometry.Insets?>
 
 <StackPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -27,9 +28,11 @@
           maxWidth="576" maxHeight="560" spacing="0"
           StackPane.alignment="CENTER">
 
-        <!-- Progress bar -->
-        <ProgressBar fx:id="progressBar" progress="0"
-                     maxWidth="Infinity" prefHeight="4"/>
+        <!-- Progress bar: indigo fill on gray track, 4px, fully rounded (matches web) -->
+        <StackPane fx:id="progressBarPane" maxWidth="Infinity" minHeight="4" prefHeight="4" maxHeight="4" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #f3f4f6;" minHeight="4" prefHeight="4" maxHeight="4" maxWidth="Infinity"/>
+            <Region fx:id="progressFill" style="-fx-background-color: #4f46e5;" minHeight="4" prefHeight="4" maxHeight="4" prefWidth="0" maxWidth="0"/>
+        </StackPane>
 
         <!-- Header -->
         <HBox alignment="CENTER_LEFT"

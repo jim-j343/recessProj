@@ -287,9 +287,14 @@ public class AdminAnalyticsController {
         stack.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         stack.setMaxWidth(Double.MAX_VALUE);
 
-        // Bind fill width to (progress * stack width)
+        // StackPane respects maxWidth to constrain child size — bind both
+        // prefWidth AND maxWidth so the bar fills to exactly `progress` fraction.
+        final double clampedProgress = Math.max(0, Math.min(1, progress));
         fill.prefWidthProperty().bind(
-            stack.widthProperty().multiply(Math.max(0, Math.min(1, progress)))
+            stack.widthProperty().multiply(clampedProgress)
+        );
+        fill.maxWidthProperty().bind(
+            stack.widthProperty().multiply(clampedProgress)
         );
         return stack;
     }
