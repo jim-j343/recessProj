@@ -187,7 +187,7 @@
                             <!-- Custom progress bar: track + fill, matching web h-1.5 rounded-full -->
                             <StackPane fx:id="quizProgressBar" maxWidth="Infinity" minHeight="6" prefHeight="6" maxHeight="6" alignment="CENTER_LEFT">
                                 <Region style="-fx-background-color: #f3f4f6; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" maxWidth="Infinity"/>
-                                <Region fx:id="quizProgressFill" style="-fx-background-color: #4f46e5; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" prefWidth="0"/>
+                                <Region fx:id="quizProgressFill" style="-fx-background-color: #4f46e5; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" prefWidth="0" maxWidth="0"/>
                             </StackPane>
                             <Label fx:id="quizProgressSub" text="Loading..."
                                    style="-fx-font-size: 12px; -fx-text-fill: #9ca3af;"/>

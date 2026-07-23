@@ -224,11 +224,13 @@ public class StudentDashboardController {
                         quizProgressLabel.setText(fCompleted + "/" + fTotal);
                     }
                     if (quizProgressFill != null && quizProgressBar != null) {
-                        double ratio = fTotal > 0 ? (double) fCompleted / fTotal : 0;
-                        // Bind fill width once the StackPane has been laid out
+                        final double ratio = fTotal > 0 ? (double) fCompleted / fTotal : 0;
+                        // StackPane respects maxWidth to constrain child size;
+                        // bind both prefWidth AND maxWidth so the bar fills correctly.
                         quizProgressFill.prefWidthProperty().bind(
-                            quizProgressBar.widthProperty().multiply(Math.max(0, Math.min(1, ratio)))
-                        );
+                            quizProgressBar.widthProperty().multiply(Math.max(0, Math.min(1, ratio))));
+                        quizProgressFill.maxWidthProperty().bind(
+                            quizProgressBar.widthProperty().multiply(Math.max(0, Math.min(1, ratio))));
                     }
                     if (quizProgressSub != null) {
                         if (fTotal > 0) {
