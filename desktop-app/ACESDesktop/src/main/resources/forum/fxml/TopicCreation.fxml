@@ -18,9 +18,10 @@
                 </HBox>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
                 <Label text="New Topic" styleClass="nav-link,active"/>
-                <Label text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter"/>
-                <Label text="Grading" styleClass="nav-link" onMouseClicked="#onGrading"/>
+                <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
+                <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
