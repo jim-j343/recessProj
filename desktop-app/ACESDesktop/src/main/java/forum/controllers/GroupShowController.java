@@ -490,6 +490,7 @@ public class GroupShowController {
     @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
     @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onMyProgress(){ SceneManager.goStudentAssessment(); }
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
