@@ -146,6 +146,7 @@ public class GroupEditController {
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+    @FXML private void onMyProgress(){ SceneManager.goStudentAssessment(); }
     @FXML private void onModeration() { SceneManager.goAdminModeration(); }
     @FXML private void onProfile()   { SceneManager.goProfile(); }
     @FXML private void onLogout()    {
