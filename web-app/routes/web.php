@@ -65,10 +65,6 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     Route::get('/recommendations/refresh', [\App\Http\Controllers\RecommendationController::class, 'refresh'])->name('recommendations.refresh');
 
-    // ---> ADD THESE TWO LINES HERE <---
-    Route::get('/topics/{topic}/edit', [TopicController::class, 'edit'])->name('topics.edit');
-    Route::put('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
-
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
     Route::post('/posts/{post}/flag', [PostController::class, 'flag'])->name('posts.flag');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
