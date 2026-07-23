@@ -29,6 +29,10 @@ public class StudentAssessmentController {
     @FXML private Label      notifBadge;
     @FXML private Label      navNewTopic;
 
+    // ── Sidebar ────────────────────────────────────────────────────────
+    @FXML private Label sidebarUserName;
+    @FXML private Label sidebarUserRole;
+
     // ── Participation card ────────────────────────────────────────────
     @FXML private HBox    activityChartBox;
     @FXML private HBox    activityLabelsBox;
@@ -43,8 +47,6 @@ public class StudentAssessmentController {
     // ── Lecturer's remark ─────────────────────────────────────────────
     @FXML private Label   remarkLabel;
     @FXML private Label   remarkMetaLabel;
-    @FXML private Label sidebarUserName;
-    @FXML private Label sidebarUserRole;
 
     private final ApiClient api = new ApiClient();
 
@@ -62,11 +64,10 @@ public class StudentAssessmentController {
                 navNewTopic.setManaged(true);
                 navNewTopic.setVisible(true);
             }
-        }
-        if (sidebarUserName != null) {
+
+            if (sidebarUserName != null) {
                 sidebarUserName.setText(u.displayName());
             }
-
             if (sidebarUserRole != null) {
                 sidebarUserRole.setText(
                     switch (u.getRole()) {
@@ -76,6 +77,7 @@ public class StudentAssessmentController {
                     }
                 );
             }
+        }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadProgress();
     }
@@ -142,7 +144,6 @@ public class StudentAssessmentController {
             double barH = Math.max(6, heightRatio * 120); // max 120px
 
             Region bar = new Region();
-            boolean isToday = day.label != null && day.label.toLowerCase().contains("today");
             bar.setStyle("-fx-background-color: " + (day.count > 0 ? "#1e293b" : "#e2e8f0")
                 + "; -fx-background-radius: 4 4 0 0;");
             bar.setPrefHeight(barH);
@@ -157,158 +158,95 @@ public class StudentAssessmentController {
             Label lbl = new Label(day.label);
             lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #9ca3af;");
             lbl.setMaxWidth(Double.MAX_VALUE);
-            lbl.setAlignment(javafx.geometry.Pos.CENTER);
+            lbl.setAlignment(Pos.CENTER);
             HBox.setHgrow(lbl, Priority.ALWAYS);
             activityLabelsBox.getChildren().add(lbl);
         }
     }
 
     private void renderAssessmentHistory(List<StudentProgressDto.AssessmentItem> items) {
+        if (assessmentHistoryBox == null) return;
+        assessmentHistoryBox.getChildren().clear();
 
-    if (assessmentHistoryBox == null) {
-        return;
-    }
-
-    assessmentHistoryBox.getChildren().clear();
-
-    if (items == null || items.isEmpty()) {
-        Label empty = new Label("No assessments completed yet.");
-        empty.setStyle(
-            "-fx-text-fill:#9ca3af;" +
-            "-fx-font-size:13px;" +
-            "-fx-padding:20 0;"
-        );
-        assessmentHistoryBox.getChildren().add(empty);
-        return;
-    }
-
-    for (StudentProgressDto.AssessmentItem item : items) {
-
-        //---------------------------------------------------------
-        // Left column (Quiz title + completion date)
-        //---------------------------------------------------------
-
-        Label title = new Label(item.title);
-        title.setStyle(
-            "-fx-font-size:15px;" +
-            "-fx-font-weight:bold;" +
-            "-fx-text-fill:#111827;"
-        );
-
-        Label subtitle = new Label("Completed " + item.submittedAtHuman);
-        subtitle.setStyle(
-            "-fx-font-size:12px;" +
-            "-fx-text-fill:#9ca3af;"
-        );
-
-        VBox quizColumn = new VBox(title, subtitle);
-        quizColumn.setSpacing(2);
-        quizColumn.setPrefWidth(320);
-        quizColumn.setMinWidth(0);
-        quizColumn.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(quizColumn, Priority.ALWAYS);
-
-        //---------------------------------------------------------
-        // Score column
-        //---------------------------------------------------------
-
-        Label scoreLabel = new Label(
-            String.format("%.1f%%", item.scorePct)
-        );
-
-        scoreLabel.setAlignment(Pos.CENTER);
-        scoreLabel.setPrefWidth(80);
-        scoreLabel.setMinWidth(80);
-        scoreLabel.setMaxWidth(80);
-
-        scoreLabel.setStyle(
-            "-fx-font-size:15px;" +
-            "-fx-font-weight:bold;" +
-            "-fx-text-fill:#111827;"
-        );
-
-        //---------------------------------------------------------
-        // Peer comparison badge
-        //---------------------------------------------------------
-
-        StackPane peerBadgePane = new StackPane();
-        peerBadgePane.setAlignment(Pos.CENTER);
-
-        peerBadgePane.setPrefWidth(100);
-        peerBadgePane.setMinWidth(100);
-        peerBadgePane.setMaxWidth(100);
-
-        if (item.vsPeerPct != null) {
-
-            Label peerBadge = new Label(
-                String.format("%+.1f%%", item.vsPeerPct)
-            );
-
-            if (item.vsPeerPct >= 0) {
-
-                peerBadge.setStyle(
-                    "-fx-text-fill:#10b981;" +
-                    "-fx-background-color:#d1fae5;" +
-                    "-fx-background-radius:999;" +
-                    "-fx-padding:3 8;" +
-                    "-fx-font-size:11px;" +
-                    "-fx-font-weight:bold;"
-                );
-
-            } else {
-
-                peerBadge.setStyle(
-                    "-fx-text-fill:#ef4444;" +
-                    "-fx-background-color:#fee2e2;" +
-                    "-fx-background-radius:999;" +
-                    "-fx-padding:3 8;" +
-                    "-fx-font-size:11px;" +
-                    "-fx-font-weight:bold;"
-                );
-            }
-
-            peerBadgePane.getChildren().add(peerBadge);
+        if (items == null || items.isEmpty()) {
+            Label empty = new Label("No assessments completed yet.");
+            empty.setStyle("-fx-text-fill:#9ca3af; -fx-font-size:13px; -fx-padding:20 0;");
+            assessmentHistoryBox.getChildren().add(empty);
+            return;
         }
 
-        //---------------------------------------------------------
-        // Row
-        //---------------------------------------------------------
+        for (StudentProgressDto.AssessmentItem item : items) {
 
-        HBox row = new HBox();
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setSpacing(10);
+            // Left column (Quiz title + completion date)
+            Label title = new Label(item.title);
+            title.setStyle("-fx-font-size:15px; -fx-font-weight:bold; -fx-text-fill:#111827;");
 
-        row.getChildren().addAll(
-            quizColumn,
-            scoreLabel,
-            peerBadgePane
-        );
+            Label subtitle = new Label("Completed " + item.submittedAtHuman);
+            subtitle.setStyle("-fx-font-size:12px; -fx-text-fill:#9ca3af;");
 
-        assessmentHistoryBox.getChildren().add(row);
+            VBox quizColumn = new VBox(title, subtitle);
+            quizColumn.setSpacing(2);
+            quizColumn.setPrefWidth(320);
+            quizColumn.setMinWidth(0);
+            quizColumn.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(quizColumn, Priority.ALWAYS);
 
-        //---------------------------------------------------------
-        // Divider
-        //---------------------------------------------------------
+            // Score column
+            Label scoreLabel = new Label(String.format("%.1f%%", item.scorePct));
+            scoreLabel.setAlignment(Pos.CENTER);
+            scoreLabel.setPrefWidth(80);
+            scoreLabel.setMinWidth(80);
+            scoreLabel.setMaxWidth(80);
+            scoreLabel.setStyle("-fx-font-size:15px; -fx-font-weight:bold; -fx-text-fill:#111827;");
 
-        Region divider = new Region();
-        divider.setPrefHeight(1);
-        divider.setStyle("-fx-background-color:#f3f4f6;");
+            // Peer comparison badge
+            StackPane peerBadgePane = new StackPane();
+            peerBadgePane.setAlignment(Pos.CENTER);
+            peerBadgePane.setPrefWidth(100);
+            peerBadgePane.setMinWidth(100);
+            peerBadgePane.setMaxWidth(100);
 
-        assessmentHistoryBox.getChildren().add(divider);
+            if (item.vsPeerPct != null) {
+                Label peerBadge = new Label(String.format("%+.1f%%", item.vsPeerPct));
+                if (item.vsPeerPct >= 0) {
+                    peerBadge.setStyle(
+                        "-fx-text-fill:#10b981; -fx-background-color:#d1fae5; -fx-background-radius:999; " +
+                        "-fx-padding:3 8; -fx-font-size:11px; -fx-font-weight:bold;");
+                } else {
+                    peerBadge.setStyle(
+                        "-fx-text-fill:#ef4444; -fx-background-color:#fee2e2; -fx-background-radius:999; " +
+                        "-fx-padding:3 8; -fx-font-size:11px; -fx-font-weight:bold;");
+                }
+                peerBadgePane.getChildren().add(peerBadge);
+            }
+
+            // Row
+            HBox row = new HBox();
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setSpacing(10);
+            row.getChildren().addAll(quizColumn, scoreLabel, peerBadgePane);
+            assessmentHistoryBox.getChildren().add(row);
+
+            // Divider
+            Region divider = new Region();
+            divider.setPrefHeight(1);
+            divider.setStyle("-fx-background-color:#f3f4f6;");
+            assessmentHistoryBox.getChildren().add(divider);
+        }
     }
-}
 
+    // ── Navigation ───────────────────────────────────────────────────────
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
-    @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onNewTopic()  { SceneManager.goTopicCreation(); }
-    @FXML private void onForum()     { SceneManager.goForumDashboard(); }
-    @FXML private void onProfile()   { SceneManager.goProfile(); }
-    @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
-    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
-    @FXML private void onLogout()    {
+    @FXML private void onGroups()     { SceneManager.goGroups(); }
+    @FXML private void onNewTopic()   { SceneManager.goTopicCreation(); }
+    @FXML private void onForum()      { SceneManager.goForumDashboard(); }
+    @FXML private void onProfile()    { SceneManager.goProfile(); }
+    @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
+    @FXML private void onGrading()    { SceneManager.goParticipationGrading(); }
+    @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
