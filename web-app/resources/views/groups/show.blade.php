@@ -1,16 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div class="min-w-0">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight break-words">
                     {{ $group->name }}
                 </h2>
                 @if($group->course_name)
                     <p class="text-sm font-semibold text-indigo-600 mt-0.5">{{ $group->course_name }}</p>
                 @endif
-                <p class="text-sm text-gray-500 mt-1">{{ $group->description }}</p>
+                <p class="text-sm text-gray-500 mt-1 break-words">{{ $group->description }}</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2 shrink-0">
                 @if($isMember)
                     <a href="{{ route('forum.index') }}"
                        class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
@@ -56,8 +56,8 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('success'))
                 <div class="mb-4 bg-green-100 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
@@ -71,7 +71,7 @@
             @if($removalAnnouncements->isNotEmpty())
                 <div class="flex flex-col items-center gap-2 mb-6">
                     @foreach($removalAnnouncements as $entry)
-                        <div class="bg-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-full">
+                        <div class="bg-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-full text-center">
                             👋 {{ $entry->meta['removed_username'] ?? 'A member' }} was removed from the group by {{ $entry->user->username ?? 'an admin' }}
                             <span class="text-gray-400">· {{ $entry->logged_at->diffForHumans() }}</span>
                         </div>
@@ -83,7 +83,7 @@
             @if($additionAnnouncements->isNotEmpty())
                 <div class="flex flex-col items-center gap-2 mb-6">
                     @foreach($additionAnnouncements as $entry)
-                        <div class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-full">
+                        <div class="bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-full text-center">
                             🎉 {{ $entry->meta['added_username'] ?? 'A member' }} was added to the group by {{ $entry->user->username ?? 'an admin' }}
                             <span class="text-indigo-400">· {{ $entry->logged_at->diffForHumans() }}</span>
                         </div>
@@ -92,7 +92,7 @@
             @endif
 
             {{-- Stats --}}
-            <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow-sm p-4 text-center">
                     <p class="text-2xl font-bold text-indigo-600">{{ $group->memberships->count() }}</p>
                     <p class="text-xs text-gray-500 mt-1">Members</p>
@@ -111,19 +111,19 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
 
                 {{-- Recent Topics --}}
-                <div class="col-span-2 bg-white rounded-lg shadow-sm p-6">
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-4 sm:p-6">
                     <h3 class="text-base font-semibold text-gray-900 mb-4">Recent Topics</h3>
                     @if($group->topics->isEmpty())
                         <p class="text-sm text-gray-400">No topics yet in this group.</p>
                     @endif
                     @foreach($group->topics->take(5) as $topic)
-                        <div class="flex justify-between items-start py-3 border-b border-gray-100 last:border-0">
-                            <div>
+                        <div class="flex justify-between items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+                            <div class="min-w-0">
                                 <a href="{{ route('topics.show', $topic->topic_id) }}"
-                                   class="text-sm font-medium text-gray-800 hover:text-indigo-600">
+                                   class="text-sm font-medium text-gray-800 hover:text-indigo-600 break-words">
                                     {{ $topic->title }}
                                 </a>
                                 <p class="text-xs text-gray-400 mt-0.5">
@@ -132,7 +132,7 @@
                                 </p>
                             </div>
                             @if($topic->category)
-                                <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full ml-3 shrink-0">
+                                <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full shrink-0">
                                     {{ $topic->category }}
                                 </span>
                             @endif
@@ -141,7 +141,7 @@
                 </div>
 
                 {{-- Members --}}
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-base font-semibold text-gray-900">Members</h3>
                         @if($group->admin_id === auth()->id())
