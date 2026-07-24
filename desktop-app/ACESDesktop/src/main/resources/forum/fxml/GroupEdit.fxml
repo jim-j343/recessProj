@@ -14,7 +14,7 @@
                 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link,active" onMouseClicked="#onGroups"/>
-                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
                 <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
                 <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
                 <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
@@ -105,5 +105,9 @@
             </VBox>
         </ScrollPane>
     </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
 

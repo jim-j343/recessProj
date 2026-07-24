@@ -9,25 +9,16 @@
 
                 <div class="flex items-center justify-center lg:justify-start gap-2">
 
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="w-7 h-7 text-indigo-600"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor"
-                         stroke-width="2">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m-6-3v-5m12 5v-5"/>
-                    </svg>
+                    <x-application-logo class="w-8 h-8 rounded" />
 
                     <span class="text-lg font-bold text-indigo-700">
-                        Smart Discussion Forum
+                        ACES
                     </span>
 
                 </div>
 
                 <p class="text-sm text-gray-500 mt-2">
-                    Empowering collaborative learning through meaningful academic discussions.
+                    Academic Collaboration and Evaluation system
                 </p>
 
             </div>
@@ -96,25 +87,7 @@
 
         </div>
 
-        <div class="border-t border-gray-200 mt-5 pt-4 flex flex-col md:flex-row justify-between items-center gap-3">
 
-            <span class="text-xs text-gray-500">
-                © {{ date('Y') }} Smart Discussion Forum. All rights reserved.
-            </span>
-
-            <div class="flex items-center gap-3">
-
-                <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold">
-                    Version 1.0.0
-                </span>
-
-                <span class="text-xs text-gray-400">
-                    University Edition
-                </span>
-
-            </div>
-
-        </div>
 
     </div>
 

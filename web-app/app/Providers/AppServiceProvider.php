@@ -22,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+if (app()->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
+        // Every authenticated page shares the navigation layout, so this is
         // Every authenticated page shares the navigation layout, so this is
         // the one place to load the bell icon's data instead of repeating
         // it in every controller.
