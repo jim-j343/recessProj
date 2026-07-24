@@ -80,6 +80,58 @@ class PostController extends Controller
             ->with('success', 'Reply posted!');
     }
 
+    // Poll endpoint: returns posts newer than ?after={post_id}, JSON only.
+    // The topic page calls this every few seconds so new replies appear
+    // without a refresh. Applies the same exclusion rules as the full page.
+    public function latest(Request $request, Topic $topic)
+    {
+        $afterId = (int) $request->query('after', 0);
+
+        // The topic's opening post renders as the topic body, never as a
+        // chat bubble — same convention as TopicController::show()
+        $openingPost = Post::where('topic_id', $topic->topic_id)
+            ->whereNull('parent_post_id')
+            ->orderBy('post_id')
+            ->first();
+
+        $posts = Post::where('topic_id', $topic->topic_id)
+            ->where('post_id', '>', $afterId)
+            ->when($openingPost, fn ($q) => $q->where('post_id', '!=', $openingPost->post_id))
+            ->with(['author', 'excludedUsers'])
+            ->orderBy('post_id')
+            ->get();
+
+        if (! Auth::user()->isAdmin()) {
+            $posts = $posts->reject(function ($post) {
+                return $post->author_id !== Auth::id()
+                    && $post->excludedUsers->contains('user_id', Auth::id());
+            })->values();
+        }
+
+        return response()->json($posts->map(function ($post) use ($topic) {
+            $badge = null;
+            if ($post->author_id == $topic->creator_id) {
+                $badge = 'Author';
+            } elseif (($post->author->system_role ?? null) == 'lecturer') {
+                $badge = 'Lecturer';
+            } elseif (($post->author->system_role ?? null) == 'system_admin') {
+                $badge = 'Admin';
+            }
+
+            return [
+                'post_id'         => $post->post_id,
+                'is_own'          => $post->author_id == Auth::id(),
+                'author'          => $post->author->username ?? 'Unknown',
+                'badge'           => $badge,
+                'content'         => $post->content,
+                'attachment_url'  => $post->attachment ? asset('storage/'.$post->attachment) : null,
+                'attachment_name' => $post->attachment_name,
+                'is_image'        => $post->attachment && str_starts_with($post->attachment_type ?? '', 'image/'),
+                'time'            => $post->created_at->format('h:i A'),
+            ];
+        }));
+    }
+
     // Report a post to the system admin — only someone who shares the
     // post's group can report it, matching the same scoping used
     // throughout the group-admin tools

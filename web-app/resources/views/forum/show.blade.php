@@ -192,7 +192,7 @@ use Illuminate\Support\Str;
 
         {{-- CHAT THREAD — WhatsApp-style bubbles: your own replies align right
              in green, everyone else's align left in white --}}
-        <div class="bg-slate-100 rounded-xl p-4 sm:p-6 space-y-2">
+        <div id="chat-thread" class="bg-slate-100 rounded-xl p-4 sm:p-6 space-y-2">
             @forelse($posts as $post)
 
                 {{-- Skip the first post because it is already displayed as the topic --}}
@@ -500,6 +500,97 @@ use Illuminate\Support\Str;
                 }
             }
         });
+    </script>
+
+    <script>
+        // ---- Live replies via polling ----
+        // Every 5 seconds, ask the server for posts newer than the newest one
+        // already on the page, and append them as bubbles. No refresh needed.
+        const topicPollUrl = "{{ route('posts.latest', $topic->topic_id) }}";
+
+        function lastPostId() {
+            let max = 0;
+            document.querySelectorAll('[id^="post-"]').forEach(el => {
+                const n = parseInt(el.id.replace('post-', ''), 10);
+                if (!isNaN(n) && n > max) max = n;
+            });
+            return max;
+        }
+
+        // Escape user text so a reply containing HTML can't inject markup
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s ?? '';
+            return d.innerHTML;
+        }
+
+        function bubbleHtml(p) {
+            const own = p.is_own;
+            const badge = p.badge
+                ? `<span class="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full font-medium">${p.badge}</span>`
+                : '';
+            const nameRow = own ? '' : `
+                <div class="flex items-center gap-1.5 mb-1">
+                    <span class="text-xs font-bold text-purple-700">${esc(p.author)}</span>
+                    ${badge}
+                </div>`;
+            const avatar = own ? '' : `
+                <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mb-1">
+                    ${esc((p.author || 'U').charAt(0).toUpperCase())}
+                </div>`;
+            const content = p.content
+                ? `<p class="text-gray-900 text-sm leading-6 whitespace-pre-wrap break-words">${esc(p.content)}</p>`
+                : '';
+            let attachment = '';
+            if (p.attachment_url) {
+                attachment = p.is_image
+                    ? `<div class="mt-2"><a href="${p.attachment_url}" target="_blank"><img src="${p.attachment_url}" class="rounded-lg max-h-60 max-w-full border border-black/10"></a></div>`
+                    : `<div class="mt-2"><a href="${p.attachment_url}" target="_blank" class="flex items-center gap-2 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-black/10">📎 <span class="truncate">${esc(p.attachment_name ?? 'Attachment')}</span></a></div>`;
+            }
+            return `
+            <div id="post-${p.post_id}" class="flex ${own ? 'justify-end' : 'justify-start'}">
+                <div class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%] ${own ? 'flex-row-reverse' : ''}">
+                    ${avatar}
+                    <div class="relative ${own ? 'bg-green-200 rounded-3xl rounded-tr-md' : 'bg-white rounded-3xl rounded-tl-md border border-gray-200'} px-4 py-3 pr-8 shadow">
+                        ${nameRow}
+                        ${content}
+                        ${attachment}
+                        <p class="text-[10px] text-gray-500 text-right mt-1.5 select-none">${p.time}</p>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        async function pollNewPosts() {
+            if (document.hidden) return; // don't poll from background tabs
+            try {
+                const res = await fetch(`${topicPollUrl}?after=${lastPostId()}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return;
+                const posts = await res.json();
+                if (!posts.length) return;
+
+                const thread = document.getElementById('chat-thread');
+                const nearBottom = window.innerHeight + window.scrollY
+                    >= document.body.scrollHeight - 200;
+
+                posts.forEach(p => {
+                    if (document.getElementById(`post-${p.post_id}`)) return;
+                    thread.insertAdjacentHTML('beforeend', bubbleHtml(p));
+                });
+
+                // Only auto-scroll if the reader was already at the bottom —
+                // never yank someone away from an older message they're reading
+                if (nearBottom) {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }
+            } catch (e) {
+                // Network hiccup — silently try again on the next tick
+            }
+        }
+
+        setInterval(pollNewPosts, 5000);
     </script>
 
 </body>
