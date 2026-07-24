@@ -16,70 +16,74 @@
 
     <div class="flex flex-col lg:flex-row min-h-screen bg-gray-50">
         <!-- LEFT SIDEBAR -->
-        <div class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-gray-200 p-6 flex flex-col gap-4 shrink-0">
-            <h2 class="text-xl font-bold text-gray-800">Student Portal</h2>
-            <nav class="flex flex-col gap-2">
-                <a href="{{ route('forum.index') }}" class="flex items-center gap-2 bg-gray-100 text-gray-900 px-4 py-2 rounded font-medium">
-                    <x-icon name="chat" class="w-4 h-4" /> Forums
-                </a>
-            </nav>
+        <div class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-gray-200 p-4 lg:p-6 flex flex-col gap-4 shrink-0">
+            <div class="flex items-center justify-between lg:block">
+                <h2 class="text-lg lg:text-xl font-bold text-gray-800">Student Portal</h2>
+                <nav class="lg:mt-4 lg:flex lg:flex-col lg:gap-2">
+                    <a href="{{ route('forum.index') }}" class="flex items-center gap-2 bg-gray-100 text-gray-900 px-4 py-2 rounded font-medium text-sm lg:text-base">
+                        <x-icon name="chat" class="w-4 h-4" /> Forums
+                    </a>
+                </nav>
+            </div>
 
             <!-- QUICK STATS (uses existing group/topic/post counters) -->
-            <div class="mt-4 pt-4 border-t border-gray-100 space-y-3">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Groups joined</span>
-                    <span class="font-semibold text-gray-800">{{ $groupCount ?? 0 }}</span>
+            <div class="pt-4 border-t border-gray-100 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
+                <div class="flex flex-col-reverse items-center lg:flex-row lg:justify-between text-sm">
+                    <span class="text-gray-500 text-xs lg:text-sm text-center">Groups joined</span>
+                    <span class="font-bold text-lg lg:text-sm lg:font-semibold text-gray-800">{{ $groupCount ?? 0 }}</span>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Topics in reach</span>
-                    <span class="font-semibold text-gray-800">{{ $topicCount ?? 0 }}</span>
+                <div class="flex flex-col-reverse items-center lg:flex-row lg:justify-between text-sm">
+                    <span class="text-gray-500 text-xs lg:text-sm text-center">Topics in reach</span>
+                    <span class="font-bold text-lg lg:text-sm lg:font-semibold text-gray-800">{{ $topicCount ?? 0 }}</span>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Posts made</span>
-                    <span class="font-semibold text-gray-800">{{ $postCount ?? 0 }}</span>
+                <div class="flex flex-col-reverse items-center lg:flex-row lg:justify-between text-sm">
+                    <span class="text-gray-500 text-xs lg:text-sm text-center">Posts made</span>
+                    <span class="font-bold text-lg lg:text-sm lg:font-semibold text-gray-800">{{ $postCount ?? 0 }}</span>
                 </div>
             </div>
         </div>
 
         <!-- MIDDLE PANE -->
-        <div class="flex-1 w-full p-4 sm:p-8 overflow-y-auto space-y-6">
+        <div class="flex-1 w-full p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-4 sm:space-y-6">
 
             <!-- QUIZ NOTICE (Recess Requirement #10) -->
             @if($activeQuiz ?? null)
                 <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded shadow-sm">
-                    <div class="flex justify-between items-center gap-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
                                 <x-icon name="alert-triangle" class="w-5 h-5 text-amber-600" />
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <h3 class="font-bold text-amber-800">Live Quiz In Progress</h3>
-                                <p class="text-sm text-amber-700">
-                                    "{{ $activeQuiz->title }}" is open now ({{ $activeQuiz->duration_minutes }} min). It will auto-submit when time expires.
+                                <p class="text-sm font-semibold text-amber-800 break-words">"{{ $activeQuiz->title }}"</p>
+                                <p class="text-xs text-amber-700 mt-0.5">
+                                    Open now · {{ $activeQuiz->duration_minutes }} min · auto-submits when time expires
                                 </p>
                             </div>
                         </div>
                         <a href="{{ route('quiz.show', $activeQuiz->quiz_id) }}"
-                           class="bg-amber-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-amber-700 whitespace-nowrap">
+                           class="bg-amber-600 text-white px-4 py-2.5 rounded text-sm font-semibold hover:bg-amber-700 text-center w-full sm:w-auto shrink-0">
                             Enter Quiz
                         </a>
                     </div>
                 </div>
             @elseif($upcomingQuiz ?? null)
                 <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded shadow-sm">
-                    <div class="flex justify-between items-center gap-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
                                 <x-icon name="bell" class="w-5 h-5 text-indigo-600" />
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <h3 class="font-bold text-indigo-800">Upcoming Quiz</h3>
-                                <p class="text-sm text-indigo-700">
-                                    "{{ $upcomingQuiz->title }}" opens {{ $upcomingQuiz->start_time->format('D, d M Y · H:i') }} ({{ $upcomingQuiz->duration_minutes }} min).
+                                <p class="text-sm font-semibold text-indigo-800 break-words">"{{ $upcomingQuiz->title }}"</p>
+                                <p class="text-xs text-indigo-700 mt-0.5">
+                                    Opens {{ $upcomingQuiz->start_time->format('D, d M Y · H:i') }} · {{ $upcomingQuiz->duration_minutes }} min
                                 </p>
                             </div>
                         </div>
-                        <span id="quiz-countdown" class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-full whitespace-nowrap font-mono">
+                        <span id="quiz-countdown" class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-full whitespace-nowrap font-mono self-start sm:self-center shrink-0">
                             Starts {{ $upcomingQuiz->start_time->diffForHumans() }}
                         </span>
                     </div>
@@ -101,10 +105,10 @@
             <!-- PROGRESS & GENERAL ASSESSMENT -->
             <div>
                 <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Progress & General Assessment</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
 
                         <!-- Quiz progress -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5">
                             <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mb-3">
                                 <x-icon name="chart-bar" class="w-5 h-5 text-blue-600" />
                             </div>
@@ -117,7 +121,7 @@
                         </div>
 
                         <!-- Participation, per group -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5">
                             <div class="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center mb-3">
                                 <x-icon name="sparkles" class="w-5 h-5 text-pink-600" />
                             </div>
@@ -138,7 +142,7 @@
                         </div>
 
                         <!-- Community standing -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5">
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-5">
                             @if(($latestWarning ?? null) && !$latestWarning->is_heeded)
                                 <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center mb-3">
                                     <x-icon name="shield-check" class="w-5 h-5 text-amber-600" />
@@ -164,10 +168,10 @@
 
 
             <!-- GRADES -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                <div class="flex justify-between items-center mb-4">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
                             <x-icon name="chart-bar" class="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
@@ -175,15 +179,15 @@
                             <p class="text-xs text-gray-400">Your most recent quiz results</p>
                         </div>
                     </div>
-                    <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full self-start sm:self-auto">
                         Average: {{ $averageGrade !== null ? $averageGrade.'%' : '—' }}
                     </span>
                 </div>
 
                 @forelse($gradedSubmissions ?? [] as $submission)
-                    <div class="flex justify-between items-center py-3 border-b border-gray-50 last:border-0">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">{{ $submission->quiz->title ?? 'Quiz' }}</p>
+                    <div class="flex justify-between items-center gap-3 py-3 border-b border-gray-50 last:border-0">
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-gray-800 truncate">{{ $submission->quiz->title ?? 'Quiz' }}</p>
                             <p class="text-xs text-gray-400">
                                 Submitted {{ $submission->submitted_at?->format('d M Y, H:i') }}
                                 @if($submission->auto_submitted)
@@ -191,7 +195,7 @@
                                 @endif
                             </p>
                         </div>
-                        <span class="text-sm font-bold text-gray-900">{{ $submission->scorePct }}%</span>
+                        <span class="text-sm font-bold text-gray-900 shrink-0">{{ $submission->scorePct }}%</span>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400">No graded quizzes yet — results will appear here once a quiz is marked.</p>
@@ -200,14 +204,14 @@
 
             <!-- TOPIC ISOLATION AND PDF EXPORT (Recess Requirement #6) -->
             @if($latestTopic ?? null)
-            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-900">Topic: {{ $latestTopic->title }}</h3>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 break-words">Topic: {{ $latestTopic->title }}</h3>
                         <p class="text-xs text-gray-400">Latest discussion in your groups — isolated view</p>
                     </div>
                     <a href="{{ route('topics.pdf', $latestTopic->topic_id) }}"
-                       class="bg-gray-900 text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wide hover:bg-gray-700">
+                       class="bg-gray-900 text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wide hover:bg-gray-700 self-start shrink-0">
                         Export Thread to PDF
                     </a>
                 </div>
@@ -215,7 +219,7 @@
                     @forelse($latestTopic->posts as $post)
                         @php $isOwn = $post->author_id === auth()->id(); @endphp
                         <div class="flex {{ $isOwn ? 'justify-end' : 'justify-start' }}">
-                            <div class="flex items-end gap-2 max-w-[80%] {{ $isOwn ? 'flex-row-reverse' : '' }}">
+                            <div class="flex items-end gap-2 max-w-[85%] sm:max-w-[80%] {{ $isOwn ? 'flex-row-reverse' : '' }}">
                                 @unless($isOwn)
                                     <div class="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                                         {{ strtoupper(substr($post->author->username ?? 'U', 0, 1)) }}
@@ -223,11 +227,11 @@
                                 @endunless
                                 <div class="{{ $isOwn
                                         ? 'bg-green-200 rounded-2xl rounded-tr-md'
-                                        : 'bg-gray-100 rounded-2xl rounded-tl-md' }} px-3 py-2">
+                                        : 'bg-gray-100 rounded-2xl rounded-tl-md' }} px-3 py-2 min-w-0">
                                     @unless($isOwn)
                                         <p class="text-[11px] font-semibold text-purple-700 mb-0.5">{{ $post->author->username ?? 'Unknown' }}</p>
                                     @endunless
-                                    <p class="text-sm text-gray-800">{{ Str::limit($post->content, 180) }}</p>
+                                    <p class="text-sm text-gray-800 break-words">{{ Str::limit($post->content, 180) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -241,14 +245,14 @@
                 </div>
             </div>
             @else
-            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 text-center text-gray-400 text-sm">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 text-center text-gray-400 text-sm">
                 No discussions in your groups yet — <a href="{{ route('groups.index') }}" class="text-indigo-600 underline">join a group</a> to get started.
             </div>
             @endif
         </div>
 
         <!-- RIGHT SIDEBAR (Recess Requirement #11 & #12) -->
-        <div class="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-6 flex flex-col gap-6 shrink-0">
+        <div class="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-4 lg:p-6 flex flex-col gap-6 shrink-0">
             <!-- RECOMMENDATIONS -->
             <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
                 <div class="flex items-center gap-2 mb-1">
@@ -260,7 +264,7 @@
                 <p class="text-xs text-indigo-700 mb-2">Based on your engagement history:</p>
                 @forelse($recommendedTopics as $rec)
                     <a href="{{ route('topics.show', $rec->topic_id) }}"
-                       class="text-xs font-semibold text-indigo-600 underline block mb-1.5">
+                       class="text-xs font-semibold text-indigo-600 underline block mb-1.5 break-words">
                         # {{ $rec->topic->title ?? 'Untitled topic' }}
                     </a>
                 @empty
