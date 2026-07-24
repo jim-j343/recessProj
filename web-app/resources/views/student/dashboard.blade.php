@@ -79,7 +79,7 @@
                                 </p>
                             </div>
                         </div>
-                        <span class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-full whitespace-nowrap">
+                        <span id="quiz-countdown" class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-full whitespace-nowrap font-mono">
                             Starts {{ $upcomingQuiz->start_time->diffForHumans() }}
                         </span>
                     </div>
@@ -271,7 +271,7 @@
                     ↻ Refresh recommendations
                 </a>
             </div>
-            
+
             <!-- RECENT ACTIVITY -->
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -294,4 +294,38 @@
 
         </div>
     </div>
+    @if($upcomingQuiz ?? null)
+    <script>
+        // Live countdown to quiz start. Computed server-side so the student's
+        // system clock being wrong can't unlock the quiz early or late.
+        let secondsUntilStart = {{ (int) max(0, now()->diffInSeconds($upcomingQuiz->start_time, false)) }};
+        const countdownEl = document.getElementById('quiz-countdown');
+
+        function renderQuizCountdown() {
+            if (secondsUntilStart >= 86400) {
+                const d = Math.floor(secondsUntilStart / 86400);
+                const h = Math.floor((secondsUntilStart % 86400) / 3600);
+                countdownEl.textContent = `Starts in ${d}d ${h}h`;
+                return;
+            }
+            const h = Math.floor(secondsUntilStart / 3600);
+            const m = String(Math.floor((secondsUntilStart % 3600) / 60)).padStart(2, '0');
+            const s = String(secondsUntilStart % 60).padStart(2, '0');
+            countdownEl.textContent = h > 0 ? `Starts in ${h}:${m}:${s}` : `Starts in ${m}:${s}`;
+        }
+
+        renderQuizCountdown();
+        const quizTick = setInterval(() => {
+            secondsUntilStart--;
+            if (secondsUntilStart <= 0) {
+                clearInterval(quizTick);
+                // Reload flips the card into "Live Quiz In Progress" with the
+                // Enter button — the controller already handles that state.
+                location.reload();
+                return;
+            }
+            renderQuizCountdown();
+        }, 1000);
+    </script>
+    @endif
 </x-app-layout>

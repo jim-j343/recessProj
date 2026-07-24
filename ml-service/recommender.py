@@ -31,6 +31,11 @@ def get_recommendations(target_user_id, engagements, top_n=5):
     """
     Returns top_n topic IDs recommended for target_user_id
     """
+    # No engagement data yet (fresh database) — nothing to recommend from.
+    # Without this guard, building the matrix from an empty list crashes.
+    if not engagements:
+        return []
+
     matrix = build_user_topic_matrix(engagements)
 
     # If user not in matrix, return empty list

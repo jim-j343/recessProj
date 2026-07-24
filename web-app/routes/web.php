@@ -61,10 +61,10 @@ Route::middleware(['auth', 'not.blacklisted'])->group(function () {
     Route::put('/topics/{topic}', [TopicController::class, 'update'])->name('topics.update');
     Route::get('/topics/{topic}/export-pdf', [TopicController::class, 'exportPdf'])->name('topics.pdf');
     Route::post('/topics/{topic}/posts', [PostController::class, 'store'])->name('posts.store');
+        Route::get('/topics/{topic}/posts/latest', [PostController::class, 'latest'])->name('posts.latest');
     Route::delete('/topics/{topic}', [TopicController::class, 'destroy'])->name('topics.destroy');
     Route::post('/topics/{topic}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     Route::get('/recommendations/refresh', [\App\Http\Controllers\RecommendationController::class, 'refresh'])->name('recommendations.refresh');
-
 
     Route::post('/posts/{post}/solution', [PostController::class, 'markSolution'])->name('posts.solution');
     Route::post('/posts/{post}/flag', [PostController::class, 'flag'])->name('posts.flag');
@@ -167,4 +167,3 @@ Route::middleware(['auth', 'role:system_admin'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
