@@ -99,7 +99,13 @@ class AdminController extends Controller
             ->pluck('total', 'quiz_id');
 
         $groupPerformance = Group::orderBy('name')->get()->map(function ($group) use ($quizTotalMarks) {
+<<<<<<< HEAD
+            $quizIds = Quiz::where('group_id', $group->group_id)
+                ->when($group->course_name, fn ($q) => $q->orWhere('course_name', $group->course_name))
+                ->pluck('quiz_id');
+=======
             $quizIds = Quiz::where('group_id', $group->group_id)->pluck('quiz_id');
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
             $percentages = Submission::whereIn('quiz_id', $quizIds)
                 ->whereNotNull('submitted_at')
@@ -129,11 +135,25 @@ class AdminController extends Controller
             $quizzes = Quiz::where('lecturer_id', $lecturer->user_id)->get();
             $quizIds = $quizzes->pluck('quiz_id');
 
+<<<<<<< HEAD
+            $courses = $quizzes->pluck('course_name')->filter()->unique();
+
+            // Legacy quizzes created before course_name existed only have
+            // a group_id — fall back to deriving the course from that
+            if ($courses->isEmpty()) {
+                $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->filter()->unique())
+                    ->pluck('course_name')
+                    ->filter()
+                    ->unique()
+                    ->values();
+            }
+=======
             $courses = Group::whereIn('group_id', $quizzes->pluck('group_id')->unique())
                 ->pluck('course_name')
                 ->filter()
                 ->unique()
                 ->values();
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
             $percentages = Submission::whereIn('quiz_id', $quizIds)
                 ->whereNotNull('submitted_at')
@@ -337,6 +357,10 @@ class AdminController extends Controller
                     'id' => $r->report_id,
                     'post_content' => $r->post ? $r->post->content : 'Unknown',
                     'topic_title' => $r->post && $r->post->topic ? $r->post->topic->title : 'Unknown',
+<<<<<<< HEAD
+                    'topic_id' => $r->post && $r->post->topic ? $r->post->topic->topic_id : null,
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     'author' => $r->post && $r->post->author ? $r->post->author->username : 'Unknown',
                     'reported_by' => $r->reportedBy ? $r->reportedBy->username : 'Unknown',
                     'reason' => $r->reason,
@@ -366,4 +390,8 @@ class AdminController extends Controller
             ]
         ]);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

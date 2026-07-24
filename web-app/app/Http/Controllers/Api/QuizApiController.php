@@ -4,7 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
+<<<<<<< HEAD
+use App\Models\Group;
 use App\Models\GroupMembership;
+use App\Models\Notification;
+=======
+use App\Models\GroupMembership;
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\Submission;
@@ -14,13 +20,30 @@ use Illuminate\Http\Request;
 
 class QuizApiController extends Controller
 {
+<<<<<<< HEAD
+    /** GET /api/quizzes — student: available quizzes in their groups
+     *  (including course-targeted quizzes visible to every group sharing
+     *  that course unit — mirrors StudentController::dashboard() on web) */
+=======
     /** GET /api/quizzes — student: available quizzes in their groups */
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     public function index(Request $request): JsonResponse
     {
         $groupIds = GroupMembership::where('user_id', $request->user()->user_id)
             ->where('status', 'active')->pluck('group_id');
 
+<<<<<<< HEAD
+        $courseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
+
+        $quizzes = Quiz::where(function ($q) use ($groupIds, $courseNames) {
+                $q->whereIn('group_id', $groupIds);
+                if ($courseNames->isNotEmpty()) {
+                    $q->orWhereIn('course_name', $courseNames);
+                }
+            })
+=======
         $quizzes = Quiz::whereIn('group_id', $groupIds)
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             ->where('is_published', true)
             ->latest()->get()
             ->map(fn($q) => $this->quizShape($q));
@@ -38,6 +61,97 @@ class QuizApiController extends Controller
         return response()->json($quizzes);
     }
 
+<<<<<<< HEAD
+    /** POST /api/quizzes — lecturer: create a quiz + its questions/answers.
+     *  Mirrors QuizController::store() on web exactly. */
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title'                      => ['required', 'string', 'max:255'],
+            'course_name'                => ['required', 'string', 'max:150'],
+            'start_time'                 => ['required', 'date'],
+            'duration'                   => ['required', 'integer', 'min:1'],
+            'target'                     => ['nullable', 'string', 'max:80'],
+            'questions'                  => ['required', 'array', 'min:1'],
+            'questions.*.text'           => ['required', 'string'],
+            'questions.*.answers'        => ['required', 'array', 'min:2'],
+            'questions.*.answers.*'      => ['required', 'string'],
+            'questions.*.correct_answer' => ['required', 'integer'],
+        ]);
+
+        $quiz = Quiz::create([
+            'lecturer_id'      => $request->user()->user_id,
+            'course_name'      => $request->course_name,
+            'title'            => $request->title,
+            'target_category'  => $request->target,
+            'start_time'       => $request->start_time,
+            'duration_minutes' => $request->duration,
+            'is_published'     => $request->boolean('publish'),
+        ]);
+
+        foreach ($request->questions as $index => $q) {
+            $question = Question::create([
+                'quiz_id'     => $quiz->quiz_id,
+                'content'     => $q['text'],
+                'type'        => 'mcq',
+                'marks'       => 1,
+                'order_index' => $index + 1,
+            ]);
+
+            foreach ($q['answers'] as $aIndex => $answerText) {
+                Answer::create([
+                    'question_id' => $question->question_id,
+                    'content'     => $answerText,
+                    'is_correct'  => ($aIndex == $q['correct_answer']),
+                ]);
+            }
+        }
+
+        if ($quiz->is_published) {
+            $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
+                ->where('status', 'active')
+                ->where('user_id', '!=', $request->user()->user_id)
+                ->pluck('user_id')
+                ->unique();
+
+            foreach ($memberIds as $userId) {
+                Notification::notify($userId, 'quiz_announced');
+            }
+        }
+
+        return response()->json($this->quizShape($quiz->fresh()), 201);
+    }
+
+    /** POST /api/quizzes/{id}/publish — lecturer: publish a draft quiz.
+     *  Mirrors QuizController::publish() on web. */
+    public function publish(Request $request, $id): JsonResponse
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        if ($quiz->lecturer_id !== $request->user()->user_id && ! $request->user()->isAdmin()) {
+            return response()->json(['message' => 'You cannot publish this quiz.'], 403);
+        }
+        if ($quiz->is_published) {
+            return response()->json(['message' => 'This quiz is already published.'], 422);
+        }
+
+        $quiz->update(['is_published' => true]);
+
+        $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
+            ->where('status', 'active')
+            ->where('user_id', '!=', $request->user()->user_id)
+            ->pluck('user_id')
+            ->unique();
+
+        foreach ($memberIds as $userId) {
+            Notification::notify($userId, 'quiz_announced');
+        }
+
+        return response()->json($this->quizShape($quiz->fresh()));
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     /** GET /api/quizzes/{id} — quiz with questions and answers */
     public function show($id): JsonResponse
     {

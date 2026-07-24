@@ -22,7 +22,11 @@ public class TopicDao {
             SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,
                    t.is_flagged, t.created_at,
                    COALESCE(u.username, u.email) AS author,
+<<<<<<< HEAD
+                   MAX((SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id), IFNULL(t.reply_count, 0)) AS replies
+=======
                    (SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id) AS replies
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             FROM topics t
             LEFT JOIN users u ON u.user_id = t.creator_id
             ORDER BY t.created_at DESC, t.topic_id DESC
@@ -46,7 +50,11 @@ public class TopicDao {
             SELECT t.topic_id, t.group_id, t.creator_id, t.title, t.category,
                    t.is_flagged, t.created_at,
                    COALESCE(u.username, u.email) AS author,
+<<<<<<< HEAD
+                   MAX((SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id), IFNULL(t.reply_count, 0)) AS replies
+=======
                    (SELECT COUNT(*) FROM posts p WHERE p.topic_id = t.topic_id) AS replies
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             FROM topics t
             LEFT JOIN users u ON u.user_id = t.creator_id
             WHERE t.group_id = ?
@@ -115,7 +123,11 @@ public class TopicDao {
      */
     public void upsertFromServer(TopicDto dto) {
         String update = "UPDATE topics SET group_id = ?, creator_id = ?, title = ?, "
+<<<<<<< HEAD
+                + "category = ?, created_at = COALESCE(?, created_at), reply_count = ?, server_id = ? WHERE server_id = ?";
+=======
                 + "category = ?, created_at = COALESCE(?, created_at), server_id = ? WHERE server_id = ?";
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         try (Connection c = SQLiteConnection.get()) {
             int rows;
             try (PreparedStatement ps = c.prepareStatement(update)) {
@@ -124,14 +136,25 @@ public class TopicDao {
                 ps.setString(3, dto.title);
                 ps.setString(4, dto.category);
                 ps.setString(5, dto.created_at);
+<<<<<<< HEAD
+                ps.setInt(6, dto.posts_count > 0 ? dto.posts_count : dto.replies);
+                ps.setLong(7, dto.topic_id);
+                ps.setLong(8, dto.topic_id);
+=======
                 ps.setLong(6, dto.topic_id);
                 ps.setLong(7, dto.topic_id);
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 rows = ps.executeUpdate();
             }
             if (rows == 0) {
                 String insert = "INSERT OR REPLACE INTO topics"
+<<<<<<< HEAD
+                        + "(topic_id, group_id, creator_id, title, category, is_flagged, server_id, created_at, reply_count) "
+                        + "VALUES(?,?,?,?,?,0,?,?,?)";
+=======
                         + "(topic_id, group_id, creator_id, title, category, is_flagged, server_id, created_at) "
                         + "VALUES(?,?,?,?,?,0,?,?)";
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 try (PreparedStatement pi = c.prepareStatement(insert)) {
                     pi.setLong(1, dto.topic_id);
                     pi.setLong(2, dto.group_id);
@@ -140,6 +163,10 @@ public class TopicDao {
                     pi.setString(5, dto.category);
                     pi.setLong(6, dto.topic_id);
                     pi.setString(7, dto.created_at);
+<<<<<<< HEAD
+                    pi.setInt(8, dto.posts_count > 0 ? dto.posts_count : dto.replies);
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     pi.executeUpdate();
                 }
             }
@@ -189,6 +216,39 @@ public class TopicDao {
         }
     }
 
+<<<<<<< HEAD
+    /** Removes a topic (and its posts) from the local cache after a successful server-side delete. */
+    public void deleteLocal(long topicId) {
+        try (Connection c = SQLiteConnection.get()) {
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE topic_id = ?")) {
+                ps.setLong(1, topicId);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = c.prepareStatement("DELETE FROM topics WHERE topic_id = ?")) {
+                ps.setLong(1, topicId);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Updates a topic's cached title/category after a successful server-side edit. */
+    public void updateLocal(long topicId, String title, String category) {
+        try (Connection c = SQLiteConnection.get();
+             PreparedStatement ps = c.prepareStatement(
+                     "UPDATE topics SET title = ?, category = ? WHERE topic_id = ?")) {
+            ps.setString(1, title);
+            ps.setString(2, category);
+            ps.setLong(3, topicId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     /** Ensures a default group + a couple of demo topics exist on first run. */
     public void seedDemoIfEmpty() {
         if (count("\"groups\"") == 0) insertDefaultGroup();
@@ -244,4 +304,8 @@ public class TopicDao {
         t.setReplyCount(rs.getInt("replies"));
         return t;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

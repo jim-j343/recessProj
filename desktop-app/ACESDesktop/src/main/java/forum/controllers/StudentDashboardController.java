@@ -4,9 +4,17 @@ import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.QuizDto;
 import forum.api.dto.QuizResultDto;
+<<<<<<< HEAD
+import forum.api.dto.StudentDashboardDto;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
+import forum.models.Topic;
+=======
+import forum.app.SceneManager;
+import forum.app.Session;
+import forum.app.ViewState;
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 import forum.models.User;
 import forum.services.AuthService;
 import forum.util.NavbarHelper;
@@ -16,6 +24,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+<<<<<<< HEAD
+import javafx.scene.control.MenuButton;
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -28,6 +40,11 @@ public class StudentDashboardController {
     @FXML private Label       avatarLabel;
     @FXML private Label       userNameLabel;
     @FXML private Label       welcomeLabel;
+<<<<<<< HEAD
+    @FXML private MenuButton  notifButton;
+    @FXML private Label       notifBadge;
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private HBox        quizAlertBox;
     @FXML private Label       quizAlertIcon;
     @FXML private Label       quizAlertTitle;
@@ -42,8 +59,18 @@ public class StudentDashboardController {
     @FXML private VBox        resultsBox;
     @FXML private Label       noResultsLabel;
 
+<<<<<<< HEAD
+    // Latest topic / recommended topic cards
+    @FXML private VBox   latestTopicBox;
+    @FXML private Label  latestTopicTitle;
+    @FXML private Label  latestTopicMeta;
+    @FXML private VBox   recommendedTopicBox;
+    @FXML private Label  recommendedTopicTitle;
+    @FXML private Label  recommendedTopicMeta;
+=======
     @FXML private javafx.scene.control.MenuButton notifButton;
     @FXML private Label notifBadge;
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
     private final ApiClient api = new ApiClient();
 
@@ -56,9 +83,16 @@ public class StudentDashboardController {
             welcomeLabel.setText("Welcome back, " + u.displayName() + " 👋");
         }
         if (notifButton != null) {
+<<<<<<< HEAD
+            NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
+        loadInBackground();
+        loadDashboardExtras();
+=======
             forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
         loadInBackground();
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     private void loadInBackground() {
@@ -107,6 +141,65 @@ public class StudentDashboardController {
         worker.start();
     }
 
+<<<<<<< HEAD
+    /** Participation, community standing, and the two topic cards. */
+    private void loadDashboardExtras() {
+        String token = Session.authToken();
+        if (token == null) return;
+
+        Thread worker = new Thread(() -> {
+            try {
+                StudentDashboardDto dto = api.studentDashboard(token);
+                Platform.runLater(() -> renderExtras(dto));
+            } catch (ApiException | java.io.IOException | InterruptedException e) {
+                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            }
+        }, "student-dashboard-extras");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    private void renderExtras(StudentDashboardDto dto) {
+        participationLabel.setText(Math.round(dto.participationAvg) + "%");
+
+        standingLabel.getStyleClass().removeAll("badge-success", "badge-warning", "badge-danger");
+        boolean hasWarning = dto.standing != null && "warning".equals(dto.standing.status);
+        standingLabel.setText(dto.standing != null && dto.standing.label != null ? dto.standing.label
+                : (hasWarning ? "Warning" : "Good Standing"));
+        standingLabel.getStyleClass().add(hasWarning ? "badge-warning" : "badge-success");
+        standingSub.setText(dto.standing != null && dto.standing.sub != null ? dto.standing.sub
+                : "No active warnings on your account");
+
+        if (dto.latestTopic != null) {
+            latestTopicTitle.setText(dto.latestTopic.title);
+            latestTopicMeta.setText(dto.latestTopic.groupName + " · " + dto.latestTopic.postsCount
+                    + " replies · " + dto.latestTopic.createdAtHuman);
+            latestTopicBox.setOnMouseClicked(e -> openTopic(dto.latestTopic));
+        } else {
+            latestTopicTitle.setText("No topics yet");
+            latestTopicMeta.setText("Nothing posted in your groups yet.");
+        }
+
+        if (dto.recommendedTopic != null) {
+            recommendedTopicTitle.setText(dto.recommendedTopic.title);
+            recommendedTopicMeta.setText(dto.recommendedTopic.groupName + " · " + dto.recommendedTopic.postsCount + " replies");
+            recommendedTopicBox.setOnMouseClicked(e -> openTopic(dto.recommendedTopic));
+        } else {
+            recommendedTopicTitle.setText("You're all caught up");
+            recommendedTopicMeta.setText("No unread recommendations right now.");
+        }
+    }
+
+    private void openTopic(StudentDashboardDto.TopicSummary summary) {
+        Topic t = new Topic();
+        t.setTopicId(summary.topicId);
+        t.setTitle(summary.title);
+        ViewState.setSelectedTopic(t);
+        SceneManager.show("TopicDetail", "Smart Discussion Forum — " + summary.title);
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     private void renderQuizAlert(List<QuizDto> quizzes) {
         QuizDto active = quizzes.stream()
                 .filter(q -> q.isPublished && isNowActive(q))

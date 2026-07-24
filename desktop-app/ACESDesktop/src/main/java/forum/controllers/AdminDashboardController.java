@@ -140,6 +140,22 @@ public class AdminDashboardController {
         // Right-click context menu on member rows for quick blacklist/lift
         membersTable.setRowFactory(table -> memberRow());
 
+<<<<<<< HEAD
+        // ── Auto-resize tables (Fixed height to match web style) ──
+        groupSettingsTable.setFixedCellSize(52);
+        groupSettingsTable.prefHeightProperty().bind(
+            javafx.beans.binding.Bindings.max(1, javafx.beans.binding.Bindings.size(groupSettingsTable.getItems()))
+                .multiply(groupSettingsTable.getFixedCellSize()).add(36)
+        );
+
+        membersTable.setFixedCellSize(52);
+        membersTable.prefHeightProperty().bind(
+            javafx.beans.binding.Bindings.max(1, javafx.beans.binding.Bindings.size(membersTable.getItems()))
+                .multiply(membersTable.getFixedCellSize()).add(36)
+        );
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         loadDashboard();
     }
@@ -171,12 +187,21 @@ public class AdminDashboardController {
         blacklistedLabel.setText(String.valueOf(data.blacklisted));
 
         // Group settings table
+<<<<<<< HEAD
+        groupSettingsTable.getItems().setAll(
+                data.groupSettings == null ? java.util.List.of() : data.groupSettings);
+
+        // Member table
+        membersTable.getItems().setAll(
+                data.members == null ? java.util.List.of() : data.members);
+=======
         groupSettingsTable.setItems(FXCollections.observableArrayList(
                 data.groupSettings == null ? java.util.List.of() : data.groupSettings));
 
         // Member table
         membersTable.setItems(FXCollections.observableArrayList(
                 data.members == null ? java.util.List.of() : data.members));
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         if (statusLabel != null) {
             statusLabel.setManaged(false);

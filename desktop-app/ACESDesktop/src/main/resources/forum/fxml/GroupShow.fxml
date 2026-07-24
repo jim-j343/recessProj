@@ -48,8 +48,25 @@
                         </HBox>
                     </graphic>
                     <items>
+<<<<<<< HEAD
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+=======
                         <MenuItem text="✓  Profile" onAction="#onProfile"/>
                         <MenuItem text="→  Log Out" onAction="#onLogout"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
@@ -64,6 +81,10 @@
                     <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
                     <Button fx:id="editGroupBtn" text="Edit Group" styleClass="btn,btn-secondary" onAction="#onEditGroup" managed="false" visible="false"/>
                     <Button fx:id="deleteGroupBtn" text="Delete Group" style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-weight:bold; -fx-padding:8 16 8 16; -fx-background-radius:6; -fx-cursor:hand;" onAction="#onDeleteGroup" managed="false" visible="false"/>
+<<<<<<< HEAD
+                    <Button fx:id="leaveGroupBtn" text="Leave Group" styleClass="btn,btn-secondary" onAction="#onLeaveGroup" managed="false" visible="false"/>
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 </HBox>
             </HBox>
         </VBox>
@@ -202,3 +223,7 @@
     </StackPane>
 
 </StackPane>
+<<<<<<< HEAD
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

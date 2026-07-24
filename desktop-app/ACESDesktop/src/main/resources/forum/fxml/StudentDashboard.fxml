@@ -2,6 +2,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<<<<<<< HEAD
+<?import javafx.scene.layout.StackPane?>
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.StudentDashboardController"
@@ -36,8 +40,25 @@
                         </HBox>
                     </graphic>
                     <items>
+<<<<<<< HEAD
+                        <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+=======
                         <MenuItem text="✓  Profile" onAction="#onProfile"/>
                         <MenuItem text="→  Log Out" onAction="#onLogout"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
@@ -103,13 +124,41 @@
                                managed="false" visible="false"/>
                     </VBox>
 
+<<<<<<< HEAD
+                    <!-- Latest topic / Recommended for you -->
+                    <HBox spacing="16">
+                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="LATEST TOPIC" styleClass="eyebrow"/>
+                            <Label fx:id="latestTopicTitle" styleClass="label-strong" wrapText="true"/>
+                            <Label fx:id="latestTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="RECOMMENDED FOR YOU" styleClass="eyebrow"/>
+                            <Label fx:id="recommendedTopicTitle" styleClass="label-strong" wrapText="true"/>
+                            <Label fx:id="recommendedTopicMeta" styleClass="subtle" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Logout -->
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </graphic>
+                        </Button>
+=======
                     <!-- Logout -->
                     <HBox alignment="CENTER_RIGHT">
                         <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </HBox>
 
                 </VBox>
             </VBox>
         </ScrollPane>
     </center>
+<<<<<<< HEAD
 </BorderPane>
+=======
+</BorderPane>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

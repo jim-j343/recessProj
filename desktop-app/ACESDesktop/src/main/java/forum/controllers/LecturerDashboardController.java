@@ -98,7 +98,11 @@ public class LecturerDashboardController {
 
     private HBox quizRow(QuizDto q) {
         Label title = new Label(q.title);
+<<<<<<< HEAD
+        title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+=======
         title.getStyleClass().add("label-strong");
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         String timeStr = "";
         if (q.startTime != null && !q.startTime.isBlank()) {
@@ -119,7 +123,11 @@ public class LecturerDashboardController {
         }
 
         Label meta = new Label(timeStr);
+<<<<<<< HEAD
+        meta.setStyle("-fx-font-size: 12px; -fx-text-fill: #6b7280;");
+=======
         meta.getStyleClass().add("subtle");
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         VBox info = new VBox(2, title, meta);
         HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
@@ -127,12 +135,51 @@ public class LecturerDashboardController {
         Label badge = new Label(q.isPublished ? "Published" : "Draft");
         badge.getStyleClass().addAll("badge", q.isPublished ? "badge-success" : "badge-neutral");
 
+<<<<<<< HEAD
+        HBox row;
+        if (!q.isPublished) {
+            javafx.scene.control.Button publishBtn = new javafx.scene.control.Button("Publish");
+            publishBtn.getStyleClass().addAll("btn-sm", "btn-outline");
+            publishBtn.setOnAction(e -> onPublishQuiz(q, publishBtn));
+            row = new HBox(10, info, badge, publishBtn);
+        } else {
+            row = new HBox(info, badge);
+        }
+=======
         HBox row = new HBox(info, badge);
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         row.setPadding(new Insets(10, 0, 10, 0));
         return row;
     }
 
+<<<<<<< HEAD
+    private void onPublishQuiz(QuizDto q, javafx.scene.control.Button sourceBtn) {
+        String token = Session.authToken();
+        if (token == null) return;
+        sourceBtn.setDisable(true);
+        Thread t = new Thread(() -> {
+            try {
+                api.publishQuiz(token, q.quizId);
+                Platform.runLater(this::loadInBackground); // refresh the whole list
+            } catch (ApiException e) {
+                Platform.runLater(() -> {
+                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.ERROR, e.getMessage());
+                    a.setHeaderText("Couldn't publish quiz");
+                    a.showAndWait();
+                    sourceBtn.setDisable(false);
+                });
+            } catch (Exception e) {
+                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            }
+        }, "publish-quiz-api");
+        t.setDaemon(true);
+        t.start();
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private void onGroups()     { SceneManager.goGroups(); }
     @FXML private void onNewTopic()   { SceneManager.goTopicCreation(); }
     @FXML private void onForum()      { SceneManager.goForumDashboard(); }

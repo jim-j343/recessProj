@@ -139,7 +139,11 @@
 .btn-primary:hover { -fx-background-color: -indigo-700; }
 .btn-dark          { -fx-background-color: -ink; -fx-text-fill: white; }
 .btn-dark:hover    { -fx-background-color: -ink-700; }
+<<<<<<< HEAD
+.btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; -fx-alignment: center-left; }
+=======
 .btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; }
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 .btn-secondary:hover { -fx-background-color: -border; }
 .btn-outline       { -fx-background-color: -surface; -fx-text-fill: -ink-700; -fx-border-color: -border; -fx-border-width: 1; }
 .btn-outline:hover { -fx-background-color: -bg-50; }
@@ -328,7 +332,11 @@
     -fx-padding: 8 16 8 16; -fx-cursor: hand;
 }
 .segmented-blue .toggle-button:hover { -fx-background-color: -bg-50; }
+<<<<<<< HEAD
+.segmented-blue .toggle-button:selected { -fx-background-color: -indigo; -fx-text-fill: white; -fx-border-color: -indigo; -fx-font-weight: 600; }
+=======
 .segmented-blue .toggle-button:selected { -fx-background-color: -indigo-500; -fx-text-fill: white; -fx-border-color: -indigo-500; -fx-font-weight: 600; }
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
 /* Underline tab strip — mirrors web border-b-2 tab style */
 .tab-strip { -fx-background-color: transparent; -fx-spacing: 0; -fx-padding: 0; }
@@ -355,6 +363,16 @@
 }
 .segmented-role .toggle-button:selected { -fx-background-color: -surface; -fx-text-fill: -ink; -fx-font-weight: 600; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 3, 0, 0, 1); }
 
+<<<<<<< HEAD
+/* ---------- Table (Matches web exact Tailwind styling) ---------- */
+.table-view { -fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; }
+.table-view .column-header-background { -fx-background-color: -bg-50; -fx-background-radius: 0; -fx-padding: 0; }
+.table-view .column-header { -fx-background-color: transparent; -fx-border-color: -border; -fx-border-width: 0 0 1 0; }
+.table-view .column-header .label { -fx-text-fill: -ink-500; -fx-font-size: 12px; -fx-font-weight: 600; -fx-alignment: center-left; -fx-padding: 12 16 12 16; }
+.table-view .table-cell { -fx-text-fill: -ink-500; -fx-padding: 16 16 16 16; -fx-border-color: transparent; -fx-font-size: 13px; }
+.table-row-cell { -fx-background-color: -surface; -fx-border-color: -border; -fx-border-width: 0 0 1 0; }
+.table-row-cell:hover { -fx-background-color: -surface; /* Web tables don't have hover */ }
+=======
 /* ---------- Table ---------- */
 .table-view { -fx-background-color: -surface; -fx-border-color: -border-100; -fx-border-width: 1; -fx-background-radius: 8; -fx-border-radius: 8; }
 .table-view .column-header-background { -fx-background-color: -bg-50; -fx-background-radius: 8 8 0 0; }
@@ -364,6 +382,7 @@
 .table-view .table-cell { -fx-text-fill: -ink-700; -fx-padding: 14 16 14 16; -fx-border-color: transparent; -fx-font-size: 13px; }
 .table-row-cell { -fx-background-color: -surface; -fx-border-color: -border-100; -fx-border-width: 0 0 1 0; -fx-cell-size: 52px; }
 .table-row-cell:hover { -fx-background-color: -bg-50; }
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 .table-view .filler, .table-view .corner { -fx-background-color: -bg-50; }
 
 /* ---------- Misc ---------- */

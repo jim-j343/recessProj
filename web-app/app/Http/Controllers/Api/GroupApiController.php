@@ -100,6 +100,25 @@ class GroupApiController extends Controller
         return response()->json(['message' => 'Join request sent.']);
     }
 
+<<<<<<< HEAD
+    /** POST /api/groups/{group}/leave — mirrors GroupController::leave() on web. */
+    public function leave(Request $request, Group $group): JsonResponse
+    {
+        $userId = $request->user()->user_id;
+
+        if ($group->admin_id === $userId) {
+            return response()->json(['message' => 'Group admin cannot leave.'], 422);
+        }
+
+        GroupMembership::where('user_id', $userId)
+            ->where('group_id', $group->group_id)
+            ->delete();
+
+        return response()->json(['message' => 'You left ' . $group->name . '.']);
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     /** GET /api/groups/{group}/members  (admin only) */
     public function members(Request $request, Group $group): JsonResponse
     {

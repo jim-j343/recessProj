@@ -488,6 +488,21 @@ use Illuminate\Support\Str;
         }
     </script>
 
+<<<<<<< HEAD
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash) {
+                const posts = document.querySelectorAll('[id^="post-"]');
+                const lastPost = posts[posts.length - 1];
+                if (lastPost) {
+                    lastPost.scrollIntoView({ behavior: 'auto', block: 'end' });
+                } else {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+                }
+            }
+        });
+    </script>
+=======
     {{-- After posting a reply, jump to it instead of landing back at the
          top of the page (the default behaviour of a full-page redirect) --}}
     @if(session('success') === 'Reply posted!')
@@ -503,6 +518,7 @@ use Illuminate\Support\Str;
             });
         </script>
     @endif
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
 </body>
 </html>

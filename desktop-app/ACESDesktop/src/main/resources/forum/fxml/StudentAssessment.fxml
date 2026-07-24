@@ -40,8 +40,25 @@
                     </HBox>
                 </graphic>
                 <items>
+<<<<<<< HEAD
+                    <MenuItem text="Profile" onAction="#onProfile">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+                        <MenuItem text="Log Out" onAction="#onLogout">
+                            <graphic>
+                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
+                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </javafx.scene.layout.StackPane>
+                            </graphic>
+                        </MenuItem>
+=======
                     <MenuItem text="✓  Profile" onAction="#onProfile"/>
                     <MenuItem text="→  Log Out" onAction="#onLogout"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 </items>
             </MenuButton>
         </HBox>
@@ -53,13 +70,34 @@
                 <VBox spacing="24" maxWidth="1120">
                     <VBox spacing="4">
                         <Label text="Assessment Overview" styleClass="h-lg"/>
+<<<<<<< HEAD
+                        <Label text="Your real forum activity and quiz performance across the courses you've joined." styleClass="muted"/>
+=======
                         <Label text="Detailed breakdown of your academic consistency and recent performance." styleClass="muted"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </VBox>
 
                     <HBox spacing="24">
                         <!-- Participation metrics -->
                         <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
                             <Label text="Participation Metrics" styleClass="card-title"/>
+<<<<<<< HEAD
+                            <Label text="Your Real Engagement Data" styleClass="eyebrow"/>
+
+                            <Label text="Your Activity (Last 7 Days)" styleClass="subtle"/>
+                            <HBox fx:id="activityChartBox" spacing="10" alignment="BOTTOM_LEFT" prefHeight="96"/>
+                            <HBox fx:id="activityLabelsBox" spacing="10"/>
+
+                            <Region styleClass="divider" prefHeight="1"/>
+                            <VBox spacing="4">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Forum Participation" styleClass="muted"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="participationPctLabel" text="—" styleClass="label-strong"/>
+                                </HBox>
+                                <ProgressBar fx:id="participationProgressBar" progress="0" maxWidth="Infinity"/>
+                                <Label fx:id="participationSubLabel" styleClass="subtle" wrapText="true"/>
+=======
                             <Label text="Consistency Score (Last 7 Days)" styleClass="subtle"/>
                             <HBox spacing="10" alignment="BOTTOM_LEFT" prefHeight="120">
                                 <VBox HBox.hgrow="ALWAYS" alignment="BOTTOM_CENTER"><Region styleClass="bar,bar-dim" prefHeight="48"  maxWidth="Infinity"/></VBox>
@@ -87,12 +125,30 @@
                             <VBox spacing="4">
                                 <HBox alignment="CENTER_LEFT"><Label text="Peer Review Accuracy" styleClass="muted"/><Region HBox.hgrow="ALWAYS"/><Label text="88%" styleClass="label-strong"/></HBox>
                                 <ProgressBar progress="0.88" maxWidth="Infinity" style="-fx-accent:#9ca3af;"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                             </VBox>
                         </VBox>
 
                         <!-- Assessment history -->
                         <VBox styleClass="card-flat" spacing="12" HBox.hgrow="ALWAYS">
                             <Label text="Assessment History" styleClass="card-title"/>
+<<<<<<< HEAD
+                            <VBox fx:id="assessmentHistoryBox" spacing="0"/>
+                            <Label fx:id="assessmentEmptyLabel" text="No completed quizzes yet."
+                                   styleClass="subtle" wrapText="true" managed="false" visible="false"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Lecturer's remark, or empty state -->
+                    <VBox fx:id="remarkBox" styleClass="card-dark" spacing="12" managed="false" visible="false">
+                        <Label text="Lecturer's Remark" styleClass="eyebrow-invert"/>
+                        <Label fx:id="remarkQuoteLabel" styleClass="body-invert" wrapText="true"/>
+                        <Label fx:id="remarkMetaLabel" style="-fx-text-fill:#6b7280; -fx-font-size:11px;"/>
+                    </VBox>
+                    <VBox fx:id="noRemarkBox" styleClass="card-flat" alignment="CENTER" managed="false" visible="false">
+                        <Label text="No lecturer remarks yet — these appear here once a lecturer grades your participation."
+                               styleClass="subtle" wrapText="true" style="-fx-text-alignment:center;"/>
+=======
                             <Label text="Your quiz results and participation scores will appear here."
                                 styleClass="subtle" wrapText="true"/>
                         </VBox>
@@ -103,6 +159,7 @@
                         <Label text="Professor's Insight" styleClass="eyebrow-invert"/>
                         <Label text="Your participation and engagement data will appear here once assessed by your lecturer."
                             styleClass="body-invert" wrapText="true"/>
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </VBox>
                 </VBox>
             </VBox>
@@ -110,3 +167,7 @@
     </center>
 </BorderPane>
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

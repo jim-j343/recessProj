@@ -41,6 +41,10 @@ public class GroupShowController {
 
     @FXML private Button editGroupBtn;
     @FXML private Button deleteGroupBtn;
+<<<<<<< HEAD
+    @FXML private Button leaveGroupBtn;
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private Button addMemberBtn;
     
     @FXML private VBox   topicsBox;
@@ -127,6 +131,18 @@ public class GroupShowController {
             if (addMemberBtn != null) { addMemberBtn.setManaged(true); addMemberBtn.setVisible(true); }
         }
 
+<<<<<<< HEAD
+        // Any active member who isn't the group's admin can leave — mirrors
+        // the @unless($group->admin_id === auth()->id()) check on web.
+        boolean isActiveMember = "active".equals(group.myStatus);
+        boolean isGroupAdmin = u != null && group.adminId == u.getUserId();
+        if (leaveGroupBtn != null && isActiveMember && !isGroupAdmin) {
+            leaveGroupBtn.setManaged(true);
+            leaveGroupBtn.setVisible(true);
+        }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         loadMembers();
         loadTopics();
     }
@@ -352,6 +368,38 @@ public class GroupShowController {
         t.start();
     }
 
+<<<<<<< HEAD
+    @FXML private void onLeaveGroup() {
+        if (group == null) return;
+        javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to leave this group?",
+                javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(choice -> {
+            if (choice != javafx.scene.control.ButtonType.YES) return;
+            String token = Session.authToken();
+            if (token == null) return;
+            Thread t = new Thread(() -> {
+                try {
+                    api.leaveGroup(token, group.groupId);
+                    Platform.runLater(SceneManager::goGroups);
+                } catch (Exception e) {
+                    Platform.runLater(() -> {
+                        javafx.scene.control.Alert error = new javafx.scene.control.Alert(
+                                javafx.scene.control.Alert.AlertType.ERROR, e.getMessage());
+                        error.setHeaderText("Couldn't leave group");
+                        error.showAndWait();
+                    });
+                }
+            }, "leave-group-api");
+            t.setDaemon(true);
+            t.start();
+        });
+    }
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private void onAddMember() {
         if (group == null) return;
         newMemberUsernameField.clear();

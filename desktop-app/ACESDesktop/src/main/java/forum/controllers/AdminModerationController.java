@@ -88,6 +88,24 @@ public class AdminModerationController {
         initReportsTable();
         initRemovalsTable();
 
+<<<<<<< HEAD
+        // Auto-resize tables (Fixed height to match web style)
+        reportsTable.getStyleClass().add("moderation-table");
+        reportsTable.setFixedCellSize(72); // larger size for 2-line post column
+        reportsTable.prefHeightProperty().bind(
+            javafx.beans.binding.Bindings.max(1, javafx.beans.binding.Bindings.size(reportsTable.getItems()))
+                .multiply(reportsTable.getFixedCellSize()).add(36)
+        );
+
+        removalsTable.getStyleClass().add("moderation-table");
+        removalsTable.setFixedCellSize(72);
+        removalsTable.prefHeightProperty().bind(
+            javafx.beans.binding.Bindings.max(1, javafx.beans.binding.Bindings.size(removalsTable.getItems()))
+                .multiply(removalsTable.getFixedCellSize()).add(36)
+        );
+
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         // Tab switch → swap visible pane + reload
         tabGroup.selectedToggleProperty().addListener((obs, old, newVal) -> {
             if (newVal == null) { old.setSelected(true); return; }
@@ -112,6 +130,42 @@ public class AdminModerationController {
 
     private void initReportsTable() {
         // "Post" column: shows topic title + truncated content (like web)
+<<<<<<< HEAD
+        colReportPost.setCellFactory(tc -> new TableCell<AdminReportDto, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null); setText(null); return;
+                }
+                AdminReportDto r = getTableRow().getItem();
+                VBox box = new VBox(4);
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                
+                Label title = new Label(r.topicTitle != null ? r.topicTitle : "—");
+                title.setStyle("-fx-text-fill: #4f46e5; -fx-font-size: 14px; -fx-font-weight: 500; -fx-cursor: hand;");
+                title.setOnMouseClicked(e -> {
+                    if (r.topicId != null) {
+                        forum.models.Topic t = new forum.models.Topic();
+                        t.setTopicId(r.topicId);
+                        t.setTitle(r.topicTitle != null ? r.topicTitle : "Topic");
+                        forum.app.ViewState.setSelectedTopic(t);
+                        forum.app.SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
+                    }
+                });
+                
+                String contentStr = r.postContent != null
+                        ? (r.postContent.length() > 60 ? r.postContent.substring(0, 60) + "…" : r.postContent)
+                        : "";
+                Label content = new Label(contentStr);
+                content.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 13px;");
+                
+                box.getChildren().addAll(title, content);
+                setGraphic(box);
+                setText(null);
+            }
+        });
+
+=======
         colReportPost.setCellValueFactory(data -> {
             AdminReportDto r = data.getValue();
             String title = r.topicTitle != null ? r.topicTitle : "—";
@@ -120,6 +174,7 @@ public class AdminModerationController {
                     : "";
             return new SimpleStringProperty(title + (content.isEmpty() ? "" : "\n" + content));
         });
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         colReportAuthor.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().author));
         colReportedBy.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().reportedBy));
         colReportReason.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().reason));
@@ -132,6 +187,22 @@ public class AdminModerationController {
                     setGraphic(null); return;
                 }
                 AdminReportDto row = getTableRow().getItem();
+<<<<<<< HEAD
+                HBox box = new HBox(16);
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                if (row.reviewed) {
+                    Label badge = new Label("Reviewed" + (row.reviewedBy != null ? " by " + row.reviewedBy : ""));
+                    badge.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
+                    box.getChildren().add(badge);
+                } else {
+                    Label badge = new Label("Needs review");
+                    badge.setStyle("-fx-background-color: #fef9c3; -fx-text-fill: #a16207; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
+                    
+                    Label btn = new Label("Mark\nReviewed"); // Two lines like the web
+                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px; -fx-alignment: center-left;");
+                    btn.setOnMouseClicked(e -> markReportReviewed(row.id));
+                    
+=======
                 HBox box = new HBox(8);
                 box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                 if (row.reviewed) {
@@ -144,16 +215,60 @@ public class AdminModerationController {
                     Button btn = new Button("Mark Reviewed");
                     btn.getStyleClass().addAll("btn-sm", "btn-primary");
                     btn.setOnAction(e -> markReportReviewed(row.id));
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     box.getChildren().addAll(badge, btn);
                 }
                 setGraphic(box);
             }
         });
+<<<<<<< HEAD
+
+        reportsTable.setRowFactory(table -> {
+            TableRow<AdminReportDto> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem reviewItem = new MenuItem("Mark as Reviewed");
+            reviewItem.setOnAction(e -> markReportReviewed(row.getItem().id));
+            menu.getItems().add(reviewItem);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu));
+            return row;
+        });
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     private void initRemovalsTable() {
         colMember.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().removedUser));
+<<<<<<< HEAD
+        colMember.setCellFactory(tc -> new TableCell<AdminRemovalDto, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); setText(null); return; }
+                Label lbl = new Label(item);
+                lbl.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #111827;");
+                setGraphic(lbl);
+                setText(null);
+            }
+        });
+
         colGroup.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().groupName));
+        colGroup.setCellFactory(tc -> new TableCell<AdminRemovalDto, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); setText(null); return; }
+                Label lbl = new Label(item);
+                lbl.setWrapText(true);
+                lbl.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 13px;");
+                setGraphic(lbl);
+                setText(null);
+            }
+        });
+
+=======
+        colGroup.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().groupName));
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         colRemovedBy.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().removedBy));
         colReason.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().reason));
         colWhen.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().createdAtHuman));
@@ -165,6 +280,22 @@ public class AdminModerationController {
                     setGraphic(null); return;
                 }
                 AdminRemovalDto row = getTableRow().getItem();
+<<<<<<< HEAD
+                HBox box = new HBox(16); // spacing between badge and button
+                box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                if (row.reviewed) {
+                    Label badge = new Label("Reviewed" + (row.reviewedBy != null ? " by " + row.reviewedBy : ""));
+                    badge.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
+                    box.getChildren().add(badge);
+                } else {
+                    Label badge = new Label("Needs review");
+                    badge.setStyle("-fx-background-color: #fef9c3; -fx-text-fill: #a16207; -fx-padding: 4 10 4 10; -fx-background-radius: 999; -fx-font-size: 11.5px; -fx-font-weight: 600;");
+                    
+                    Label btn = new Label("Mark\nReviewed"); // Two lines like the web
+                    btn.setStyle("-fx-text-fill: #4f46e5; -fx-font-weight: 600; -fx-cursor: hand; -fx-font-size: 12px; -fx-alignment: center-left;");
+                    btn.setOnMouseClicked(e -> markRemovalReviewed(row.id));
+                    
+=======
                 HBox box = new HBox(8);
                 box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                 if (row.reviewed) {
@@ -177,11 +308,28 @@ public class AdminModerationController {
                     Button btn = new Button("Mark Reviewed");
                     btn.getStyleClass().addAll("btn-sm", "btn-primary");
                     btn.setOnAction(e -> markRemovalReviewed(row.id));
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     box.getChildren().addAll(badge, btn);
                 }
                 setGraphic(box);
             }
         });
+<<<<<<< HEAD
+
+        removalsTable.setRowFactory(table -> {
+            TableRow<AdminRemovalDto> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem reviewItem = new MenuItem("Mark as Reviewed");
+            reviewItem.setOnAction(e -> markRemovalReviewed(row.getItem().id));
+            menu.getItems().add(reviewItem);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu));
+            return row;
+        });
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     // ── Data loading ─────────────────────────────────────────────────

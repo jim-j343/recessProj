@@ -264,6 +264,10 @@ class TopicController extends Controller
 
 
         return redirect()->route('topics.show', $topic->topic_id)
+<<<<<<< HEAD
+            ->withFragment('post-' . $post->post_id)
+=======
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             ->with('success', 'Reply posted!');
     }
 

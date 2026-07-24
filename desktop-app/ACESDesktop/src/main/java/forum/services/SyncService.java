@@ -68,7 +68,11 @@ public class SyncService {
                     if (p == null) continue;
                     long serverTopicId = topicDao.serverIdFor(p.getTopicId());
                     if (serverTopicId <= 0) continue;   // parent topic not synced yet — retry later
+<<<<<<< HEAD
+                    PostDto created = api.createPost(token, serverTopicId, p.getContent(), null, null);
+=======
                     PostDto created = api.createPost(token, serverTopicId, p.getContent(), null);
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     postDao.markSynced(row.localId(), created.post_id);
                     cache.markSynced(row.syncId(), created.post_id);
                     pushed++;
@@ -94,4 +98,8 @@ public class SyncService {
             return 0;
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
