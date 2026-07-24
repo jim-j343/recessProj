@@ -18,6 +18,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Separator;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class StudentAssessmentController {
     // ── Sidebar ────────────────────────────────────────────────────────
     @FXML private Label sidebarUserName;
     @FXML private Label sidebarUserRole;
+
 
     // ── Participation card ────────────────────────────────────────────
     @FXML private HBox    activityChartBox;
@@ -165,75 +167,112 @@ public class StudentAssessmentController {
     }
 
     private void renderAssessmentHistory(List<StudentProgressDto.AssessmentItem> items) {
-        if (assessmentHistoryBox == null) return;
-        assessmentHistoryBox.getChildren().clear();
 
-        if (items == null || items.isEmpty()) {
-            Label empty = new Label("No assessments completed yet.");
-            empty.setStyle("-fx-text-fill:#9ca3af; -fx-font-size:13px; -fx-padding:20 0;");
-            assessmentHistoryBox.getChildren().add(empty);
-            return;
-        }
+    if (assessmentHistoryBox == null) return;
 
-        for (StudentProgressDto.AssessmentItem item : items) {
+    assessmentHistoryBox.getChildren().clear();
 
-            // Left column (Quiz title + completion date)
-            Label title = new Label(item.title);
-            title.setStyle("-fx-font-size:15px; -fx-font-weight:bold; -fx-text-fill:#111827;");
+    if (items == null || items.isEmpty()) {
+        Label empty = new Label("No assessments completed yet.");
+        empty.setStyle("-fx-text-fill:#9ca3af; -fx-font-size:13px;");
+        assessmentHistoryBox.getChildren().add(empty);
+        return;
+    }
 
-            Label subtitle = new Label("Completed " + item.submittedAtHuman);
-            subtitle.setStyle("-fx-font-size:12px; -fx-text-fill:#9ca3af;");
+    for (StudentProgressDto.AssessmentItem item : items) {
 
-            VBox quizColumn = new VBox(title, subtitle);
-            quizColumn.setSpacing(2);
-            quizColumn.setPrefWidth(320);
-            quizColumn.setMinWidth(0);
-            quizColumn.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(quizColumn, Priority.ALWAYS);
+        // ---------------- Quiz column ----------------
 
-            // Score column
-            Label scoreLabel = new Label(String.format("%.1f%%", item.scorePct));
-            scoreLabel.setAlignment(Pos.CENTER);
-            scoreLabel.setPrefWidth(80);
-            scoreLabel.setMinWidth(80);
-            scoreLabel.setMaxWidth(80);
-            scoreLabel.setStyle("-fx-font-size:15px; -fx-font-weight:bold; -fx-text-fill:#111827;");
+        Label title = new Label(item.title);
+        title.setWrapText(true);
+        title.setStyle(
+            "-fx-font-size:14px;" +
+            "-fx-font-weight:bold;" +
+            "-fx-text-fill:#111827;"
+        );
 
-            // Peer comparison badge
-            StackPane peerBadgePane = new StackPane();
-            peerBadgePane.setAlignment(Pos.CENTER);
-            peerBadgePane.setPrefWidth(100);
-            peerBadgePane.setMinWidth(100);
-            peerBadgePane.setMaxWidth(100);
+        Label date = new Label("Completed " + item.submittedAtHuman);
+        date.setStyle(
+            "-fx-font-size:12px;" +
+            "-fx-text-fill:#94a3b8;"
+        );
 
-            if (item.vsPeerPct != null) {
-                Label peerBadge = new Label(String.format("%+.1f%%", item.vsPeerPct));
-                if (item.vsPeerPct >= 0) {
-                    peerBadge.setStyle(
-                        "-fx-text-fill:#10b981; -fx-background-color:#d1fae5; -fx-background-radius:999; " +
-                        "-fx-padding:3 8; -fx-font-size:11px; -fx-font-weight:bold;");
-                } else {
-                    peerBadge.setStyle(
-                        "-fx-text-fill:#ef4444; -fx-background-color:#fee2e2; -fx-background-radius:999; " +
-                        "-fx-padding:3 8; -fx-font-size:11px; -fx-font-weight:bold;");
-                }
-                peerBadgePane.getChildren().add(peerBadge);
+        VBox quizBox = new VBox(title, date);
+        quizBox.setSpacing(2);
+
+        HBox.setHgrow(quizBox, Priority.ALWAYS);
+        quizBox.setMaxWidth(Double.MAX_VALUE);
+
+        // ---------------- Score column ----------------
+
+        Label score = new Label(String.format("%.1f%%", item.scorePct));
+        score.setStyle(
+            "-fx-font-size:14px;" +
+            "-fx-font-weight:bold;" +
+            "-fx-text-fill:#111827;"
+        );
+
+        StackPane scorePane = new StackPane(score);
+        scorePane.setAlignment(Pos.CENTER);
+        scorePane.setPrefWidth(90);
+        scorePane.setMinWidth(90);
+        scorePane.setMaxWidth(90);
+
+        // ---------------- Peer column ----------------
+
+        StackPane peerPane = new StackPane();
+        peerPane.setAlignment(Pos.CENTER);
+        peerPane.setPrefWidth(120);
+        peerPane.setMinWidth(120);
+        peerPane.setMaxWidth(120);
+
+        if (item.vsPeerPct != null) {
+
+            Label badge = new Label(String.format("%+.1f%%", item.vsPeerPct));
+
+            if (item.vsPeerPct >= 0) {
+                badge.setStyle(
+                    "-fx-background-color:#DCFCE7;" +
+                    "-fx-text-fill:#166534;" +
+                    "-fx-background-radius:999;" +
+                    "-fx-padding:4 10;" +
+                    "-fx-font-size:11px;" +
+                    "-fx-font-weight:bold;"
+                );
+            } else {
+                badge.setStyle(
+                    "-fx-background-color:#FEE2E2;" +
+                    "-fx-text-fill:#991B1B;" +
+                    "-fx-background-radius:999;" +
+                    "-fx-padding:4 10;" +
+                    "-fx-font-size:11px;" +
+                    "-fx-font-weight:bold;"
+                );
             }
 
-            // Row
-            HBox row = new HBox();
-            row.setAlignment(Pos.CENTER_LEFT);
-            row.setSpacing(10);
-            row.getChildren().addAll(quizColumn, scoreLabel, peerBadgePane);
-            assessmentHistoryBox.getChildren().add(row);
-
-            // Divider
-            Region divider = new Region();
-            divider.setPrefHeight(1);
-            divider.setStyle("-fx-background-color:#f3f4f6;");
-            assessmentHistoryBox.getChildren().add(divider);
+            peerPane.getChildren().add(badge);
         }
+
+        // ---------------- Row ----------------
+
+        HBox row = new HBox(16);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setFillHeight(true);
+
+        row.getChildren().addAll(
+            quizBox,
+            scorePane,
+            peerPane
+        );
+
+        assessmentHistoryBox.getChildren().add(row);
+
+        Separator separator = new Separator();
+        separator.setMaxWidth(Double.MAX_VALUE);
+
+        assessmentHistoryBox.getChildren().add(separator);
     }
+}
 
     // ── Navigation ───────────────────────────────────────────────────────
     @FXML private void onDashboard() {
