@@ -214,7 +214,7 @@ use Illuminate\Support\Str;
                             </div>
                         @endunless
 
-                        <div class="relative {{ $isOwn
+                        <div class="relative min-w-0 {{ $isOwn
                                 ? 'bg-green-200 rounded-3xl rounded-tr-md'
                                 : 'bg-white rounded-3xl rounded-tl-md border border-gray-200' }}
                                 px-4 py-3 pr-8 shadow">
@@ -281,8 +281,8 @@ use Illuminate\Support\Str;
                                     @else
                                         <a href="{{ asset('storage/'.$post->attachment) }}"
                                            target="_blank"
-                                           class="flex items-center gap-2 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-black/10">
-                                            📎 <span class="truncate">{{ $post->attachment_name }}</span>
+                                           class="flex items-center gap-2 min-w-0 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-black/10">
+                                            📎 <span class="truncate min-w-0">{{ $post->attachment_name }}</span>
                                         </a>
                                     @endif
                                 </div>
@@ -352,6 +352,7 @@ use Illuminate\Support\Str;
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-10">
         <div class="max-w-3xl mx-auto">
             <div id="attachment-preview" class="hidden items-center gap-2 mb-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 w-fit">
+                <x-icon name="paperclip" class="w-3.5 h-3.5 shrink-0" />
                 <span id="attachment-preview-name" class="truncate max-w-[220px]"></span>
                 <button type="button" onclick="clearAttachment()" class="text-gray-400 hover:text-gray-700 font-bold">✕</button>
             </div>
@@ -429,7 +430,7 @@ use Illuminate\Support\Str;
             const preview = document.getElementById('attachment-preview');
             const nameEl = document.getElementById('attachment-preview-name');
             if (input.files && input.files[0]) {
-                nameEl.textContent = '📎 ' + input.files[0].name;
+                nameEl.textContent = input.files[0].name;
                 preview.classList.remove('hidden');
                 preview.classList.add('flex');
             }
@@ -545,7 +546,7 @@ use Illuminate\Support\Str;
             if (p.attachment_url) {
                 attachment = p.is_image
                     ? `<div class="mt-2"><a href="${p.attachment_url}" target="_blank"><img src="${p.attachment_url}" class="rounded-lg max-h-60 max-w-full border border-black/10"></a></div>`
-                    : `<div class="mt-2"><a href="${p.attachment_url}" target="_blank" class="flex items-center gap-2 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-black/10">📎 <span class="truncate">${esc(p.attachment_name ?? 'Attachment')}</span></a></div>`;
+                    : `<div class="mt-2"><a href="${p.attachment_url}" target="_blank" class="flex items-center gap-2 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-black/10"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 shrink-0"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg> <span class="truncate">${esc(p.attachment_name ?? 'Attachment')}</span></a></div>`;
             }
             return `
             <div id="post-${p.post_id}" class="flex ${own ? 'justify-end' : 'justify-start'}">

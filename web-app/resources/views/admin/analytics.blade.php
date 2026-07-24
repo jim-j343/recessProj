@@ -122,6 +122,7 @@
                         <h3 class="font-semibold text-gray-900">Lecturer Performance</h3>
                         <p class="text-xs text-gray-400">Quiz average and grading activity per lecturer</p>
                     </div>
+                    <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
@@ -156,7 +157,8 @@
                             </tr>
                             @endforelse
                         </tbody>
-                    </table>
+                   </table>
+                    </div>
                 </div>
 
                 {{-- Most Active Groups (replaces the mockup's "AI-curated Trending Topics" —
