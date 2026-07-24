@@ -79,7 +79,6 @@ class ForumController extends Controller
         return response()->json($this->topicShape($topic), 201);
     }
 
-<<<<<<< HEAD
     /** GET /api/topics/{topic} — the topic, its posts, and the group roster
      *  (for the "exclude from this reply" picker). */
     public function show(Request $request, Topic $topic): JsonResponse
@@ -133,32 +132,6 @@ class ForumController extends Controller
             'parent_post_id'   => ['nullable', 'integer', 'exists:posts,post_id'],
             'excluded_users'   => ['nullable', 'array'],
             'excluded_users.*' => ['integer', 'exists:users,user_id'],
-=======
-    /** GET /api/topics/{topic} — the topic plus its posts. */
-    public function show(Topic $topic): JsonResponse
-    {
-        $topic->loadCount('posts')->load('creator');
-
-        $posts = $topic->posts()
-            ->with('author')
-            ->orderBy('created_at')
-            ->orderBy('post_id')
-            ->get()
-            ->map(fn (Post $p) => $this->postShape($p));
-
-        return response()->json([
-            'topic' => $this->topicShape($topic),
-            'posts' => $posts,
-        ]);
-    }
-
-    /** POST /api/topics/{topic}/posts — add a reply. */
-    public function storePost(Request $request, Topic $topic): JsonResponse
-    {
-        $data = $request->validate([
-            'content'        => ['required', 'string'],
-            'parent_post_id' => ['nullable', 'integer', 'exists:posts,post_id'],
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         ]);
 
         $post = Post::create([
@@ -169,7 +142,6 @@ class ForumController extends Controller
             'is_synced'      => true,
         ]);
 
-<<<<<<< HEAD
         // Never let a poster accidentally exclude themselves — mirrors
         // PostController::store() on web.
         $excludedIds = collect($data['excluded_users'] ?? [])
@@ -294,13 +266,6 @@ class ForumController extends Controller
 
         $post->delete();
         return response()->json(['message' => 'Post deleted.']);
-=======
-        $request->user()->forceFill(['last_active_at' => now()])->save();
-
-        $post->load('author');
-
-        return response()->json($this->postShape($post), 201);
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     private function topicShape(Topic $t): array
@@ -317,21 +282,14 @@ class ForumController extends Controller
         ];
     }
 
-<<<<<<< HEAD
     private function postShape(Post $p, ?int $viewerId = null): array
     {
         $shape = [
-=======
-    private function postShape(Post $p): array
-    {
-        return [
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             'post_id'        => (int) $p->post_id,
             'topic_id'       => (int) $p->topic_id,
             'author_id'      => (int) $p->author_id,
             'parent_post_id' => $p->parent_post_id ? (int) $p->parent_post_id : null,
             'content'        => $p->content,
-<<<<<<< HEAD
             'is_flagged'     => (bool) $p->is_flagged,
             'created_at'     => optional($p->created_at)->toIso8601String(),
             'author'         => $p->author->username ?? null,
@@ -349,10 +307,3 @@ class ForumController extends Controller
         return $shape;
     }
 }
-=======
-            'created_at'     => optional($p->created_at)->toIso8601String(),
-            'author'         => $p->author->username ?? null,
-        ];
-    }
-}
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

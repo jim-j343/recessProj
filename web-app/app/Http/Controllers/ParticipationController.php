@@ -197,20 +197,16 @@ class ParticipationController extends Controller
             ->where('status', 'active')
             ->pluck('group_id');
 
-<<<<<<< HEAD
         $topics = Topic::whereIn('group_id', $lecturerGroupIds)
             ->orderBy('title')->get();
 
         $topicFilter = $request->query('topic');
         $search      = $request->query('search');
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
             ->where('status', 'active')
             ->pluck('user_id');
 
-<<<<<<< HEAD
         $studentsQuery = User::whereIn('user_id', $studentIds)
             ->where('system_role', 'student');
 
@@ -239,25 +235,12 @@ class ParticipationController extends Controller
                 }
             })
             ->pluck('quiz_id');
-=======
-        $students = User::whereIn('user_id', $studentIds)
-            ->where('system_role', 'student')
-            ->orderBy('username')->get();
-
-        $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-            ->whereHas('topic', fn ($q) => $q->whereIn('group_id', $lecturerGroupIds))
-            ->groupBy('topic_id')
-            ->pluck('post_id');
-
-        $quizIds = Quiz::whereIn('group_id', $lecturerGroupIds)->pluck('quiz_id');
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         $quizTotalMarks = Question::whereIn('quiz_id', $quizIds)
             ->select('quiz_id', DB::raw('SUM(marks) as total'))
             ->groupBy('quiz_id')
             ->pluck('total', 'quiz_id');
 
-<<<<<<< HEAD
         $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter, $openingPostIds, $quizIds, $quizTotalMarks) {
             $postsQuery = Post::where('author_id', $student->user_id)
                 ->whereHas('topic', function($q) use ($lecturerGroupIds, $topicFilter) {
@@ -268,12 +251,6 @@ class ParticipationController extends Controller
                 });
 
             $postCount  = (clone $postsQuery)->count();
-=======
-        $rows = $students->map(function ($student) use ($lecturerGroupIds, $openingPostIds, $quizIds, $quizTotalMarks) {
-            $postsQuery = Post::where('author_id', $student->user_id)
-                ->whereHas('topic', fn($q) => $q->whereIn('group_id', $lecturerGroupIds));
-
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
 
             $participationScore = min($replyCount, self::REPLIES_FOR_FULL_MARKS);
@@ -304,17 +281,13 @@ class ParticipationController extends Controller
             return [
                 'user_id'            => $student->user_id,
                 'username'           => $student->username,
-<<<<<<< HEAD
                 'post_count'         => $postCount,
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 'reply_count'        => $replyCount,
                 'participation_pct'  => round($participationPct, 1),
                 'quiz_avg_pct'       => $quizAvgPct,
                 'quiz_count'         => $quizCount,
                 'suggested_score'    => $suggestedScore,
                 'existing_score'     => $existing ? $existing->score : null,
-<<<<<<< HEAD
                 'existing_remark'    => $existing ? $existing->criteria : null,
             ];
         });
@@ -327,12 +300,6 @@ class ParticipationController extends Controller
             'rows' => $rows->values(),
             'topics' => $topics
         ]);
-=======
-            ];
-        });
-
-        return response()->json($rows->values());
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     public function saveGrades(Request $request): \Illuminate\Http\JsonResponse
@@ -366,8 +333,4 @@ class ParticipationController extends Controller
         }
         return response()->json(['message' => 'Grades saved.']);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

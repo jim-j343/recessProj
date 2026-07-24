@@ -4,13 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
-<<<<<<< HEAD
 use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\Notification;
-=======
-use App\Models\GroupMembership;
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\Submission;
@@ -20,19 +16,14 @@ use Illuminate\Http\Request;
 
 class QuizApiController extends Controller
 {
-<<<<<<< HEAD
     /** GET /api/quizzes — student: available quizzes in their groups
      *  (including course-targeted quizzes visible to every group sharing
      *  that course unit — mirrors StudentController::dashboard() on web) */
-=======
-    /** GET /api/quizzes — student: available quizzes in their groups */
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     public function index(Request $request): JsonResponse
     {
         $groupIds = GroupMembership::where('user_id', $request->user()->user_id)
             ->where('status', 'active')->pluck('group_id');
 
-<<<<<<< HEAD
         $courseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
 
         $quizzes = Quiz::where(function ($q) use ($groupIds, $courseNames) {
@@ -41,9 +32,6 @@ class QuizApiController extends Controller
                     $q->orWhereIn('course_name', $courseNames);
                 }
             })
-=======
-        $quizzes = Quiz::whereIn('group_id', $groupIds)
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             ->where('is_published', true)
             ->latest()->get()
             ->map(fn($q) => $this->quizShape($q));
@@ -61,7 +49,6 @@ class QuizApiController extends Controller
         return response()->json($quizzes);
     }
 
-<<<<<<< HEAD
     /** POST /api/quizzes — lecturer: create a quiz + its questions/answers.
      *  Mirrors QuizController::store() on web exactly. */
     public function store(Request $request): JsonResponse
@@ -150,8 +137,6 @@ class QuizApiController extends Controller
         return response()->json($this->quizShape($quiz->fresh()));
     }
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     /** GET /api/quizzes/{id} — quiz with questions and answers */
     public function show($id): JsonResponse
     {

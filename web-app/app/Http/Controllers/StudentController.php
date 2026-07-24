@@ -216,7 +216,6 @@ class StudentController extends Controller
         });
 
         // ---- Assessment history: every completed quiz, with a real peer
-<<<<<<< HEAD
         // average (mean score of everyone who's completed that same quiz).
         // Quizzes are matched by group_id OR course_name — a course-targeted
         // quiz has no group_id at all, so group-only matching missed them. ----
@@ -230,12 +229,6 @@ class StudentController extends Controller
                     $q->orWhereIn('course_name', $courseNames);
                 }
             })
-=======
-        // average (mean score of everyone who's completed that same quiz) ----
-        $submissions = Submission::where('user_id', $user->user_id)
-            ->whereNotNull('submitted_at')
-            ->whereHas('quiz', fn ($q) => $q->whereIn('group_id', $groupIds))
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             ->with('quiz.questions')
             ->latest('submitted_at')
             ->get();
@@ -274,8 +267,4 @@ class StudentController extends Controller
             'latestRemark'
         ));
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
