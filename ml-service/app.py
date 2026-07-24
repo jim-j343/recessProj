@@ -1,4 +1,5 @@
 # app.py — The main Flask API server
+from pathlib import Path
 from flask import Flask, request, jsonify
 import joblib
 import mysql.connector
@@ -6,8 +7,9 @@ from recommender import get_recommendations
 
 app = Flask(__name__)
 
-# Load the trained classifier once when server starts
-classifier = joblib.load('topic_classifier.pkl')
+# Load the trained classifier once when server starts.
+# Path is resolved next to this script, so it works from any directory.
+classifier = joblib.load(Path(__file__).resolve().parent / 'topic_classifier.pkl')
 
 # MySQL connection config
 DB_CONFIG = {
@@ -79,21 +81,21 @@ if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5001)
 
 # Start the Flask server:
-#   cd C:\Users\moses\Desktop\ml-service
+#   cd C:\Users\moses\Documents\GitHub\recessProj\ml-service
 #   python app.py
 
- #Test classification (open a new Command Prompt):
-#curl -X POST http://localhost:5001/classify ^
- #    -H "Content-Type: application/json" ^
-  #   -d "{"text": "how to use joins in SQL"}"
+# Test classification (open a new Command Prompt):
+# curl -X POST http://localhost:5001/classify ^
+#      -H "Content-Type: application/json" ^
+#      -d "{\"text\": \"how to use joins in SQL\"}"
 # Response:
 # {"category": "Technology"}
 
 # Test recommendations:
-#curl http://localhost:5001/recommend/1
+# curl http://localhost:5001/recommend/1
 # Response:
 # {"recommendations": [{"score": 2.12, "topic_id": 13}, ...]}
 
 # Health check:
-#curl http://localhost:5001/health
+# curl http://localhost:5001/health
 # {"message": "ML service running", "status": "ok"}
