@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <h2 class="font-semibold text-xl text-gray-900">Create Quiz</h2>
             <a href="{{ route('lecturer.dashboard') }}"
-               class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
+               class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 self-start sm:self-auto">
                 ← Back to Dashboard
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8 bg-gray-50 min-h-screen">
+    <div class="py-6 sm:py-8 bg-gray-50 min-h-screen">
         <div class="max-w-3xl mx-auto px-4 space-y-6">
 
             @if($errors->any())
@@ -50,7 +50,7 @@
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Start Date & Time *</label>
                             <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required
