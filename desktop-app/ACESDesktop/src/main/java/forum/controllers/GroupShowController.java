@@ -41,10 +41,6 @@ public class GroupShowController {
 
     @FXML private Button editGroupBtn;
     @FXML private Button deleteGroupBtn;
-<<<<<<< HEAD
-    @FXML private Button leaveGroupBtn;
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private Button addMemberBtn;
     
     @FXML private VBox   topicsBox;
@@ -123,7 +119,7 @@ public class GroupShowController {
         blacklistDaysLabel.setText(String.valueOf(group.blacklistDays));
 
         // Show buttons for group admin/lecturer
-        boolean isAdmin = "admin".equals(group.myRole);
+        boolean isAdmin = isGroupAdmin();
         boolean isLecturer = u != null && u.getRole() == Role.LECTURER;
         if (isAdmin || (isLecturer && group.adminId == (u != null ? u.getUserId() : -1))) {
             if (editGroupBtn != null) { editGroupBtn.setManaged(true); editGroupBtn.setVisible(true); }
@@ -131,18 +127,6 @@ public class GroupShowController {
             if (addMemberBtn != null) { addMemberBtn.setManaged(true); addMemberBtn.setVisible(true); }
         }
 
-<<<<<<< HEAD
-        // Any active member who isn't the group's admin can leave — mirrors
-        // the @unless($group->admin_id === auth()->id()) check on web.
-        boolean isActiveMember = "active".equals(group.myStatus);
-        boolean isGroupAdmin = u != null && group.adminId == u.getUserId();
-        if (leaveGroupBtn != null && isActiveMember && !isGroupAdmin) {
-            leaveGroupBtn.setManaged(true);
-            leaveGroupBtn.setVisible(true);
-        }
-
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         loadMembers();
         loadTopics();
     }
@@ -205,28 +189,33 @@ public class GroupShowController {
         String token = Session.authToken();
         if (token == null) return;
 
-        // Only admins can see the full member list via /members endpoint
-        if (!"admin".equals(group.myRole)) return;
+        // All group members can see the member list, but only admins can manage it
+        boolean isAdmin = "admin".equals(group.myRole);
 
         Thread worker = new Thread(() -> {
             try {
                 JsonNode root = api.groupMembers(token, group.groupId);
+                if (root == null) {
+                    System.err.println("[GROUP] groupMembers returned null");
+                    return;
+                }
+                
                 List<MemberRow> active  = new ArrayList<>();
                 List<MemberRow> pending = new ArrayList<>();
 
                 JsonNode activeNode  = root.get("active");
                 JsonNode pendingNode = root.get("pending");
 
-                if (activeNode != null) {
+                if (activeNode != null && activeNode.isArray()) {
                     for (JsonNode n : activeNode) {
                         active.add(new MemberRow(
                                 n.get("user_id").asLong(),
                                 n.get("username").asText(),
-                                n.has("role") ? n.get("role").asText() : "member",
+                                n.has("role") ? n.get("role").asText() : null,
                                 "active"));
                     }
                 }
-                if (pendingNode != null) {
+                if (pendingNode != null && pendingNode.isArray() && isAdmin) {
                     for (JsonNode n : pendingNode) {
                         pending.add(new MemberRow(
                                 n.get("user_id").asLong(),
@@ -236,8 +225,14 @@ public class GroupShowController {
                     }
                 }
 
-                Platform.runLater(() -> renderMembers(active, pending));
+                if (!active.isEmpty()) {
+                    Platform.runLater(() -> renderMembers(active, pending));
+                } else {
+                    System.err.println("[GROUP] No active members found in response");
+                }
             } catch (Exception e) {
+                System.err.println("[GROUP] Error loading members: " + e.getMessage());
+                e.printStackTrace();
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             }
         }, "load-members");
@@ -274,17 +269,21 @@ public class GroupShowController {
         Label name = new Label(m.username);
         name.getStyleClass().add("label-strong");
 
-        Label role = new Label(capitalize(m.role));
-        role.getStyleClass().add("subtle");
-
-        VBox info = new VBox(2, name, role);
+        VBox info = new VBox(2, name);
+        // Membership roles are management information, so render them only
+        // for the group administrator's own view.
+        if (isGroupAdmin() && m.role != null && !m.role.isBlank()) {
+            Label role = new Label(capitalize(m.role));
+            role.getStyleClass().add("subtle");
+            info.getChildren().add(role);
+        }
         HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
 
         HBox row = new HBox(12, av, info);
         row.setPadding(new Insets(8, 0, 8, 0));
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        boolean isAdmin = "admin".equals(group.myRole);
+        boolean isAdmin = isGroupAdmin();
         if (showApprove) {
             Button approveBtn = new Button("Approve");
             approveBtn.getStyleClass().addAll("btn", "btn-primary");
@@ -314,6 +313,11 @@ public class GroupShowController {
         }, "approve-member");
         t.setDaemon(true);
         t.start();
+    }
+
+    private boolean isGroupAdmin() {
+        User user = Session.currentUser();
+        return group != null && user != null && group.adminId == user.getUserId();
     }
 
     @FXML private void onEditGroup() {
@@ -368,38 +372,6 @@ public class GroupShowController {
         t.start();
     }
 
-<<<<<<< HEAD
-    @FXML private void onLeaveGroup() {
-        if (group == null) return;
-        javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
-                javafx.scene.control.Alert.AlertType.CONFIRMATION,
-                "Are you sure you want to leave this group?",
-                javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
-        confirm.setHeaderText(null);
-        confirm.showAndWait().ifPresent(choice -> {
-            if (choice != javafx.scene.control.ButtonType.YES) return;
-            String token = Session.authToken();
-            if (token == null) return;
-            Thread t = new Thread(() -> {
-                try {
-                    api.leaveGroup(token, group.groupId);
-                    Platform.runLater(SceneManager::goGroups);
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        javafx.scene.control.Alert error = new javafx.scene.control.Alert(
-                                javafx.scene.control.Alert.AlertType.ERROR, e.getMessage());
-                        error.setHeaderText("Couldn't leave group");
-                        error.showAndWait();
-                    });
-                }
-            }, "leave-group-api");
-            t.setDaemon(true);
-            t.start();
-        });
-    }
-
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML private void onAddMember() {
         if (group == null) return;
         newMemberUsernameField.clear();
@@ -518,6 +490,7 @@ public class GroupShowController {
     @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
     @FXML private void onQuizCenter(){ SceneManager.goQuizManagement(); }
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
+    @FXML private void onMyProgress(){ SceneManager.goStudentAssessment(); }
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());

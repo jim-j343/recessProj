@@ -10,6 +10,7 @@ import forum.database.PostDao;
 import forum.database.TopicDao;
 import forum.models.Topic;
 import forum.models.User;
+import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -18,16 +19,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import java.io.IOException;
-
 /**
  * Publishes a topic. Online: POST to the API and cache the result.
  * Offline: create locally (queued) with a local-only first post for display.
  * Runs the network call off the UI thread.
  */
 public class TopicCreationController {
-
-    private static final long DEFAULT_GROUP_ID = 1;
 
     @FXML private TextField titleField;
     @FXML private ComboBox<String> categoryCombo;
@@ -38,6 +35,10 @@ public class TopicCreationController {
     @FXML private Label avatarLabel;
     @FXML private javafx.scene.control.MenuButton notifButton;
     @FXML private Label notifBadge;
+    @FXML private Label navMyProgress;
+    @FXML private Label navQuizCenter;
+    @FXML private Label navGrading;
+
 
     private final TopicDao topicDao = new TopicDao();
     private final PostDao postDao = new PostDao();
@@ -46,6 +47,9 @@ public class TopicCreationController {
     @FXML
     private void initialize() {
         User u = Session.currentUser();
+        if (u != null) {
+            NavbarHelper.applyRoleNav(u.getRole(), navMyProgress, null, navQuizCenter, navGrading, null, null, null);
+        }
         if (u != null) {
             if (userNameLabel != null) userNameLabel.setText(u.displayName());
             if (avatarLabel != null) {
@@ -157,6 +161,7 @@ public class TopicCreationController {
         if (u != null) SceneManager.showHomeFor(u.getRole());
     }
     @FXML private void onGroups() { SceneManager.goGroups(); }
+    @FXML private void onMyProgress() { SceneManager.goStudentAssessment(); }
     @FXML private void onQuizCenter() { SceneManager.goQuizManagement(); }
     @FXML private void onGrading() { SceneManager.goParticipationGrading(); }
     @FXML private void onProfile()   { SceneManager.goProfile(); }

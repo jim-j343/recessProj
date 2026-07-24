@@ -10,11 +10,9 @@ import forum.models.User;
 import forum.services.AuthService;
 import forum.services.SyncService;
 import forum.util.NavbarHelper;
-import javafx.scene.control.MenuButton;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -78,6 +76,11 @@ public class ForumDashboardController {
             forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
+        // Wire search field listener
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldV, newV) -> onSearchTopics());
+        }
+
         renderTopics(topicDao.listRecent(15));
         fetchMyGroups();
         syncInBackground();
@@ -104,7 +107,6 @@ public class ForumDashboardController {
         }
 
         for (Topic t : topics) {
-<<<<<<< HEAD
             VBox card = new VBox(12);
             card.getStyleClass().add("card");
             card.setStyle("-fx-border-color: #f3f4f6; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand; -fx-background-color: white;");
@@ -137,43 +139,6 @@ public class ForumDashboardController {
             meta.setStyle("-fx-font-size: 13px; -fx-text-fill: #6b7280;");
 
             card.getChildren().addAll(topRow, title, meta);
-=======
-            VBox card = new VBox(8);
-            card.getStyleClass().add("card-flat");
-            card.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1; -fx-border-radius: 8; -fx-padding: 16; -fx-cursor: hand;");
-            
-            HBox header = new HBox(12);
-            Label av = new Label(initial(t.getAuthorName()));
-            av.getStyleClass().addAll("avatar", "avatar-soft");
-            av.setMinSize(36, 36);
-
-            VBox text = new VBox(2);
-            Label title = new Label(t.getTitle());
-            title.getStyleClass().add("label-strong");
-            title.setWrapText(true);
-
-            text.getChildren().addAll(title);
-
-            HBox.setHgrow(text, Priority.ALWAYS);
-            header.getChildren().addAll(av, text);
-
-            HBox footer = new HBox(8);
-            if (t.getCategory() != null && !t.getCategory().isBlank()) {
-                Label tag = new Label("#" + t.getCategory());
-                tag.setStyle("-fx-text-fill: #4f46e5; -fx-font-size: 11px; -fx-font-weight: bold;");
-                footer.getChildren().add(tag);
-            }
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-            
-            Label meta = new Label("Posted by " + safe(t.getAuthorName()) + "  ·  💬 " + t.getReplyCount());
-            meta.getStyleClass().add("subtle");
-            meta.setStyle("-fx-font-size: 11px;");
-            
-            footer.getChildren().addAll(spacer, meta);
-
-            card.getChildren().addAll(header, footer);
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             card.setOnMouseClicked(e -> openTopic(t));
 
             discussionList.getChildren().add(card);
@@ -256,6 +221,23 @@ public class ForumDashboardController {
         SceneManager.show("TopicDetail", "ACES — " + t.getTitle());
     }
 
+    private void onSearchTopics() {
+        String query = searchField.getText().trim().toLowerCase();
+        if (query.isEmpty()) {
+            // Show all recent topics if search is empty
+            renderTopics(topicDao.listRecent(15));
+        } else {
+            // Search in local topics by title and category
+            List<Topic> allTopics = topicDao.listRecent(100);
+            List<Topic> filtered = allTopics.stream()
+                .filter(t -> t.getTitle().toLowerCase().contains(query) || 
+                            (t.getCategory() != null && t.getCategory().toLowerCase().contains(query)))
+                .limit(50)
+                .toList();
+            renderTopics(filtered);
+        }
+    }
+
     @FXML private void onDashboard() {
         User u = Session.currentUser();
         if (u != null) SceneManager.showHomeFor(u.getRole());
@@ -268,6 +250,7 @@ public class ForumDashboardController {
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
     @FXML private void onModeration() { SceneManager.goAdminModeration(); }
     @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onMyProgress(){ SceneManager.goStudentAssessment(); }
 
     @FXML private void onLogout() {
         String token = Session.authToken();

@@ -2,10 +2,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<<<<<<< HEAD
-<?import javafx.scene.layout.StackPane?>
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.Group?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="forum.controllers.StudentDashboardController"
@@ -13,12 +11,18 @@
             prefWidth="1280" prefHeight="820">
     <top>
         <VBox>
+            <!-- ═══════════════════ NAVBAR ═══════════════════ -->
             <HBox styleClass="navbar" alignment="CENTER_LEFT">
-<javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
+                <javafx.scene.image.ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+                    <image><javafx.scene.image.Image url="@../images/logo.jpg"/></image>
+                </javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link,active" onMouseClicked="#onDashboard"/>
                 <Label text="Groups"    styleClass="nav-link"        onMouseClicked="#onGroups"/>
-                <Label text="Forum"     styleClass="nav-link"        onMouseClicked="#onForum"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
+                <Label fx:id="navNewTopic"   text="New Topic"   styleClass="nav-link" onMouseClicked="#onNewTopic"   managed="false" visible="false"/>
                 <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Bell / Notifications -->
                 <MenuButton fx:id="notifButton" styleClass="btn-ghost" text="">
                     <graphic>
                         <StackPane>
@@ -29,9 +33,10 @@
                                    managed="false" visible="false"/>
                         </StackPane>
                     </graphic>
-                    <items>
-                    </items>
+                    <items/>
                 </MenuButton>
+
+                <!-- User menu -->
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
@@ -40,125 +45,379 @@
                         </HBox>
                     </graphic>
                     <items>
-<<<<<<< HEAD
                         <MenuItem text="Profile" onAction="#onProfile">
                             <graphic>
-                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
-                                    <javafx.scene.shape.SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
-                                </javafx.scene.layout.StackPane>
+                                <StackPane prefHeight="30" prefWidth="40">
+                                    <SVGPath content="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z M9 12l2 2 4-4"
+                                             fill="transparent" stroke="#94a3b8" strokeWidth="1.7"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </StackPane>
                             </graphic>
                         </MenuItem>
                         <MenuItem text="Log Out" onAction="#onLogout">
                             <graphic>
-                                <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
-                                    <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
-                                </javafx.scene.layout.StackPane>
+                                <StackPane prefHeight="30" prefWidth="40">
+                                    <SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9"
+                                             fill="transparent" stroke="#94a3b8" strokeWidth="1.7"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </StackPane>
                             </graphic>
                         </MenuItem>
-=======
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
+
+            <!-- ═══════════════════ PAGE HEADER ═══════════════════ -->
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
                 <VBox spacing="2">
-                    <Label fx:id="welcomeLabel" styleClass="page-title"/>
-                    <Label text="Here's where your progress, grades, and quizzes stand today." styleClass="subtle"/>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <!-- welcomeLabel text is set in controller: "Welcome back, {name}" -->
+                        <Label fx:id="welcomeLabel" styleClass="page-title"/>
+                        <javafx.scene.image.ImageView fitWidth="26" fitHeight="26" preserveRatio="true">
+                            <image><javafx.scene.image.Image url="@../images/wave.png"/></image>
+                        </javafx.scene.image.ImageView>
+                    </HBox>
+                    <Label text="Here's where your progress, grades, and quizzes stand today."
+                           style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
+                <Button text="Go to Forum" styleClass="btn" onAction="#onForum"
+                        style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-font-weight: 600;
+                               -fx-background-radius: 6; -fx-padding: 9 18;"/>
             </HBox>
         </VBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" styleClass="content-50">
-            <VBox alignment="TOP_CENTER">
-                <VBox spacing="24" maxWidth="1120">
+        <!-- 32px padding all sides matches web's sm:p-8 -->
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #f9fafb; -fx-padding: 32;">
+            <HBox spacing="0" alignment="TOP_LEFT">
 
-                    <!-- Quiz alert -->
-                    <HBox fx:id="quizAlertBox" styleClass="alert-gray" alignment="CENTER_LEFT" spacing="12">
-                        <Label fx:id="quizAlertIcon" style="-fx-text-fill:#4b5563; -fx-font-size:18px;"/>
-                        <VBox>
-                            <Label fx:id="quizAlertTitle" styleClass="label-strong"/>
-                            <Label fx:id="quizAlertSub"   styleClass="subtle"/>
+                <!-- ═══════════════════ LEFT SIDEBAR (256px = w-64) ═══════════════════ -->
+                <VBox spacing="16" prefWidth="256" minWidth="256" maxWidth="256"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #e5e7eb;
+                             -fx-border-width: 0 1 0 0; -fx-padding: 24;">
+
+                    <Label text="Student Portal"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                    <!-- Forums nav item — matches web: bg-gray-100, chat icon + "Forums" -->
+                    <HBox alignment="CENTER_LEFT" spacing="12"
+                          style="-fx-background-color: #f3f4f6; -fx-padding: 10 16; -fx-background-radius: 6; -fx-cursor: hand;"
+                          onMouseClicked="#onForum">
+                        <SVGPath content="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 12.5v-7Z"
+                                 fill="transparent" stroke="#4b5563" strokeWidth="1.6" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                        <Label text="Forums" style="-fx-font-weight: 600; -fx-text-fill: #1f2937; -fx-font-size: 14px;"/>
+                    </HBox>
+
+                    <!-- Quick Stats — populated from API by controller -->
+                    <VBox spacing="12" style="-fx-padding: 16 0 0 0;">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Groups joined" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="groupCountLabel" text="—" style="-fx-font-weight: 600; -fx-text-fill: #1f2937; -fx-font-size: 14px;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Topics in reach" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="topicCountLabel" text="—" style="-fx-font-weight: 600; -fx-text-fill: #1f2937; -fx-font-size: 14px;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Posts made" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="postCountLabel" text="—" style="-fx-font-weight: 600; -fx-text-fill: #1f2937; -fx-font-size: 14px;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- ═══════════════════ CENTER COLUMN (flex-1) ═══════════════════ -->
+                <VBox spacing="24" HBox.hgrow="ALWAYS" style="-fx-padding: 0 24;">
+
+                    <!-- ── Quiz Alert Banner — state set dynamically by controller ── -->
+                    <HBox fx:id="quizAlertBox" alignment="CENTER_LEFT" spacing="16"
+                          style="-fx-padding: 16 20; -fx-background-color: #f8fafc;
+                                 -fx-border-color: #818cf8; -fx-border-radius: 8;
+                                 -fx-background-radius: 8; -fx-border-width: 1 1 1 4;">
+                        <!-- Indigo icon box: bell SVG -->
+                        <StackPane styleClass="icon-box,icon-box-indigo">
+                            <Group>
+                                <SVGPath content="M12 3.5a4 4 0 0 0-4 4V11c0 1-.4 2-1.2 2.7L5.5 15h13l-1.3-1.3c-.8-.7-1.2-1.7-1.2-2.7V7.5a4 4 0 0 0-4-4Z"
+                                         fill="transparent" stroke="#4f46e5" strokeWidth="1.6"
+                                         strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                <SVGPath content="M9.5 18.5a2.5 2.5 0 0 0 5 0"
+                                         fill="transparent" stroke="#4f46e5" strokeWidth="1.6"
+                                         strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </Group>
+                        </StackPane>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="quizAlertTitle" text="Loading quiz data..."
+                                   style="-fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-font-size: 14px;"/>
+                            <Label fx:id="quizAlertSub" text=""
+                                   style="-fx-text-fill: #6366f1; -fx-font-size: 13px;"/>
                         </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="takeQuizBtn" text="Take Quiz"
-                                styleClass="btn,btn-primary"
-                                onAction="#onTakeQuiz"
+                        <Label fx:id="quizAlertBadge" text=""
+                               style="-fx-background-color: #e0e7ff; -fx-text-fill: #4338ca;
+                                      -fx-padding: 6 12; -fx-background-radius: 16;
+                                      -fx-font-size: 12px; -fx-font-weight: bold;"
+                               managed="false" visible="false"/>
+                        <Button fx:id="takeQuizBtn" text="Enter Quiz" onAction="#onTakeQuiz"
+                                style="-fx-background-color: #f59e0b; -fx-text-fill: white;
+                                       -fx-font-weight: bold; -fx-background-radius: 6;
+                                       -fx-padding: 8 16;"
                                 managed="false" visible="false"/>
                     </HBox>
 
-                    <!-- Stats -->
-                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT" styleClass="eyebrow"/>
+                    <!-- Section eyebrow — matches web text-sm font-semibold uppercase tracking-wide -->
+                    <Label text="PROGRESS &amp; GENERAL ASSESSMENT"
+                           style="-fx-text-fill: #6b7280; -fx-font-weight: 600; -fx-font-size: 13px;"/>
+
+                    <!-- ── 3 Progress Cards ── -->
                     <HBox spacing="16">
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="QUIZ PROGRESS" styleClass="eyebrow"/>
-                            <Label fx:id="quizProgressLabel" text="—" styleClass="metric-value"/>
-                            <ProgressBar fx:id="quizProgressBar" progress="0" maxWidth="Infinity"/>
-                            <Label fx:id="quizProgressSub" styleClass="subtle" wrapText="true"/>
+
+                        <!-- Quiz Progress card — live data -->
+                        <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS">
+                            <StackPane styleClass="icon-box,icon-box-blue">
+                                <SVGPath content="M4 20V10M10 20V4M16 20v-7M4 20h16"
+                                         fill="transparent" stroke="#2563eb" strokeWidth="1.6"
+                                         strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </StackPane>
+                            <Label text="QUIZ PROGRESS"
+                                   style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #9ca3af;"/>
+                            <Label fx:id="quizProgressLabel" text="..." styleClass="metric-value"/>
+                            <!-- Custom progress bar: track + fill, matching web h-1.5 rounded-full -->
+                            <StackPane fx:id="quizProgressBar" maxWidth="Infinity" minHeight="6" prefHeight="6" maxHeight="6" alignment="CENTER_LEFT">
+                                <Region style="-fx-background-color: #f3f4f6; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" maxWidth="Infinity"/>
+                                <Region fx:id="quizProgressFill" style="-fx-background-color: #4f46e5; -fx-background-radius: 999;" minHeight="6" prefHeight="6" maxHeight="6" prefWidth="0" maxWidth="0"/>
+                            </StackPane>
+                            <Label fx:id="quizProgressSub" text="Loading..."
+                                   style="-fx-font-size: 12px; -fx-text-fill: #9ca3af;"/>
                         </VBox>
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="PARTICIPATION SCORE" styleClass="eyebrow"/>
-                            <Label fx:id="participationLabel" text="—" styleClass="metric-value"/>
-                            <Label styleClass="subtle" text="Based on posts and replies"/>
+
+                        <!-- Participation Score card -->
+                        <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS">
+                            <!-- Pink icon box: sparkles — matches web bg-pink-100, text-pink-600 -->
+                            <StackPane styleClass="icon-box,icon-box-pink">
+                                <Group>
+                                    <SVGPath content="M12 3l1.4 4.2L17.5 8.6l-4.1 1.4L12 14.2l-1.4-4.2-4.1-1.4 4.1-1.4L12 3Z"
+                                             fill="transparent" stroke="#db2777" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                    <SVGPath content="M19 14.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9Z"
+                                             fill="transparent" stroke="#db2777" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </Group>
+                            </StackPane>
+                            <Label text="PARTICIPATION SCORE"
+                                   style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #9ca3af;"/>
+                            <VBox fx:id="participationByGroupBox" spacing="5">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="BSSE Year 1 - Stream A" style="-fx-font-size: 12px; -fx-text-fill: #6b7280;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="50%" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Web Development Cohort" style="-fx-font-size: 12px; -fx-text-fill: #6b7280;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="0%" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="OOP Study Group" style="-fx-font-size: 12px; -fx-text-fill: #6b7280;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="20%" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Data Management Group" style="-fx-font-size: 12px; -fx-text-fill: #6b7280;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="0%" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Numerical Methods Group" style="-fx-font-size: 12px; -fx-text-fill: #6b7280;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="20%" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                </HBox>
+                            </VBox>
+                            <Label text="Live — based on your current replies"
+                                   style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
                         </VBox>
-                        <VBox styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="COMMUNITY STANDING" styleClass="eyebrow"/>
-                            <Label fx:id="standingLabel" styleClass="badge,badge-success" text="Active"/>
-                            <Label fx:id="standingSub" styleClass="subtle" wrapText="true"/>
+
+                        <!-- Community Standing card -->
+                        <VBox styleClass="card" spacing="10" HBox.hgrow="ALWAYS">
+                            <!-- Green icon box: shield-check — matches web bg-green-100, text-green-600 -->
+                            <StackPane styleClass="icon-box,icon-box-green">
+                                <Group>
+                                    <SVGPath content="M12 3.5l7 3v5.5c0 4.5-3 7.5-7 8.5-4-1-7-4-7-8.5V6.5l7-3Z"
+                                             fill="transparent" stroke="#16a34a" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                    <SVGPath content="M9 12l2 2 4-4.5"
+                                             fill="transparent" stroke="#16a34a" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </Group>
+                            </StackPane>
+                            <Label text="COMMUNITY STANDING"
+                                   style="-fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #9ca3af;"/>
+                            <Label fx:id="standingLabel" text="Good Standing"
+                                   style="-fx-background-color: #dcfce7; -fx-text-fill: #15803d;
+                                          -fx-padding: 4 12; -fx-background-radius: 16;
+                                          -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                            <Label fx:id="standingSub" text="No active warnings on your account"
+                                   style="-fx-font-size: 12px; -fx-text-fill: #9ca3af;"/>
                         </VBox>
                     </HBox>
 
-                    <!-- Recent quiz results -->
-                    <VBox styleClass="card" spacing="0">
-                        <HBox alignment="CENTER_LEFT">
-                            <padding><Insets bottom="12"/></padding>
-                            <Label text="Recent Quiz Results" styleClass="card-title"/>
+                    <!-- ── Grades card — rows built dynamically by controller ── -->
+                    <VBox styleClass="card" spacing="16">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <StackPane styleClass="icon-box,icon-box-emerald">
+                                <SVGPath content="M4 20V10M10 20V4M16 20v-7M4 20h16"
+                                         fill="transparent" stroke="#059669" strokeWidth="1.6"
+                                         strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                            </StackPane>
+                            <VBox>
+                                <Label text="Grades"
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                <Label text="Your most recent quiz results"
+                                       style="-fx-font-size: 12px; -fx-text-fill: #9ca3af;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="averageGradeLabel" text=""
+                                   style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569;
+                                          -fx-padding: 4 12; -fx-background-radius: 16;
+                                          -fx-font-weight: 600; -fx-font-size: 13px;"
+                                   managed="false" visible="false"/>
                         </HBox>
+
+                        <!-- Grade rows populated by addResultRow() -->
                         <VBox fx:id="resultsBox" spacing="0"/>
-                        <Label fx:id="noResultsLabel" text="No quiz results yet." styleClass="muted"
+
+                        <Label fx:id="noResultsLabel"
+                               text="No graded quizzes yet — results will appear here once marked."
+                               style="-fx-font-size: 13px; -fx-text-fill: #9ca3af;"
+                               managed="true" visible="true"/>
+                    </VBox>
+
+                    <!-- ── Topic Discussion card — title/meta from API ── -->
+                    <VBox styleClass="card" spacing="16">
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label fx:id="topicCardTitle" text="Loading latest topic..."
+                                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                                <Label fx:id="topicCardMeta" text=""
+                                       style="-fx-font-size: 12px; -fx-text-fill: #9ca3af;"/>
+                            </VBox>
+                            <Button fx:id="exportPdfBtn" text="EXPORT THREAD TO PDF" onAction="#onExportPdf"
+                                    style="-fx-background-color: #0f172a; -fx-text-fill: white;
+                                           -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 4;
+                                           -fx-font-size: 12px;"
+                                    managed="false" visible="false"/>
+                        </HBox>
+
+                        <VBox fx:id="topicPostsBox" spacing="12" style="-fx-padding: 16 0 0 0;">
+                            <!-- Posts populated dynamically OR static preview below -->
+                            <HBox alignment="TOP_RIGHT">
+                                <Label text="Has anyone tried the approach suggested in the textbook? It worked for me."
+                                       style="-fx-background-color: #bbf7d0; -fx-padding: 10 16;
+                                              -fx-background-radius: 16 16 0 16; -fx-text-fill: #166534;
+                                              -fx-font-size: 13px;"/>
+                            </HBox>
+                            <HBox alignment="TOP_LEFT" spacing="8">
+                                <Label text="N"
+                                       style="-fx-background-color: #8b5cf6; -fx-text-fill: white;
+                                              -fx-min-width: 28; -fx-min-height: 28; -fx-alignment: center;
+                                              -fx-background-radius: 14; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                <VBox spacing="3">
+                                    <Label text="nakato_alice"
+                                           style="-fx-text-fill: #8b5cf6; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label text="This is covered in chapter 5 of the recommended textbook."
+                                           style="-fx-background-color: #f1f5f9; -fx-padding: 10 16;
+                                                  -fx-background-radius: 0 16 16 16; -fx-text-fill: #334155;
+                                                  -fx-font-size: 13px;"/>
+                                </VBox>
+                            </HBox>
+                            <HBox alignment="TOP_LEFT" spacing="8">
+                                <Label text="A"
+                                       style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                                              -fx-min-width: 28; -fx-min-height: 28; -fx-alignment: center;
+                                              -fx-background-radius: 14; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                <VBox spacing="3">
+                                    <Label text="akello_sarah"
+                                           style="-fx-text-fill: #a855f7; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label text="I tested this locally and it works. Let me know if you need the exact code."
+                                           style="-fx-background-color: #f1f5f9; -fx-padding: 10 16;
+                                                  -fx-background-radius: 0 16 16 16; -fx-text-fill: #334155;
+                                                  -fx-font-size: 13px;"/>
+                                </VBox>
+                            </HBox>
+                            <Label fx:id="viewDiscussionLink" text="View full discussion →"
+                                   style="-fx-text-fill: #4f46e5; -fx-font-weight: 600;
+                                          -fx-cursor: hand; -fx-padding: 4 0 0 0; -fx-font-size: 13px;"/>
+                        </VBox>
+                    </VBox>
+
+                </VBox>
+
+                <!-- ═══════════════════ RIGHT SIDEBAR (320px = w-80) ═══════════════════ -->
+                <VBox spacing="24" prefWidth="320" minWidth="320" maxWidth="320"
+                      style="-fx-background-color: #ffffff; -fx-border-color: #e5e7eb;
+                             -fx-border-width: 0 0 0 1; -fx-padding: 24;">
+
+                    <!-- Recommended for You — populated from API -->
+                    <VBox spacing="8"
+                          style="-fx-background-color: #eef2ff; -fx-padding: 16;
+                                 -fx-background-radius: 8; -fx-border-color: #e0e7ff;
+                                 -fx-border-radius: 8; -fx-border-width: 1;">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <StackPane styleClass="icon-box-sm,icon-box-indigo">
+                                <Group scaleX="0.7" scaleY="0.7">
+                                    <SVGPath content="M12 3l1.4 4.2L17.5 8.6l-4.1 1.4L12 14.2l-1.4-4.2-4.1-1.4 4.1-1.4L12 3Z"
+                                             fill="transparent" stroke="#4f46e5" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                    <SVGPath content="M19 14.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9Z"
+                                             fill="transparent" stroke="#4f46e5" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </Group>
+                            </StackPane>
+                            <Label text="Recommended for You"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3730a3; -fx-font-size: 14px;"/>
+                        </HBox>
+                        <Label text="Based on your engagement history:"
+                               style="-fx-text-fill: #4f46e5; -fx-font-size: 12px;"/>
+                        <!-- recommendedLabel shows topic title or 'No recommendations yet.' -->
+                        <Label fx:id="recommendedLabel" text="Loading..."
+                               style="-fx-text-fill: #6366f1; -fx-font-size: 12px;"/>
+                        <Label fx:id="recommendedMeta" text=""
+                               style="-fx-text-fill: #6366f1; -fx-font-size: 11px; -fx-cursor: hand;"
                                managed="false" visible="false"/>
                     </VBox>
 
-<<<<<<< HEAD
-                    <!-- Latest topic / Recommended for you -->
-                    <HBox spacing="16">
-                        <VBox fx:id="latestTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="LATEST TOPIC" styleClass="eyebrow"/>
-                            <Label fx:id="latestTopicTitle" styleClass="label-strong" wrapText="true"/>
-                            <Label fx:id="latestTopicMeta" styleClass="subtle" wrapText="true"/>
-                        </VBox>
-                        <VBox fx:id="recommendedTopicBox" styleClass="card" spacing="6" HBox.hgrow="ALWAYS">
-                            <Label text="RECOMMENDED FOR YOU" styleClass="eyebrow"/>
-                            <Label fx:id="recommendedTopicTitle" styleClass="label-strong" wrapText="true"/>
-                            <Label fx:id="recommendedTopicMeta" styleClass="subtle" wrapText="true"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Logout -->
-                    <HBox alignment="CENTER_RIGHT">
-                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout">
-                            <graphic>
-                                <javafx.scene.shape.SVGPath content="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" fill="transparent" stroke="#94a3b8" strokeWidth="1.7" strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
-                            </graphic>
-                        </Button>
-=======
-                    <!-- Logout -->
-                    <HBox alignment="CENTER_RIGHT">
-                        <Button text="Log Out" styleClass="btn,btn-ghost" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
-                    </HBox>
+                    <!-- Recent Activity -->
+                    <VBox spacing="12">
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <!-- Gray icon box sm (28×28, rounded-md=6px): clock -->
+                            <StackPane styleClass="icon-box-sm,icon-box-gray">
+                                <Group scaleX="0.7" scaleY="0.7">
+                                    <!-- clock circle (r=9 at cx=12,cy=12) -->
+                                    <SVGPath content="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                             fill="transparent" stroke="#6b7280" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                    <!-- clock hands -->
+                                    <SVGPath content="M12 7v5l3.5 2"
+                                             fill="transparent" stroke="#6b7280" strokeWidth="1.6"
+                                             strokeLineCap="ROUND" strokeLineJoin="ROUND"/>
+                                </Group>
+                            </StackPane>
+                            <Label text="Recent Activity"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #1f2937; -fx-font-size: 14px;"/>
+                        </HBox>
+                        <Label text="No activity logged yet."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
+                    </VBox>
 
                 </VBox>
-            </VBox>
+
+            </HBox>
         </ScrollPane>
     </center>
-<<<<<<< HEAD
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
-=======
-</BorderPane>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

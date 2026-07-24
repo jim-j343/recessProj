@@ -15,7 +15,7 @@
 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link,active" onMouseClicked="#onGroups"/>
-                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
                 <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
                 <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
                 <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
@@ -48,7 +48,6 @@
                         </HBox>
                     </graphic>
                     <items>
-<<<<<<< HEAD
                         <MenuItem text="Profile" onAction="#onProfile">
                             <graphic>
                                 <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
@@ -63,10 +62,6 @@
                                 </javafx.scene.layout.StackPane>
                             </graphic>
                         </MenuItem>
-=======
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
@@ -81,10 +76,6 @@
                     <Button text="Go to Forum" styleClass="btn,btn-primary" onAction="#onForum"/>
                     <Button fx:id="editGroupBtn" text="Edit Group" styleClass="btn,btn-secondary" onAction="#onEditGroup" managed="false" visible="false"/>
                     <Button fx:id="deleteGroupBtn" text="Delete Group" style="-fx-background-color:#ef4444; -fx-text-fill:white; -fx-font-weight:bold; -fx-padding:8 16 8 16; -fx-background-radius:6; -fx-cursor:hand;" onAction="#onDeleteGroup" managed="false" visible="false"/>
-<<<<<<< HEAD
-                    <Button fx:id="leaveGroupBtn" text="Leave Group" styleClass="btn,btn-secondary" onAction="#onLeaveGroup" managed="false" visible="false"/>
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 </HBox>
             </HBox>
         </VBox>
@@ -145,6 +136,10 @@
             </VBox>
         </ScrollPane>
     </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
 
     <!-- Modal Overlay for Add Member -->
@@ -223,7 +218,4 @@
     </StackPane>
 
 </StackPane>
-<<<<<<< HEAD
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

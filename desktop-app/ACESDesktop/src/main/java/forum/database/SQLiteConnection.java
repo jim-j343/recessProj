@@ -70,6 +70,7 @@ public final class SQLiteConnection {
                 post_id        INTEGER PRIMARY KEY AUTOINCREMENT,
                 topic_id       INTEGER NOT NULL,
                 author_id      INTEGER NOT NULL,
+                author_name    TEXT,
                 parent_post_id INTEGER,
                 content        TEXT NOT NULL,
                 is_flagged     INTEGER NOT NULL DEFAULT 0,
@@ -95,15 +96,18 @@ public final class SQLiteConnection {
             st.execute(topics);
             st.execute(posts);
             st.execute(syncLog);
-<<<<<<< HEAD
             
             try {
                 st.execute("ALTER TABLE topics ADD COLUMN reply_count INTEGER NOT NULL DEFAULT 0");
             } catch (SQLException ignore) {
                 // column likely already exists
             }
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
+            
+            try {
+                st.execute("ALTER TABLE posts ADD COLUMN author_name TEXT");
+            } catch (SQLException ignore) {
+                // column likely already exists
+            }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialise local schema", e);
         }

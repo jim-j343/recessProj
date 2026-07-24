@@ -42,7 +42,6 @@
                         </HBox>
                     </graphic>
                     <items>
-<<<<<<< HEAD
                         <MenuItem text="Profile" onAction="#onProfile">
                             <graphic>
                                 <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
@@ -57,10 +56,6 @@
                                 </javafx.scene.layout.StackPane>
                             </graphic>
                         </MenuItem>
-=======
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
@@ -80,7 +75,6 @@
                     <Label fx:id="statusLabel" styleClass="muted"
                            managed="false" visible="false"/>
 
-<<<<<<< HEAD
                     <!-- Filter Section -->
                     <HBox spacing="16" alignment="CENTER_LEFT" styleClass="card">
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
@@ -97,8 +91,6 @@
                         </VBox>
                     </HBox>
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     <!-- Grading table -->
                     <VBox styleClass="card" spacing="0">
                         <HBox alignment="CENTER_LEFT">
@@ -106,7 +98,6 @@
                             <Label text="Student Forum Participation" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Button text="💾 Save All Grades"
-<<<<<<< HEAD
                                     styleClass="btn-ghost" style="-fx-text-fill: #4f46e5; -fx-font-weight: bold; -fx-background-color: transparent;"
                                     onAction="#onSaveGrades"/>
                         </HBox>
@@ -123,33 +114,14 @@
                         <VBox fx:id="studentListContainer" spacing="0">
                             <!-- Rows go here dynamically -->
                         </VBox>
-=======
-                                    styleClass="btn,btn-primary"
-                                    onAction="#onSaveGrades"/>
-                        </HBox>
-
-                        <TableView fx:id="gradesTable" prefHeight="480">
-                            <columns>
-                                <TableColumn fx:id="colStudent"       text="STUDENT"       prefWidth="180"/>
-                                <TableColumn fx:id="colReplies"       text="REPLIES"       prefWidth="80"/>
-                                <TableColumn fx:id="colParticipation" text="PARTICIPATION" prefWidth="120"/>
-                                <TableColumn fx:id="colTestAvg"       text="TEST AVG"      prefWidth="180"/>
-                                <TableColumn fx:id="colScore"         text="SCORE"         prefWidth="100"/>
-                                <TableColumn fx:id="colRemarks"       text="REMARKS"       prefWidth="220"/>
-                            </columns>
-                            <placeholder>
-                                <Label text="No students in your groups yet." styleClass="muted"/>
-                            </placeholder>
-                        </TableView>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </VBox>
 
                 </VBox>
             </VBox>
         </ScrollPane>
     </center>
-<<<<<<< HEAD
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
-=======
-</BorderPane>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

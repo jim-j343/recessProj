@@ -15,7 +15,7 @@
 <javafx.scene.image.ImageView fitWidth="48" fitHeight="48" preserveRatio="true"><image><javafx.scene.image.Image url="@../images/logo.jpg"/></image></javafx.scene.image.ImageView>
                 <Label text="Dashboard" styleClass="nav-link" onMouseClicked="#onDashboard"/>
                 <Label text="Groups" styleClass="nav-link" onMouseClicked="#onGroups"/>
-                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onDashboard" managed="false" visible="false"/>
+                <Label fx:id="navMyProgress" text="My Progress" styleClass="nav-link" onMouseClicked="#onMyProgress" managed="false" visible="false"/>
                 <Label fx:id="navNewTopic" text="New Topic" styleClass="nav-link" onMouseClicked="#onNewTopic" managed="false" visible="false"/>
                 <Label fx:id="navQuizCenter" text="Quiz Center" styleClass="nav-link" onMouseClicked="#onQuizCenter" managed="false" visible="false"/>
                 <Label fx:id="navGrading" text="Grading" styleClass="nav-link" onMouseClicked="#onGrading" managed="false" visible="false"/>
@@ -36,7 +36,6 @@
                     <items>
                     </items>
                 </MenuButton>
-<<<<<<< HEAD
                 <MenuButton styleClass="btn-ghost" text="">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="8">
@@ -62,14 +61,6 @@
                         </MenuItem>
                     </items>
                 </MenuButton>
-=======
-                <HBox styleClass="nav-user" alignment="CENTER_LEFT" spacing="8" onMouseClicked="#onLogout">
-                    <Label fx:id="avatarLabel" text="?" styleClass="avatar" minWidth="32" minHeight="32"/>
-                    <Label fx:id="userNameLabel" text="Signed in"/>
-                    <Label fx:id="userMetaLabel" text="Student" visible="false" managed="false"/>
-                    <Label text="Log out ▾" styleClass="subtle"/>
-                </HBox>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             </HBox>
             <!-- HEADER BAND -->
             <HBox styleClass="page-header" alignment="CENTER_LEFT">
@@ -86,7 +77,7 @@
                 <VBox spacing="16" maxWidth="1152">
                     <!-- Search bar card -->
                     <VBox styleClass="card">
-                        <TextField promptText="Search topics..." maxWidth="Infinity"/>
+                        <TextField fx:id="searchField" promptText="Search topics..." maxWidth="Infinity"/>
                     </VBox>
 
                     <!-- Topic list (rows injected by controller) -->
@@ -99,9 +90,10 @@
             </VBox>
         </ScrollPane>
     </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

@@ -38,7 +38,6 @@
                         </HBox>
                     </graphic>
                     <items>
-<<<<<<< HEAD
                         <MenuItem text="Profile" onAction="#onProfile">
                             <graphic>
                                 <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
@@ -53,10 +52,6 @@
                                 </javafx.scene.layout.StackPane>
                             </graphic>
                         </MenuItem>
-=======
-                        <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                        <MenuItem text="→  Log Out" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                     </items>
                 </MenuButton>
             </HBox>
@@ -98,18 +93,10 @@
                     <HBox spacing="24">
                         <!-- My quizzes -->
                         <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
-<<<<<<< HEAD
                             <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 12 0;">
                                 <Label text="My Quizzes" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
                                 <Region HBox.hgrow="ALWAYS"/>
                                 <Hyperlink text="+ New" onAction="#onQuizCenter" style="-fx-text-fill: #4f46e5; -fx-font-weight: bold; -fx-font-size: 13px; -fx-border-color: transparent;"/>
-=======
-                            <HBox alignment="CENTER_LEFT">
-                                <padding><Insets bottom="12"/></padding>
-                                <Label text="My Quizzes" styleClass="card-title"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Hyperlink text="+ New" onAction="#onQuizCenter" styleClass="subtle"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                             </HBox>
                             <VBox fx:id="quizListBox" spacing="0"/>
                             <Label fx:id="noQuizzesLabel" text="No quizzes yet. Create your first one."
@@ -118,7 +105,6 @@
 
                         <!-- Quick actions -->
                         <VBox styleClass="card" spacing="12" HBox.hgrow="ALWAYS">
-<<<<<<< HEAD
                             <Label text="Quick Actions" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
                             <!-- Each button: left-aligned icon + text, matching web -->
                             <Button styleClass="btn,btn-secondary" maxWidth="Infinity" onAction="#onQuizCenter">
@@ -153,21 +139,6 @@
                                     </HBox>
                                 </graphic>
                             </Button>
-=======
-                            <Label text="Quick Actions" styleClass="card-title"/>
-                            <Button text="📝  Create a new quiz"
-                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
-                                    onAction="#onQuizCenter"/>
-                            <Button text="💬  Post a new topic"
-                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
-                                    onAction="#onNewTopic"/>
-                            <Button text="👁  View forum"
-                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
-                                    onAction="#onForum"/>
-                            <Button text="🏆  Award participation marks"
-                                    styleClass="btn,btn-secondary" maxWidth="Infinity"
-                                    onAction="#onGrading"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                         </VBox>
                     </HBox>
 
@@ -175,8 +146,9 @@
             </VBox>
         </ScrollPane>
     </center>
-</BorderPane>
-<<<<<<< HEAD
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
+</BorderPane>
+

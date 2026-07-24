@@ -67,7 +67,10 @@ public class GroupsIndexController {
 
     private void loadGroups() {
         String token = Session.authToken();
-        if (token == null) { showStatus("Offline — cannot load groups."); return; }
+        if (token == null || token.isBlank()) {
+            showStatus("Groups require an online session. Start the API, then log out and sign in again.");
+            return;
+        }
 
         Thread worker = new Thread(() -> {
             try {
@@ -199,6 +202,7 @@ public class GroupsIndexController {
     @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
     @FXML private void onMembers()   { SceneManager.goAdminMembers(); }
     @FXML private void onAnalytics() { SceneManager.goAdminAnalytics(); }
+    @FXML private void onMyProgress(){ SceneManager.goStudentAssessment(); }
 
     @FXML private void onModeration()  { SceneManager.goAdminModeration(); }
     @FXML private void onProfile()   { SceneManager.goProfile(); }

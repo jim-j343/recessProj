@@ -28,7 +28,6 @@ public class LoginController {
     @FXML
     private void initialize() {
         if (errorLabel != null) errorLabel.setManaged(false);
-<<<<<<< HEAD
         
         javafx.event.EventHandler<javafx.scene.input.KeyEvent> enterHandler = e -> {
             if (e.getCode() == javafx.scene.input.KeyCode.ENTER) {
@@ -38,8 +37,6 @@ public class LoginController {
         
         if (emailField != null) emailField.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, enterHandler);
         if (passwordField != null) passwordField.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, enterHandler);
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
 @FXML

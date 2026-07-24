@@ -9,7 +9,6 @@ import forum.models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
-<<<<<<< HEAD
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,19 +23,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-=======
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,20 +32,10 @@ public class ParticipationGradingController {
     @FXML private Label     avatarLabel;
     @FXML private Label     userNameLabel;
     @FXML private Label     statusLabel;
-<<<<<<< HEAD
     
     @FXML private ComboBox<TopicOption> topicCombo;
     @FXML private TextField searchField;
     @FXML private VBox studentListContainer;
-=======
-    @FXML private TableView<GradeRow> gradesTable;
-    @FXML private TableColumn<GradeRow, String> colStudent;
-    @FXML private TableColumn<GradeRow, String> colReplies;
-    @FXML private TableColumn<GradeRow, String> colParticipation;
-    @FXML private TableColumn<GradeRow, String> colTestAvg;
-    @FXML private TableColumn<GradeRow, String> colScore;
-    @FXML private TableColumn<GradeRow, String> colRemarks;
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
     @FXML private javafx.scene.control.MenuButton notifButton;
     @FXML private Label notifBadge;
@@ -81,7 +57,6 @@ public class ParticipationGradingController {
             forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
-<<<<<<< HEAD
         topicCombo.getItems().add(new TopicOption(null, "All Topics"));
         topicCombo.setValue(topicCombo.getItems().get(0));
 
@@ -97,52 +72,6 @@ public class ParticipationGradingController {
             renderStudentRows();
         });
 
-=======
-        colStudent.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().username));
-        colReplies.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().replyCount)));
-        colParticipation.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().participationPct + "%"));
-        colTestAvg.setCellValueFactory(c -> {
-            Double avg = c.getValue().quizAvgPct;
-            return new SimpleStringProperty(avg != null ? avg + "% (" + c.getValue().quizCount + " quizzes)" : "No quizzes");
-        });
-
-        // Editable score field
-        colScore.setCellFactory(col -> new TableCell<>() {
-            private final TextField field = new TextField();
-            {
-                field.setOnKeyReleased(e -> {
-                    GradeRow row = getTableView().getItems().get(getIndex());
-                    row.score = field.getText();
-                });
-            }
-            @Override protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) { setGraphic(null); return; }
-                GradeRow row = getTableView().getItems().get(getIndex());
-                field.setText(row.score);
-                setGraphic(field);
-            }
-        });
-
-        // Editable remarks field
-        colRemarks.setCellFactory(col -> new TableCell<>() {
-            private final TextField field = new TextField();
-            {
-                field.setOnKeyReleased(e -> {
-                    GradeRow row = getTableView().getItems().get(getIndex());
-                    row.remarks = field.getText();
-                });
-            }
-            @Override protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) { setGraphic(null); return; }
-                field.setText(getTableView().getItems().get(getIndex()).remarks);
-                setGraphic(field);
-            }
-        });
-
-        gradesTable.setItems(rows);
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         loadStudents();
     }
 
@@ -150,7 +79,6 @@ public class ParticipationGradingController {
         String token = Session.authToken();
         if (token == null) { showStatus("Offline — cannot load students."); return; }
 
-<<<<<<< HEAD
         TopicOption selectedTopic = topicCombo.getValue();
         String searchText = searchField.getText();
 
@@ -169,15 +97,6 @@ public class ParticipationGradingController {
                         .connectTimeout(Duration.ofSeconds(8)).build();
                 HttpRequest req = HttpRequest.newBuilder(
                         URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json?" + topicQuery + searchQuery))
-=======
-        Thread worker = new Thread(() -> {
-            try {
-                // Call the web participation grade endpoint via API
-                HttpClient http = HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(8)).build();
-                HttpRequest req = HttpRequest.newBuilder(
-                        URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json"))
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .GET().build();
@@ -187,7 +106,6 @@ public class ParticipationGradingController {
                 if (resp.statusCode() == 200) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode root = mapper.readTree(resp.body());
-<<<<<<< HEAD
                     
                     JsonNode rowsNode = root.has("rows") ? root.get("rows") : root;
                     List<GradeRow> result = new ArrayList<>();
@@ -196,19 +114,11 @@ public class ParticipationGradingController {
                         row.userId           = node.get("user_id").asLong();
                         row.username         = node.get("username").asText();
                         row.postCount        = node.has("post_count") ? node.get("post_count").asInt() : 0;
-=======
-                    List<GradeRow> result = new ArrayList<>();
-                    for (JsonNode node : root) {
-                        GradeRow row = new GradeRow();
-                        row.userId           = node.get("user_id").asLong();
-                        row.username         = node.get("username").asText();
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                         row.replyCount       = node.get("reply_count").asInt();
                         row.participationPct = node.get("participation_pct").asDouble();
                         row.quizAvgPct       = node.hasNonNull("quiz_avg_pct") ? node.get("quiz_avg_pct").asDouble() : null;
                         row.quizCount        = node.get("quiz_count").asInt();
                         row.suggestedScore   = node.get("suggested_score").asDouble();
-<<<<<<< HEAD
                         row.existingScore    = node.hasNonNull("existing_score") ? node.get("existing_score").asText() : null;
                         row.existingRemark   = node.hasNonNull("existing_remark") ? node.get("existing_remark").asText() : null;
                         row.score            = row.existingScore != null ? row.existingScore : String.valueOf(row.suggestedScore);
@@ -239,13 +149,6 @@ public class ParticipationGradingController {
                         
                         renderStudentRows();
                     });
-=======
-                        row.score            = node.hasNonNull("existing_score") ? node.get("existing_score").asText() : String.valueOf(row.suggestedScore);
-                        row.remarks          = "";
-                        result.add(row);
-                    }
-                    Platform.runLater(() -> rows.setAll(result));
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 } else {
                     Platform.runLater(() -> showStatus("Could not load students (HTTP " + resp.statusCode() + ")."));
                 }
@@ -258,7 +161,6 @@ public class ParticipationGradingController {
         worker.start();
     }
 
-<<<<<<< HEAD
     private void renderStudentRows() {
         studentListContainer.getChildren().clear();
         String searchText = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
@@ -334,8 +236,6 @@ public class ParticipationGradingController {
         loadStudents();
     }
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML
     private void onSaveGrades() {
         String token = Session.authToken();
@@ -368,17 +268,12 @@ public class ParticipationGradingController {
                         .build();
 
                 HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-<<<<<<< HEAD
                 Platform.runLater(() -> {
                     showStatus(resp.statusCode() == 200 ? "✓ Grades saved." : "Save failed — try again.");
                     if (resp.statusCode() == 200) {
                         loadStudents(); // Reload to get updated "Last score"
                     }
                 });
-=======
-                Platform.runLater(() -> showStatus(
-                        resp.statusCode() == 200 ? "✓ Grades saved." : "Save failed — try again."));
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
                 Platform.runLater(() -> showStatus("Save failed: " + e.getMessage()));
@@ -410,16 +305,12 @@ public class ParticipationGradingController {
     public static class GradeRow {
         public long   userId;
         public String username;
-<<<<<<< HEAD
         public int    postCount;
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         public int    replyCount;
         public double participationPct;
         public Double quizAvgPct;
         public int    quizCount;
         public double suggestedScore;
-<<<<<<< HEAD
         public String existingScore;
         public String existingRemark;
         public String score   = "";
@@ -432,9 +323,4 @@ public class ParticipationGradingController {
         public TopicOption(Long id, String title) { this.id = id; this.title = title; }
         @Override public String toString() { return title; }
     }
-=======
-        public String score   = "";
-        public String remarks = "";
-    }
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 }

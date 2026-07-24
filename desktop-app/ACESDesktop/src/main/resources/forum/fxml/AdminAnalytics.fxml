@@ -43,7 +43,6 @@
                     </HBox>
                 </graphic>
                 <items>
-<<<<<<< HEAD
                     <MenuItem text="Profile" onAction="#onProfile">
                             <graphic>
                                 <javafx.scene.layout.StackPane prefHeight="30" prefWidth="40">
@@ -58,10 +57,6 @@
                                 </javafx.scene.layout.StackPane>
                             </graphic>
                         </MenuItem>
-=======
-                    <MenuItem text="✓  Profile" onAction="#onProfile"/>
-                    <MenuItem text="→  Log Out" onAction="#onLogout"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 </items>
             </MenuButton>
         </HBox>
@@ -152,7 +147,7 @@
                         </VBox>
 
                         <VBox styleClass="card-flat" spacing="16" prefWidth="360" minWidth="360">
-                            <HBox alignment="CENTER_LEFT"><Label text="Recent Activity" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/><Hyperlink text="View all" styleClass="subtle"/></HBox>
+                            <HBox alignment="CENTER_LEFT"><Label text="Recent Activity" styleClass="card-title"/><Region HBox.hgrow="ALWAYS"/></HBox>
                             <VBox fx:id="recentActivityBox" spacing="8"/>
                         </VBox>
                     </HBox>
@@ -160,9 +155,10 @@
             </VBox>
         </ScrollPane>
     </center>
+
+    <bottom>
+        <fx:include source="Footer.fxml"/>
+    </bottom>
 </BorderPane>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

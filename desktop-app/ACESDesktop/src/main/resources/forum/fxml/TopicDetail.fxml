@@ -13,26 +13,14 @@
               style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:0 0 1 0; -fx-padding:12 24 12 24;">
             <Hyperlink text="← Back" onAction="#onBack" styleClass="muted"/>
             <Label fx:id="topicTitleLabel" text="Topic" styleClass="label-strong"/>
-<<<<<<< HEAD
-            <Button fx:id="editTopicBtn" text="✎ Edit" styleClass="btn-sm,btn-outline" onAction="#onEditTopic" managed="false" visible="false"/>
-            <Button fx:id="deleteTopicBtn" text="🗑 Delete" styleClass="btn-sm,btn-outline" onAction="#onDeleteTopic" managed="false" visible="false"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline" onAction="#onExportPdf"/>
             <Button text="↗ Share" styleClass="btn-sm,btn-outline" onAction="#onShare"/>
-=======
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="↓ Export PDF" styleClass="btn-sm,btn-outline"/>
-            <Button text="↗ Share" styleClass="btn-sm,btn-outline"/>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         </HBox>
     </top>
 
     <center>
-<<<<<<< HEAD
         <ScrollPane fx:id="scrollPane" fitToWidth="true" styleClass="content-50">
-=======
-        <ScrollPane fitToWidth="true" styleClass="content-50">
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             <VBox alignment="TOP_CENTER">
                 <VBox spacing="16" maxWidth="768">
                     <Label fx:id="repliesCountLabel" text="Replies" styleClass="h-sm"/>
@@ -42,7 +30,6 @@
         </ScrollPane>
     </center>
 
-<<<<<<< HEAD
     <!-- STICKY REPLY BAR AREA -->
     <bottom>
         <VBox alignment="BOTTOM_CENTER">
@@ -77,16 +64,7 @@
                 </Button>
             </HBox>
             </HBox>
+            <fx:include source="Footer.fxml"/>
         </VBox>
-=======
-    <!-- STICKY REPLY BAR -->
-    <bottom>
-        <HBox alignment="CENTER" style="-fx-background-color:white; -fx-border-color:#e5e7eb; -fx-border-width:1 0 0 0; -fx-padding:12 24 12 24;">
-            <HBox spacing="12" alignment="CENTER_LEFT" maxWidth="768" HBox.hgrow="ALWAYS">
-                <TextField fx:id="composerField" promptText="Add to the conversation..." HBox.hgrow="ALWAYS" onAction="#onReply"/>
-                <Button text="↩ Reply" styleClass="btn,btn-dark" onAction="#onReply"/>
-            </HBox>
-        </HBox>
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     </bottom>
 </BorderPane>

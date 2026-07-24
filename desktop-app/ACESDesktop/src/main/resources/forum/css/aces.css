@@ -97,10 +97,10 @@
 /* ---------- Header band (white shadow strip under nav) ---------- */
 .page-header {
     -fx-background-color: -surface;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 10, 0, 0, 2);
     -fx-padding: 24 32 24 32;
 }
-.page-title { -fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: -ink-800; }
+.page-title { -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937; }
 
 /* ---------- Content canvas ---------- */
 .content { -fx-padding: 32px; -fx-background-color: -bg; }
@@ -139,11 +139,7 @@
 .btn-primary:hover { -fx-background-color: -indigo-700; }
 .btn-dark          { -fx-background-color: -ink; -fx-text-fill: white; }
 .btn-dark:hover    { -fx-background-color: -ink-700; }
-<<<<<<< HEAD
 .btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; -fx-alignment: center-left; }
-=======
-.btn-secondary     { -fx-background-color: -border-100; -fx-text-fill: -ink-700; }
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 .btn-secondary:hover { -fx-background-color: -border; }
 .btn-outline       { -fx-background-color: -surface; -fx-text-fill: -ink-700; -fx-border-color: -border; -fx-border-width: 1; }
 .btn-outline:hover { -fx-background-color: -bg-50; }
@@ -332,11 +328,7 @@
     -fx-padding: 8 16 8 16; -fx-cursor: hand;
 }
 .segmented-blue .toggle-button:hover { -fx-background-color: -bg-50; }
-<<<<<<< HEAD
 .segmented-blue .toggle-button:selected { -fx-background-color: -indigo; -fx-text-fill: white; -fx-border-color: -indigo; -fx-font-weight: 600; }
-=======
-.segmented-blue .toggle-button:selected { -fx-background-color: -indigo-500; -fx-text-fill: white; -fx-border-color: -indigo-500; -fx-font-weight: 600; }
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
 /* Underline tab strip — mirrors web border-b-2 tab style */
 .tab-strip { -fx-background-color: transparent; -fx-spacing: 0; -fx-padding: 0; }
@@ -363,7 +355,6 @@
 }
 .segmented-role .toggle-button:selected { -fx-background-color: -surface; -fx-text-fill: -ink; -fx-font-weight: 600; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 3, 0, 0, 1); }
 
-<<<<<<< HEAD
 /* ---------- Table (Matches web exact Tailwind styling) ---------- */
 .table-view { -fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; }
 .table-view .column-header-background { -fx-background-color: -bg-50; -fx-background-radius: 0; -fx-padding: 0; }
@@ -372,17 +363,6 @@
 .table-view .table-cell { -fx-text-fill: -ink-500; -fx-padding: 16 16 16 16; -fx-border-color: transparent; -fx-font-size: 13px; }
 .table-row-cell { -fx-background-color: -surface; -fx-border-color: -border; -fx-border-width: 0 0 1 0; }
 .table-row-cell:hover { -fx-background-color: -surface; /* Web tables don't have hover */ }
-=======
-/* ---------- Table ---------- */
-.table-view { -fx-background-color: -surface; -fx-border-color: -border-100; -fx-border-width: 1; -fx-background-radius: 8; -fx-border-radius: 8; }
-.table-view .column-header-background { -fx-background-color: -bg-50; -fx-background-radius: 8 8 0 0; }
-.table-view .column-header { -fx-background-color: transparent; -fx-border-color: -border; -fx-border-width: 0 0 1 0; }
-.table-view .column-header .label { -fx-text-fill: -ink-800; -fx-font-size: 11.5px; -fx-font-weight: 800; -fx-alignment: center-left; -fx-padding: 12 16 12 16; }
-.indigo-col .label { -fx-text-fill: -indigo !important; }
-.table-view .table-cell { -fx-text-fill: -ink-700; -fx-padding: 14 16 14 16; -fx-border-color: transparent; -fx-font-size: 13px; }
-.table-row-cell { -fx-background-color: -surface; -fx-border-color: -border-100; -fx-border-width: 0 0 1 0; -fx-cell-size: 52px; }
-.table-row-cell:hover { -fx-background-color: -bg-50; }
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 .table-view .filler, .table-view .corner { -fx-background-color: -bg-50; }
 
 /* ---------- Misc ---------- */
@@ -395,6 +375,30 @@
 .scroll-bar .thumb { -fx-background-color: -border-300; -fx-background-radius: 999; }
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow,
 .scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-background-color: transparent; -fx-padding: 0; }
+
+/* ---------- Icon boxes — mirrors web's w-10 h-10 rounded-lg bg-{color}-100 ---------- */
+/* Standard 40x40 icon box (w-10 h-10, rounded-lg = 8px) */
+.icon-box {
+    -fx-min-width: 40;  -fx-min-height: 40;
+    -fx-max-width: 40;  -fx-max-height: 40;
+    -fx-background-radius: 8;
+    -fx-alignment: center;
+}
+/* Smaller 28x28 icon box for sidebars (w-7 h-7, rounded-md = 6px) */
+.icon-box-sm {
+    -fx-min-width: 28;  -fx-min-height: 28;
+    -fx-max-width: 28;  -fx-max-height: 28;
+    -fx-background-radius: 6;
+    -fx-alignment: center;
+}
+/* Color variants — exact Tailwind bg-{color}-100 hex values */
+.icon-box-blue    { -fx-background-color: #dbeafe; } /* bg-blue-100    */
+.icon-box-pink    { -fx-background-color: #fce7f3; } /* bg-pink-100    */
+.icon-box-green   { -fx-background-color: #dcfce7; } /* bg-green-100   */
+.icon-box-emerald { -fx-background-color: #d1fae5; } /* bg-emerald-100 */
+.icon-box-indigo  { -fx-background-color: #e0e7ff; } /* bg-indigo-100  */
+.icon-box-amber   { -fx-background-color: #fef3c7; } /* bg-amber-100   */
+.icon-box-gray    { -fx-background-color: #f3f4f6; } /* bg-gray-100    */
 
 .hyperlink { -fx-text-fill: -indigo; -fx-border-color: transparent; -fx-padding: 0; -fx-underline: false; }
 .hyperlink:hover { -fx-underline: true; -fx-text-fill: -indigo-700; }
@@ -502,3 +506,8 @@
 .check-box:selected:hover .box { -fx-background-color: -indigo-700; }
 .check-box:selected .mark { -fx-background-color: white; }
 .check-box:disabled { -fx-opacity: 1; }
+
+.quiz-progress { -fx-min-height: 8px; -fx-pref-height: 8px; -fx-max-height: 8px; }
+.quiz-progress > .track { -fx-background-color: #f3f4f6; -fx-background-radius: 6; }
+.quiz-progress > .bar { -fx-background-color: #4f46e5; -fx-background-radius: 6; -fx-padding: 4px; }
+

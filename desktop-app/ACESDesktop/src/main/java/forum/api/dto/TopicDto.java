@@ -13,8 +13,5 @@ public class TopicDto {
     public String  created_at;
     public String  author;
     public int     replies;
-<<<<<<< HEAD
     public int     posts_count;
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 }

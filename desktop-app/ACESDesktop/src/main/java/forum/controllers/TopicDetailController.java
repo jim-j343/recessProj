@@ -1,13 +1,7 @@
 package forum.controllers;
 
 import forum.api.ApiClient;
-<<<<<<< HEAD
-import forum.api.ApiException;
 import forum.api.dto.PostDto;
-import forum.api.dto.MemberDto;
-=======
-import forum.api.dto.PostDto;
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 import forum.api.dto.TopicDetailResponse;
 import forum.app.SceneManager;
 import forum.app.Session;
@@ -15,10 +9,6 @@ import forum.app.ViewState;
 import forum.database.PostDao;
 import forum.database.TopicDao;
 import forum.models.Post;
-<<<<<<< HEAD
-import forum.models.Role;
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 import forum.models.Topic;
 import forum.models.User;
 
@@ -26,20 +16,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-<<<<<<< HEAD
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.FlowPane;
@@ -48,18 +30,12 @@ import javafx.scene.Node;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Arrays;
-=======
-import javafx.scene.layout.VBox;
-
-import java.util.List;
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Topic thread — offline-first. Shows cached posts immediately, then (if the
@@ -72,73 +48,33 @@ public class TopicDetailController {
     @FXML private Label repliesCountLabel;
     @FXML private VBox postList;
     @FXML private TextField composerField;
-<<<<<<< HEAD
     @FXML private Button hideButton;
     @FXML private javafx.scene.shape.SVGPath hideIcon;
     @FXML private ScrollPane scrollPane;
     @FXML private HBox hidePanel;
     @FXML private FlowPane hideMembersFlow;
-    @FXML private Button editTopicBtn;
-    @FXML private Button deleteTopicBtn;
 
     private boolean isHiddenMode = false;
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
+    private List<forum.api.dto.MemberDto> excludableMembers = Collections.emptyList();
+    private final Map<Long, List<String>> excludedUsernamesByPostId = new HashMap<>();
 
     private final PostDao postDao = new PostDao();
     private final TopicDao topicDao = new TopicDao();
     private final ApiClient api = new ApiClient();
 
     private Topic topic;
-<<<<<<< HEAD
-    private long currentUserId = -1;
-    private boolean isAdmin = false;
-
-    // Real "hide this reply from" state — replaces the old hardcoded/fake
-    // checkbox list. Populated from the server's group roster, sent as
-    // excluded_users on POST /topics/{id}/posts.
-    private final Set<Long> excludedUserIds = new HashSet<>();
-    private List<MemberDto> groupMembers = new ArrayList<>();
-
-    // Server post_id → who it's hidden from. Only ever populated for posts
-    // you authored (the API only tells the author this).
-    private final Map<Long, List<String>> excludedUsernamesByPost = new HashMap<>();
-    // Server post_id → authoritative author username, straight from the DTO.
-    // PostDao's local join can go stale after a reseed; this always wins.
-    private final Map<Long, String> authorNameByPost = new HashMap<>();
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
     @FXML
     private void initialize() {
         topic = ViewState.getSelectedTopic();
         if (topic == null) { onBack(); return; }
         if (topicTitleLabel != null) topicTitleLabel.setText(topic.getTitle());
-<<<<<<< HEAD
-
-        User u = Session.currentUser();
-        if (u != null) {
-            currentUserId = u.getUserId();
-            isAdmin = u.getRole() == Role.SYSTEM_ADMIN;
-        }
-
-        boolean canManageTopic = currentUserId == topic.getCreatorId() || isAdmin;
-        if (editTopicBtn != null) { editTopicBtn.setManaged(canManageTopic); editTopicBtn.setVisible(canManageTopic); }
-        if (deleteTopicBtn != null) { deleteTopicBtn.setManaged(canManageTopic); deleteTopicBtn.setVisible(canManageTopic); }
-
         renderPosts(postDao.listByTopic(topic.getTopicId()));   // instant, from cache
         scrollToBottom();
         fetchOnline();
     }
 
-    /** If the topic is on the server, pull its latest posts (and group roster) off the UI thread. */
-=======
-        renderPosts(postDao.listByTopic(topic.getTopicId()));   // instant, from cache
-        fetchOnline();
-    }
-
     /** If the topic is on the server, pull its latest posts off the UI thread. */
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     private void fetchOnline() {
         String token = Session.authToken();
         long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
@@ -148,26 +84,16 @@ public class TopicDetailController {
             try {
                 TopicDetailResponse detail = api.getTopic(token, serverTopicId);
                 if (detail.topic != null) topicDao.upsertFromServer(detail.topic);
-<<<<<<< HEAD
-                if (detail.posts != null) {
-                    for (PostDto p : detail.posts) {
-                        postDao.upsertFromServer(p);
-                        if (p.excluded_usernames != null) excludedUsernamesByPost.put(p.post_id, p.excluded_usernames);
-                        if (p.author != null) authorNameByPost.put(p.post_id, p.author);
-                    }
+                if (detail.posts != null) for (PostDto p : detail.posts) {
+                    cacheExcludedUsers(p);
+                    postDao.upsertFromServer(p);
                 }
                 List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                if (detail.groupMembers != null) groupMembers = detail.groupMembers;
                 Platform.runLater(() -> {
+                    setExcludableMembers(detail.groupMembers);
                     renderPosts(fresh);
-                    renderHideRoster();
                     scrollToBottom();
                 });
-=======
-                if (detail.posts != null) for (PostDto p : detail.posts) postDao.upsertFromServer(p);
-                List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                Platform.runLater(() -> renderPosts(fresh));
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
             } catch (Exception ignored) {
                 // stay on the cached view if the fetch fails
             }
@@ -176,54 +102,16 @@ public class TopicDetailController {
         worker.start();
     }
 
-<<<<<<< HEAD
-    /** Builds the real "hide this reply from" checkbox list from the group roster. */
-    private void renderHideRoster() {
-        if (hideMembersFlow == null) return;
-        hideMembersFlow.getChildren().clear();
-        excludedUserIds.clear();
-
-        if (groupMembers.isEmpty()) {
-            Label none = new Label("No other members in this group yet.");
-            none.getStyleClass().add("muted");
-            hideMembersFlow.getChildren().add(none);
-            return;
-        }
-
-        for (MemberDto m : groupMembers) {
-            CheckBox cb = new CheckBox(m.username);
-            cb.setStyle("-fx-background-color: white; -fx-border-color: #fde047; -fx-border-radius: 12; -fx-padding: 4 8; -fx-text-fill: #4b5563; -fx-font-size: 13px;");
-            cb.selectedProperty().addListener((obs, was, isNow) -> {
-                if (isNow) excludedUserIds.add(m.userId);
-                else excludedUserIds.remove(m.userId);
-            });
-            hideMembersFlow.getChildren().add(cb);
-        }
-    }
-
-    private String displayAuthorName(Post p) {
-        String fresh = authorNameByPost.get(p.getPostId());
-        if (fresh != null) return fresh;
-        return p.getAuthorName() == null ? "Unknown" : p.getAuthorName();
-    }
-
     private void renderPosts(List<Post> posts) {
         if (postList == null) return;
         postList.getChildren().clear();
         if (repliesCountLabel != null) repliesCountLabel.setText(Math.max(0, posts.size() - 1) + " Replies");
-=======
-    private void renderPosts(List<Post> posts) {
-        if (postList == null) return;
-        postList.getChildren().clear();
-        if (repliesCountLabel != null) repliesCountLabel.setText(posts.size() + " Replies");
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         if (posts.isEmpty()) {
             Label empty = new Label("No replies yet. Be the first to respond.");
             empty.getStyleClass().add("muted");
             postList.getChildren().add(empty);
             return;
         }
-<<<<<<< HEAD
         
         long currentUserId = 0;
         User u = Session.currentUser();
@@ -250,7 +138,7 @@ public class TopicDetailController {
         HBox topRow = new HBox(12);
         topRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         
-        String authorName = displayAuthorName(p);
+        String authorName = p.getAuthorName() == null ? "Unknown" : p.getAuthorName();
         Label avatar = new Label(authorName.isBlank() ? "?" : String.valueOf(authorName.charAt(0)).toUpperCase());
         avatar.setStyle("-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 50; -fx-min-width: 40; -fx-min-height: 40; -fx-alignment: center;");
         
@@ -289,8 +177,6 @@ public class TopicDetailController {
         body.setWrapText(true);
         
         card.getChildren().addAll(topRow, title, body);
-
-        addHiddenBadgeIfAny(card, p);
         return card;
     }
 
@@ -298,7 +184,7 @@ public class TopicDetailController {
         HBox row = new HBox(8);
         row.setPadding(new javafx.geometry.Insets(0, 0, 16, 0));
         
-        String authorName = displayAuthorName(p);
+        String authorName = p.getAuthorName() == null ? "Unknown" : p.getAuthorName();
         Label avatar = new Label(authorName.isBlank() ? "?" : String.valueOf(authorName.charAt(0)).toUpperCase());
         avatar.setStyle("-fx-background-color: #a855f7; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 50; -fx-min-width: 28; -fx-min-height: 28; -fx-alignment: center;");
         
@@ -379,8 +265,15 @@ public class TopicDetailController {
         HBox metaRow = new HBox(meta);
         metaRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
         
-        bubble.getChildren().addAll(bodyNode, metaRow);
-        addHiddenBadgeIfAny(bubble, p);
+        bubble.getChildren().add(bodyNode);
+        List<String> excludedUsers = excludedUsernamesByPostId.getOrDefault(p.getPostId(), Collections.emptyList());
+        if (isOutgoing && !excludedUsers.isEmpty()) {
+            Label excludedLabel = new Label("Hidden from: " + String.join(", ", excludedUsers));
+            excludedLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #b45309; -fx-font-style: italic;");
+            excludedLabel.setWrapText(true);
+            bubble.getChildren().add(excludedLabel);
+        }
+        bubble.getChildren().add(metaRow);
         
         HBox topButtons = new HBox(4);
         topButtons.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
@@ -436,34 +329,6 @@ public class TopicDetailController {
         return row;
     }
 
-    /** "🔒 Hidden from X, Y" — only ever populated for posts you authored. */
-    private void addHiddenBadgeIfAny(VBox container, Post p) {
-        List<String> hiddenFrom = excludedUsernamesByPost.get(p.getPostId());
-        if (hiddenFrom == null || hiddenFrom.isEmpty()) return;
-        Label badge = new Label("🔒 Hidden from " + String.join(", ", hiddenFrom));
-        badge.setStyle("-fx-text-fill: #b45309; -fx-font-size: 11px;");
-        container.getChildren().add(badge);
-    }
-
-=======
-        for (Post p : posts) postList.getChildren().add(postCard(p));
-    }
-
-    private VBox postCard(Post p) {
-        Label author = new Label(p.getAuthorName() == null ? "Unknown" : p.getAuthorName());
-        author.getStyleClass().add("label-strong");
-        Label body = new Label(p.getContent());
-        body.getStyleClass().add("body");
-        body.setWrapText(true);
-        Label meta = new Label(p.isSynced() ? "synced" : "pending sync");
-        meta.getStyleClass().add("muted");
-
-        VBox card = new VBox(6, author, body, meta);
-        card.getStyleClass().add("card");
-        return card;
-    }
-
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     @FXML
     private void onReply() {
         if (composerField == null || topic == null) return;
@@ -471,27 +336,25 @@ public class TopicDetailController {
         if (content == null || content.isBlank()) return;
         composerField.clear();
 
+        List<Long> excludedUserIds = selectedExcludedUserIds();
+        if (isHiddenMode && !excludedUserIds.isEmpty()) {
+            content = "[Hidden from Students] " + content;
+        }
+        if (isHiddenMode) toggleHideMode(); // reset after send
+
         User u = Session.currentUser();
         long authorId = (u != null) ? u.getUserId() : 0;
         String token = Session.authToken();
         long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
         String body = content.trim();
-<<<<<<< HEAD
-        List<Long> excludedForThisReply = new ArrayList<>(excludedUserIds);
-
-        // Reset the picker immediately after capturing the selection
-        resetHidePicker();
-=======
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
 
         Thread worker = new Thread(() -> {
             // Online — post to the server and cache the result.
             if (token != null && !token.isBlank() && serverTopicId > 0) {
                 try {
-<<<<<<< HEAD
-                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedForThisReply);
+                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedUserIds);
+                    cacheExcludedUsers(dto);
                     postDao.upsertFromServer(dto);
-                    if (dto.excluded_usernames != null) excludedUsernamesByPost.put(dto.post_id, dto.excluded_usernames);
                     List<Post> fresh = postDao.listByTopic(topic.getTopicId());
                     Platform.runLater(() -> {
                         renderPosts(fresh);
@@ -499,35 +362,20 @@ public class TopicDetailController {
                     });
                     return;
                 } catch (Exception offline) {
-                    // fall through to the local queue — excluded_users isn't
-                    // supported for queued offline replies (server-only feature)
-=======
-                    PostDto dto = api.createPost(token, serverTopicId, body, null);
-                    postDao.upsertFromServer(dto);
-                    List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                    Platform.runLater(() -> renderPosts(fresh));
-                    return;
-                } catch (Exception offline) {
                     // fall through to the local queue
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
                 }
             }
             // Offline — save locally and queue for sync.
             postDao.create(topic.getTopicId(), authorId, null, body);
             List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-<<<<<<< HEAD
             Platform.runLater(() -> {
                 renderPosts(fresh);
                 scrollToBottom();
             });
-=======
-            Platform.runLater(() -> renderPosts(fresh));
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         }, "aces-reply");
         worker.setDaemon(true);
         worker.start();
     }
-<<<<<<< HEAD
     
     private void scrollToBottom() {
         if (scrollPane != null) {
@@ -560,47 +408,63 @@ public class TopicDetailController {
     private void toggleHideMode() {
         isHiddenMode = !isHiddenMode;
         if (hideIcon != null) {
-            hideIcon.setStroke(!excludedUserIds.isEmpty() ? javafx.scene.paint.Color.RED : javafx.scene.paint.Color.web("#9ca3af"));
+            hideIcon.setStroke(isHiddenMode ? javafx.scene.paint.Color.RED : javafx.scene.paint.Color.web("#9ca3af"));
         }
-        if (hidePanel != null) {
+        if (hidePanel != null && hideMembersFlow != null) {
             hidePanel.setVisible(isHiddenMode);
             hidePanel.setManaged(isHiddenMode);
+            
+            if (isHiddenMode) populateHideMembers();
         }
     }
 
-    /** Clears the exclude selection and closes the panel — called after a reply is sent. */
-    private void resetHidePicker() {
-        excludedUserIds.clear();
-        if (hideMembersFlow != null) {
-            for (var node : hideMembersFlow.getChildren()) {
-                if (node instanceof CheckBox cb) cb.setSelected(false);
+    private void setExcludableMembers(List<forum.api.dto.MemberDto> members) {
+        if (members == null) {
+            excludableMembers = Collections.emptyList();
+        } else {
+            excludableMembers = members.stream()
+                    // Do not offer a group administrator or any known non-student role.
+                    .filter(member -> member.role == null || "member".equalsIgnoreCase(member.role))
+                    .toList();
+        }
+        if (isHiddenMode) populateHideMembers();
+    }
+
+    private void populateHideMembers() {
+        if (hideMembersFlow == null) return;
+        hideMembersFlow.getChildren().clear();
+        for (forum.api.dto.MemberDto member : excludableMembers) {
+            CheckBox checkBox = new CheckBox(member.username);
+            checkBox.setUserData(member.userId);
+            checkBox.setStyle("-fx-background-color: white; -fx-border-color: #fde047; -fx-border-radius: 12; -fx-padding: 4 8; -fx-text-fill: #4b5563; -fx-font-size: 13px;");
+            hideMembersFlow.getChildren().add(checkBox);
+        }
+    }
+
+    private List<Long> selectedExcludedUserIds() {
+        if (!isHiddenMode || hideMembersFlow == null) return Collections.emptyList();
+        List<Long> selected = new ArrayList<>();
+        for (Node node : hideMembersFlow.getChildren()) {
+            if (node instanceof CheckBox checkBox && checkBox.isSelected() && checkBox.getUserData() instanceof Long id) {
+                selected.add(id);
             }
         }
-        isHiddenMode = false;
-        if (hidePanel != null) {
-            hidePanel.setManaged(false);
-            hidePanel.setVisible(false);
-        }
-        if (hideIcon != null) {
-            hideIcon.setStroke(javafx.scene.paint.Color.web("#9ca3af"));
-        }
+        return selected;
     }
 
-    @FXML
-    private void onBack() {
-        SceneManager.show("ForumDashboard", "Smart Discussion Forum");
-=======
+    private void cacheExcludedUsers(PostDto post) {
+        if (post == null || post.excluded_usernames == null || post.excluded_usernames.isEmpty()) return;
+        excludedUsernamesByPostId.put(post.post_id, List.copyOf(post.excluded_usernames));
+    }
 
     @FXML
     private void onBack() {
         SceneManager.show("ForumDashboard", "ACES");
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
     }
 
     @FXML
     private void onExportPdf() {
         if (topic == null) return;
-<<<<<<< HEAD
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Discussion to PDF (Text format)");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Documents", "*.txt"));
@@ -622,26 +486,12 @@ public class TopicDetailController {
             } catch (Exception e) {
                 showThemedWarning("Error", "Failed to export: " + e.getMessage());
             }
-=======
-        String token = Session.authToken();
-        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
-        if (token == null || serverTopicId <= 0) return;
-
-        // Open the PDF export URL in the system browser
-        String url = forum.config.DatabaseConfig.API_BASE_URL
-                .replace("/api", "") + "/topics/" + serverTopicId + "/export-pdf";
-        try {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
-        } catch (Exception e) {
-            e.printStackTrace();
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed
         }
     }
 
     @FXML
     private void onShare() {
         if (topic == null) return;
-<<<<<<< HEAD
         javafx.stage.Stage stage = new javafx.stage.Stage();
         stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
         stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
@@ -963,62 +813,6 @@ public class TopicDetailController {
         });
     }
 
-    @FXML
-    private void onEditTopic() {
-        if (topic == null) return;
-        showThemedInput("Edit Topic", "Topic title:", topic.getTitle(), newTitle -> {
-            if (newTitle == null || newTitle.isBlank() || newTitle.equals(topic.getTitle())) return;
-
-            String token = Session.authToken();
-            long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
-            if (token == null || serverTopicId <= 0) {
-                showThemedWarning("Offline", "Topic edits need a connection — try again once you're online.");
-                return;
-            }
-
-            List<Post> cached = postDao.listByTopic(topic.getTopicId());
-            String openingContent = cached.isEmpty() ? "" : cached.get(0).getContent();
-
-            Thread worker = new Thread(() -> {
-                try {
-                    forum.api.dto.TopicDto updated = api.updateTopic(
-                            token, serverTopicId, newTitle, topic.getCategory(), topic.getGroupId(), openingContent);
-                    topicDao.upsertFromServer(updated);
-                    topic.setTitle(newTitle);
-                    Platform.runLater(() -> { if (topicTitleLabel != null) topicTitleLabel.setText(newTitle); });
-                } catch (Exception e) {
-                    Platform.runLater(() -> showThemedWarning("Error", "Failed to update topic: " + e.getMessage()));
-                }
-            });
-            worker.setDaemon(true);
-            worker.start();
-        });
-    }
-
-    @FXML
-    private void onDeleteTopic() {
-        if (topic == null) return;
-        showThemedConfirm("Delete Topic", "Delete \"" + topic.getTitle() + "\" and all its replies forever?", () -> {
-            String token = Session.authToken();
-            long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
-            if (token == null || serverTopicId <= 0) {
-                showThemedWarning("Offline", "Topic deletion needs a connection — try again once you're online.");
-                return;
-            }
-
-            Thread worker = new Thread(() -> {
-                try {
-                    api.deleteTopic(token, serverTopicId);
-                    Platform.runLater(() -> SceneManager.show("ForumDashboard", "Smart Discussion Forum"));
-                } catch (Exception e) {
-                    Platform.runLater(() -> showThemedWarning("Error", "Failed to delete topic: " + e.getMessage()));
-                }
-            });
-            worker.setDaemon(true);
-            worker.start();
-        });
-    }
-
     private String formatTime(String timeStr) {
         if (timeStr == null || timeStr.isBlank()) return "pending";
         try {
@@ -1048,37 +842,4 @@ public class TopicDetailController {
             System.err.println("Failed to open web link: " + ex.getMessage());
         }
     }
-
-    private void infoAlert(String header, String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
-        a.setHeaderText(header);
-        a.showAndWait();
-    }
-
-    private void errorAlert(String header, String msg) {
-        Alert a = new Alert(Alert.AlertType.ERROR, msg == null ? "Something went wrong." : msg);
-        a.setHeaderText(header);
-        a.showAndWait();
-    }
 }
-=======
-        // Build the web URL for this topic and copy it to clipboard
-        String url = forum.config.DatabaseConfig.API_BASE_URL
-                .replace("/api", "") + "/topics/" + topicDao.serverIdFor(topic.getTopicId());
-
-        javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
-        content.putString(url);
-        javafx.scene.input.Clipboard.getSystemClipboard().setContent(content);
-
-        // Brief visual feedback
-        if (topicTitleLabel != null) {
-            String original = topicTitleLabel.getText();
-            topicTitleLabel.setText("✓ Link copied to clipboard!");
-            new Thread(() -> {
-                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
-                Platform.runLater(() -> topicTitleLabel.setText(original));
-            }).start();
-        }
-    }
-}
->>>>>>> c0a0fe073da5b40940d7bd0bb2ce0c10d655d5ed

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="forum.controllers.PrivacyPolicyController"
+            stylesheets="@../css/aces.css" styleClass="root" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-border-width: 1;"
+            prefWidth="672" prefHeight="400">
+
+    <top>
+        <VBox style="-fx-border-color: #e5e7eb; -fx-border-width: 0 0 1 0; -fx-padding: 20 32 20 32;">
+            <Label text="Privacy Policy" style="-fx-font-weight: bold; -fx-text-fill: #1f2937; -fx-font-size: 16px;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" style="-fx-background-color: transparent; -fx-padding: 24 32 24 32;">
+            <VBox spacing="16" style="-fx-background-color: transparent;">
+                <Label text="ACES collects only the information needed to run the platform: your name, email, group memberships, posts, and participation records used for grading and moderation." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                <Label text="Your data is visible to group administrators and lecturers for the groups you belong to, and is never shared outside the platform." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+                <Label text="You can request an export or deletion of your account data by contacting your group administrator." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 14px;"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-border-color: #e5e7eb; -fx-border-width: 1 0 0 0; -fx-background-color: #f9fafb; -fx-padding: 16 32 16 32; -fx-background-radius: 0 0 8 8;">
+            <Button text="Close" onAction="#onClose" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-padding: 8 16 8 16; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
