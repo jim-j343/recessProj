@@ -12,4 +12,5 @@ public class QuizDto {
     @JsonProperty("duration_minutes") public int     durationMinutes;
     @JsonProperty("is_published")     public boolean isPublished;
     @JsonProperty("target_category")  public String  targetCategory;
+    @JsonProperty("my_result")        public QuizResultDto myResult;
 }

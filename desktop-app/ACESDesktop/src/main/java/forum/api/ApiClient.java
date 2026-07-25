@@ -46,7 +46,7 @@ import java.util.Map;
 public class ApiClient {
 
     private final HttpClient http = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(8))
+            .connectTimeout(Duration.ofSeconds(60))
             .build();
 
     private final ObjectMapper mapper = new ObjectMapper()
@@ -83,7 +83,7 @@ public class ApiClient {
         if (token == null || token.isBlank()) return;
         try {
             HttpRequest req = HttpRequest.newBuilder(URI.create(base + "/logout"))
-                    .timeout(Duration.ofSeconds(8))
+                    .timeout(Duration.ofSeconds(60))
                     .header("Accept", "application/json")
                     .header("Authorization", "Bearer " + token)
                     .POST(HttpRequest.BodyPublishers.noBody())
@@ -461,7 +461,7 @@ public StudentProgressDto studentProgress(String token)
 
     private HttpRequest.Builder request(String path, String token) {
         HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(base + path))
-                .timeout(Duration.ofSeconds(12))
+                .timeout(Duration.ofSeconds(60))
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json");
         if (token != null && !token.isBlank()) b.header("Authorization", "Bearer " + token);
@@ -489,7 +489,7 @@ public StudentProgressDto studentProgress(String token)
             throws ApiException, IOException, InterruptedException {
         String json = mapper.writeValueAsString(body);
         HttpRequest req = HttpRequest.newBuilder(URI.create(base + path))
-                .timeout(Duration.ofSeconds(12))
+                .timeout(Duration.ofSeconds(60))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
