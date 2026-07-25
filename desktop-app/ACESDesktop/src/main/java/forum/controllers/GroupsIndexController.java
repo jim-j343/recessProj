@@ -3,6 +3,7 @@ package forum.controllers;
 import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.GroupDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
@@ -23,7 +24,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public class GroupsIndexController {
+public class GroupsIndexController implements forum.app.Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -62,6 +63,17 @@ public class GroupsIndexController {
             }
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        loadGroups();
+    }
+
+    @Override
+    public void refresh() {
+        forum.models.User user = forum.app.Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(String.valueOf(user.displayName().trim().charAt(0)).toUpperCase());
+        }
+        forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadGroups();
     }
 

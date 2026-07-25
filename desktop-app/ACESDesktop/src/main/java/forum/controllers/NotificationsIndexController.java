@@ -2,6 +2,7 @@ package forum.controllers;
 
 import forum.api.ApiClient;
 import forum.api.dto.NotificationDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -21,7 +22,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public class NotificationsIndexController {
+public class NotificationsIndexController implements forum.app.Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -43,6 +44,17 @@ public class NotificationsIndexController {
         }
 
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        loadAllNotifications();
+    }
+
+    @Override
+    public void refresh() {
+        forum.models.User user = forum.app.Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(String.valueOf(user.displayName().trim().charAt(0)).toUpperCase());
+        }
+        forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadAllNotifications();
     }
 
