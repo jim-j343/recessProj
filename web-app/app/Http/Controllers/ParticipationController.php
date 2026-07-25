@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App\Models\GroupMembership;
 use App\Models\ParticipationScore;
 use App\Models\Post;
@@ -17,25 +18,45 @@ use App\Models\Group;
 
 class ParticipationController extends Controller
 {
-    // How many replies earn full participation marks (10/10)
-    private const REPLIES_FOR_FULL_MARKS = 10;
+    // How many replies earn full participation marks (10/10).
+    // Public so the student-facing pages use the identical figure — if this
+    // ever changes, the lecturer's grading table and the student's own views
+    // must move together.
+    public const REPLIES_FOR_FULL_MARKS = 10;
 
-    // Lecturer: grading table with real students and real activity
+    // Lecturer: grading table, scoped to ONE course/group at a time.
+    // Participation and quiz average must describe the same course — a mark
+    // belongs to the group it was earned in, not to an average blended across
+    // every group the lecturer happens to share with the student.
     public function grade(Request $request)
     {
-        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
-            ->where('status', 'active')
-            ->pluck('group_id');
+        // The lecturer's own groups, each carrying its course name
+        $groups = Group::whereIn('group_id',
+                GroupMembership::where('user_id', Auth::id())
+                    ->where('status', 'active')
+                    ->pluck('group_id')
+            )
+            ->orderBy('course_name')
+            ->orderBy('name')
+            ->get();
 
-        // Topics in the lecturer's groups (for the filter dropdown)
-        $topics = Topic::whereIn('group_id', $lecturerGroupIds)
-            ->orderBy('title')->get();
+        $search = $request->query('search');
 
-        $topicFilter = $request->query('topic');
-        $search      = $request->query('search');
+        // Selected group — defaults to the first, so the page is never empty
+        $group = $groups->firstWhere('group_id', (int) $request->query('group'))
+            ?? $groups->first();
 
-        // Students who share a group with the lecturer
-        $studentIds = GroupMembership::whereIn('group_id', $lecturerGroupIds)
+        if (!$group) {
+            return view('participation.grade', [
+                'rows'   => collect(),
+                'groups' => $groups,
+                'group'  => null,
+                'search' => $search,
+            ]);
+        }
+
+        // Students in THIS group only
+        $studentIds = GroupMembership::where('group_id', $group->group_id)
             ->where('status', 'active')
             ->pluck('user_id');
 
@@ -48,32 +69,20 @@ class ParticipationController extends Controller
 
         $students = $studentsQuery->orderBy('username')->get();
 
-        // parent_post_id is never set by any current UI flow (the reply bar
-        // only ever sends 'content'), so it can't be used to identify
-        // replies. Instead: the opening post of each topic (the one created
-        // alongside the topic itself) is the lowest post_id for that
-        // topic_id — everything else in scope counts as a reply.
+        // parent_post_id is never set by any current UI flow, so the opening
+        // post of each topic is the lowest post_id for that topic —
+        // everything else in this group counts as a reply.
         $openingPostIds = Post::select('topic_id', DB::raw('MIN(post_id) as post_id'))
-            ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
-                $q->whereIn('group_id', $lecturerGroupIds);
-                if ($topicFilter) {
-                    $q->where('topic_id', $topicFilter);
-                }
-            })
+            ->whereHas('topic', fn ($q) => $q->where('group_id', $group->group_id))
             ->groupBy('topic_id')
             ->pluck('post_id');
 
-        // Quizzes that belong to the lecturer's groups, and how many total
-        // marks each one is worth — needed to turn a raw quiz score into a
-        // percentage so multiple quizzes can be averaged together fairly.
-        // Also picks up course-targeted quizzes covering these groups even
-        // if a different lecturer set them for the shared course.
-        $lecturerCourseNames = Group::whereIn('group_id', $lecturerGroupIds)->pluck('course_name')->filter();
-
-        $quizIds = Quiz::where(function ($q) use ($lecturerGroupIds, $lecturerCourseNames) {
-                $q->whereIn('group_id', $lecturerGroupIds);
-                if ($lecturerCourseNames->isNotEmpty()) {
-                    $q->orWhereIn('course_name', $lecturerCourseNames);
+        // Quizzes for THIS course: set directly on the group, or targeted at
+        // its course name by any lecturer teaching the same unit.
+        $quizIds = Quiz::where(function ($q) use ($group) {
+                $q->where('group_id', $group->group_id);
+                if ($group->course_name) {
+                    $q->orWhere('course_name', $group->course_name);
                 }
             })
             ->pluck('quiz_id');
@@ -83,26 +92,19 @@ class ParticipationController extends Controller
             ->groupBy('quiz_id')
             ->pluck('total', 'quiz_id');
 
-        // Build per-student activity rows
-        $rows = $students->map(function ($student) use ($lecturerGroupIds, $topicFilter, $openingPostIds, $quizIds, $quizTotalMarks) {
+        $rows = $students->map(function ($student) use ($group, $openingPostIds, $quizIds, $quizTotalMarks) {
             $postsQuery = Post::where('author_id', $student->user_id)
-                ->whereHas('topic', function ($q) use ($lecturerGroupIds, $topicFilter) {
-                    $q->whereIn('group_id', $lecturerGroupIds);
-                    if ($topicFilter) {
-                        $q->where('topic_id', $topicFilter);
-                    }
-                });
+                ->whereHas('topic', fn ($q) => $q->where('group_id', $group->group_id));
 
             $postCount  = (clone $postsQuery)->count();
             $replyCount = (clone $postsQuery)->whereNotIn('post_id', $openingPostIds)->count();
 
-            // Participation: replies scaled to a mark out of 10, then to a %
+            // Same formula, same scope, as the student's own dashboard card
             $participationScore = min($replyCount, self::REPLIES_FOR_FULL_MARKS);
             $participationPct   = $participationScore * (100 / self::REPLIES_FOR_FULL_MARKS);
 
-            // Test average: mean of every completed quiz in these groups,
-            // each converted to a % of that quiz's own total marks so
-            // multiple quizzes of different sizes average fairly
+            // Each quiz converted to a % of its own total marks, so quizzes of
+            // different sizes average together fairly
             $completedSubmissions = Submission::where('user_id', $student->user_id)
                 ->whereIn('quiz_id', $quizIds)
                 ->whereNotNull('submitted_at')
@@ -118,50 +120,63 @@ class ParticipationController extends Controller
             $quizCount  = $quizPercentages->count();
             $quizAvgPct = $quizCount ? round($quizPercentages->avg(), 1) : null;
 
-            // Suggested final score: blend participation and test average.
-            // If they haven't taken any quiz yet, fall back to participation
-            // alone rather than averaging against a phantom zero.
+            // Blend participation and test average. No quizzes taken yet →
+            // fall back to participation alone rather than averaging against
+            // a phantom zero.
             $suggestedScore = $quizAvgPct !== null
                 ? round(($participationPct + $quizAvgPct) / 2, 1)
                 : round($participationPct, 1);
 
-            // Latest saved score, if any
+            // Last score saved for this student IN THIS GROUP
             $existing = ParticipationScore::where('user_id', $student->user_id)
+                ->where('group_id', $group->group_id)
                 ->latest('created_at')->first();
 
             return (object) [
-                'student'           => $student,
-                'postCount'         => $postCount,
-                'replyCount'        => $replyCount,
-                'participationPct'  => round($participationPct, 1),
-                'quizAvgPct'        => $quizAvgPct,
-                'quizCount'         => $quizCount,
-                'suggestedScore'    => $suggestedScore,
-                'existing'          => $existing,
+                'student'          => $student,
+                'postCount'        => $postCount,
+                'replyCount'       => $replyCount,
+                'participationPct' => round($participationPct, 1),
+                'quizAvgPct'       => $quizAvgPct,
+                'quizCount'        => $quizCount,
+                'suggestedScore'   => $suggestedScore,
+                'existing'         => $existing,
             ];
         });
 
-        // Hide students with zero activity when filtering by a specific topic
-        if ($topicFilter) {
-            $rows = $rows->filter(fn ($r) => $r->postCount > 0)->values();
-        }
-
-        return view('participation.grade', compact('rows', 'topics', 'topicFilter', 'search'));
+        return view('participation.grade', [
+            'rows'   => $rows,
+            'groups' => $groups,
+            'group'  => $group,
+            'search' => $search,
+        ]);
     }
 
     // Lecturer: save all grades at once
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'group_id'         => ['required', 'integer'],
             'grades'           => ['required', 'array'],
             'grades.*.score'   => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'grades.*.remark'  => ['nullable', 'string', 'max:255'],
+            // criteria column is varchar(120) — validate to match, or long
+            // remarks fail to insert
+            'grades.*.remark'  => ['nullable', 'string', 'max:120'],
         ]);
 
-        $lecturerGroupIds = GroupMembership::where('user_id', Auth::id())
-            ->where('status', 'active')
-            ->pluck('group_id');
+        $groupId = (int) $validated['group_id'];
 
+        // The lecturer can only grade a group they actually belong to
+        $isLecturersGroup = GroupMembership::where('user_id', Auth::id())
+            ->where('group_id', $groupId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$isLecturersGroup) {
+            return back()->with('error', 'You can only grade groups you belong to.');
+        }
+
+        $group = Group::find($groupId);
         $saved = 0;
 
         foreach ($validated['grades'] as $userId => $data) {
@@ -169,26 +184,28 @@ class ParticipationController extends Controller
                 continue; // skip rows the lecturer left blank
             }
 
-            // Score is stored against the group both lecturer and student share
-            $groupId = GroupMembership::where('user_id', $userId)
-                ->whereIn('group_id', $lecturerGroupIds)
-                ->value('group_id');
+            // Only grade students who are actually members of this group
+            $isMember = GroupMembership::where('user_id', $userId)
+                ->where('group_id', $groupId)
+                ->where('status', 'active')
+                ->exists();
 
-            if (!$groupId) {
+            if (!$isMember) {
                 continue;
             }
 
             ParticipationScore::create([
                 'user_id'    => $userId,
                 'group_id'   => $groupId,
-                'criteria'   => $data['remark'] ?: 'Forum participation + quiz average (auto-calculated)',
+                'criteria'   => $data['remark']
+                    ?: Str::limit('Participation + quiz average — '.($group->course_name ?: $group->name), 115),
                 'score'      => round((float) $data['score'], 2),
                 'awarded_by' => Auth::id(),
             ]);
             $saved++;
         }
 
-        return back()->with('success', "Saved grades for {$saved} student(s).");
+        return back()->with('success', "Saved grades for {$saved} student(s) in {$group->name}.");
     }
 
     public function gradeJson(Request $request): \Illuminate\Http\JsonResponse
@@ -305,16 +322,16 @@ class ParticipationController extends Controller
     public function saveGrades(Request $request): \Illuminate\Http\JsonResponse
     {
         $grades = $request->input('grades', []);
-        
+
         $lecturerGroupIds = GroupMembership::where('user_id', $request->user()->user_id)
             ->where('status', 'active')
             ->pluck('group_id');
-            
+
         foreach ($grades as $userId => $data) {
             if (!isset($data['score']) || $data['score'] === '') {
                 continue;
             }
-            
+
             $groupId = GroupMembership::where('user_id', $userId)
                 ->whereIn('group_id', $lecturerGroupIds)
                 ->value('group_id');

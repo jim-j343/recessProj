@@ -63,7 +63,7 @@
                             <option value="">-- Select a category --</option>
 
                             @foreach([
-                                'SDLC', 'Methodology', 'Requirements', 'Testing', 'Best Practices',
+                                'SDLC', 'Methodology', 'Requirements', 'Testing',
                                 'Tools', 'Web Development', 'Networking', 'Programming',
                                 'Architecture', 'Database', 'Numerical Analysis',
                             ] as $cat)

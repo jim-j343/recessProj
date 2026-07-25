@@ -119,7 +119,8 @@ class StudentController extends Controller
 
             return [
                 'group_name' => $group->name,
-                'pct'        => min($groupReplyCount, 10) * 10,
+                'pct'        => min($groupReplyCount, ParticipationController::REPLIES_FOR_FULL_MARKS)
+                                    * (100 / ParticipationController::REPLIES_FOR_FULL_MARKS),
             ];
         });
 
@@ -202,8 +203,10 @@ class StudentController extends Controller
             ->whereNotIn('post_id', $openingPostIds)
             ->count();
 
-        $participationPct = min($replyCount, 10) * 10;
+        $participationPct = min($replyCount, ParticipationController::REPLIES_FOR_FULL_MARKS)
+            * (100 / ParticipationController::REPLIES_FOR_FULL_MARKS);
 
+        
         // ---- Real activity for the last 7 days, replacing the fake chart ----
         $activityByDay = collect(range(6, 0))->map(function ($daysAgo) use ($user, $groupIds) {
             $date = now()->subDays($daysAgo);
