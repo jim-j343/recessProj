@@ -69,6 +69,15 @@ public class LecturerDashboardController {
                 });
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                Platform.runLater(() -> {
+                     quizCountLabel.setText("Error");
+                     groupCountLabel.setText("Error");
+                     topicCountLabel.setText("Error");
+                     noQuizzesLabel.setText("Failed to load dashboard data.");
+                     noQuizzesLabel.setManaged(true);
+                     noQuizzesLabel.setVisible(true);
+                     quizListBox.getChildren().clear();
+                });
             }
         }, "lecturer-dashboard-load");
         worker.setDaemon(true);
@@ -145,6 +154,7 @@ public class LecturerDashboardController {
     private void onLogout() {
         String token = Session.authToken();
         Session.end();
+        SceneManager.clearCache();
         new Thread(() -> new AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "ACES");
     }

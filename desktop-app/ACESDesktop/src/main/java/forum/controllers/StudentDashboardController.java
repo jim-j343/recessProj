@@ -153,7 +153,11 @@ public class StudentDashboardController {
                 });
             } catch (Exception e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-                // Non-critical — sidebar shows "—" on failure; ignore silently
+                Platform.runLater(() -> {
+                    if (groupCountLabel != null) groupCountLabel.setText("—");
+                    if (topicCountLabel != null) topicCountLabel.setText("—");
+                    if (postCountLabel  != null) postCountLabel .setText("—");
+                });
             }
         }, "sidebar-stats").start();
     }
@@ -201,14 +205,11 @@ public class StudentDashboardController {
                 }
 
                 for (QuizDto q : quizzes) {
-                    try {
-                        QuizResultDto result = api.myQuizResult(token, q.quizId);
+                    if (q.myResult != null) {
                         completed++;
-                        final QuizDto     fq = q;
-                        final QuizResultDto fr = result;
+                        final QuizDto fq = q;
+                        final QuizResultDto fr = q.myResult;
                         Platform.runLater(() -> addResultRow(fq, fr));
-                    } catch (ApiException ex) {
-                        // 404 = not submitted yet — expected, skip
                     }
                 }
 
@@ -258,6 +259,12 @@ public class StudentDashboardController {
 
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                Platform.runLater(() -> {
+                    if (quizAlertTitle != null) quizAlertTitle.setText("Error Loading Quizzes");
+                    if (quizAlertSub   != null) quizAlertSub.setText("Failed to connect to the server.");
+                    if (quizProgressLabel != null) quizProgressLabel.setText("Error");
+                    if (quizProgressSub != null) quizProgressSub.setText("Unable to load quiz progress.");
+                });
             }
         }, "quiz-data-load").start();
     }
@@ -275,6 +282,18 @@ public class StudentDashboardController {
                 Platform.runLater(() -> renderExtras(dto));
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+                Platform.runLater(() -> {
+                    if (participationByGroupBox != null) {
+                        participationByGroupBox.getChildren().clear();
+                        Label err = new Label("Error loading data.");
+                        err.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 12px;");
+                        participationByGroupBox.getChildren().add(err);
+                    }
+                    if (standingLabel != null) standingLabel.setText("Error");
+                    if (topicCardTitle != null) topicCardTitle.setText("Error Loading Topics");
+                    if (topicCardMeta != null) topicCardMeta.setText("Could not load latest topics.");
+                    if (recommendedLabel != null) recommendedLabel.setText("Error loading recommendations.");
+                });
             }
         }, "dashboard-extras").start();
     }
@@ -561,6 +580,14 @@ public class StudentDashboardController {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                Platform.runLater(() -> {
+                    if (topicPostsBox != null) {
+                        topicPostsBox.getChildren().clear();
+                        Label err = new Label("Failed to load topic posts.");
+                        err.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 12px;");
+                        topicPostsBox.getChildren().add(err);
+                    }
+                });
             }
         }).start();
     }
@@ -656,6 +683,7 @@ public class StudentDashboardController {
     @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
+        SceneManager.clearCache();
         new Thread(() -> new AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "ACES");
     }
