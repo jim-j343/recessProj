@@ -64,17 +64,21 @@ public final class SceneManager {
         if (stage == null) throw new IllegalStateException("SceneManager not initialised");
         try {
             Parent root;
+            Object controller = null;
             if (!UNCACHED_SCREENS.contains(fxmlName) && sceneCache.containsKey(fxmlName)) {
-                root = sceneCache.get(fxmlName).root;
+                CacheEntry entry = sceneCache.get(fxmlName);
+                root = entry.root;
+                controller = entry.controller;
             } else {
                 FXMLLoader loader = new FXMLLoader(
                         SceneManager.class.getResource("/forum/fxml/" + fxmlName + ".fxml"));
                 root = loader.load();
+                controller = loader.getController();
                 if (!UNCACHED_SCREENS.contains(fxmlName)) {
-                    sceneCache.put(fxmlName, new CacheEntry(root, loader.getController()));
+                    sceneCache.put(fxmlName, new CacheEntry(root, controller));
                 }
             }
-            
+
             Scene existing = stage.getScene();
             if (existing == null) {
                 stage.setScene(new Scene(root));
@@ -85,6 +89,11 @@ public final class SceneManager {
             stage.sizeToScene();
             stage.centerOnScreen();
             stage.show();
+
+            // Always refresh live data when navigating to a cached screen
+            if (controller instanceof Refreshable) {
+                ((Refreshable) controller).refresh();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

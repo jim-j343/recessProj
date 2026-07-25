@@ -6,6 +6,7 @@ import forum.api.dto.QuizDto;
 import forum.api.dto.QuizResultDto;
 import forum.api.dto.StudentDashboardDto;
 import forum.api.dto.StudentProgressDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.app.ViewState;
@@ -31,7 +32,7 @@ import javafx.scene.layout.VBox;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public class StudentDashboardController {
+public class StudentDashboardController implements Refreshable {
 
     // ── Navbar ──────────────────────────────────────────────────────
     @FXML private Label      avatarLabel;
@@ -124,6 +125,22 @@ public class StudentDashboardController {
         }
 
         // Kick off background data loads
+        loadSidebarStats();
+        loadQuizData();
+        loadDashboardExtras();
+    }
+
+    @Override
+    public void refresh() {
+        User u = Session.currentUser();
+        if (u != null) {
+            avatarLabel.setText(initial(u.displayName()));
+            userNameLabel.setText(u.displayName());
+            welcomeLabel.setText("Welcome back, " + u.displayName());
+        }
+        if (notifButton != null) {
+            NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
         loadSidebarStats();
         loadQuizData();
         loadDashboardExtras();

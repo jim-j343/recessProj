@@ -4,6 +4,7 @@ import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.LecturerDashboardDto;
 import forum.api.dto.QuizDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -25,7 +26,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public class LecturerDashboardController {
+public class LecturerDashboardController implements Refreshable {
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
@@ -42,6 +43,19 @@ public class LecturerDashboardController {
 
     @FXML
     private void initialize() {
+        User u = Session.currentUser();
+        if (u != null) {
+            avatarLabel.setText(initial(u.displayName()));
+            userNameLabel.setText(u.displayName());
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
+        loadInBackground();
+    }
+
+    @Override
+    public void refresh() {
         User u = Session.currentUser();
         if (u != null) {
             avatarLabel.setText(initial(u.displayName()));

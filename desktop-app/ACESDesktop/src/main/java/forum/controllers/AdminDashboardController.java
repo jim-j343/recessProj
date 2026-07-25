@@ -3,6 +3,7 @@ package forum.controllers;
 import forum.api.ApiClient;
 import forum.api.dto.AdminDashboardDto;
 import forum.api.dto.AdminMemberDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -15,7 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-public class AdminDashboardController {
+public class AdminDashboardController implements forum.app.Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -154,6 +155,17 @@ public class AdminDashboardController {
         );
 
 
+        loadDashboard();
+    }
+
+    @Override
+    public void refresh() {
+        forum.models.User user = Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(String.valueOf(user.displayName().trim().charAt(0)).toUpperCase());
+        }
+        forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadDashboard();
     }
 

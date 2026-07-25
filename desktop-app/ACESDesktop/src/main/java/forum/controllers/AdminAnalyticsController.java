@@ -2,6 +2,7 @@ package forum.controllers;
 
 import forum.api.ApiClient;
 import forum.api.dto.AdminAnalyticsDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -24,7 +25,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.FlowPane;
 
-public class AdminAnalyticsController {
+public class AdminAnalyticsController implements Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -70,6 +71,17 @@ public class AdminAnalyticsController {
         });
         colLecturerGraded.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().studentsGraded));
 
+        loadAnalytics();
+    }
+
+    @Override
+    public void refresh() {
+        User user = Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(initial(user.displayName()));
+        }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadAnalytics();
     }
 
