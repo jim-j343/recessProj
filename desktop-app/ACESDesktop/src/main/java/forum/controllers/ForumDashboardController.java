@@ -22,7 +22,9 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public class ForumDashboardController {
+import forum.app.Refreshable;
+
+public class ForumDashboardController implements Refreshable {
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
@@ -81,6 +83,21 @@ public class ForumDashboardController {
             searchField.textProperty().addListener((obs, oldV, newV) -> onSearchTopics());
         }
 
+        renderTopics(topicDao.listRecent(15));
+        fetchMyGroups();
+        syncInBackground();
+    }
+
+    @Override
+    public void refresh() {
+        User u = Session.currentUser();
+        if (u != null) {
+            if (avatarLabel != null) avatarLabel.setText(initial(u.displayName()));
+            if (userNameLabel != null) userNameLabel.setText(u.displayName());
+        }
+        if (notifButton != null) {
+            forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        }
         renderTopics(topicDao.listRecent(15));
         fetchMyGroups();
         syncInBackground();

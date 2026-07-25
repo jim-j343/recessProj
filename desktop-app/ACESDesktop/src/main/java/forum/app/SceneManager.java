@@ -129,6 +129,12 @@ public final class SceneManager {
             stage.sizeToScene();
             stage.centerOnScreen();
             stage.show();
+
+            // Always refresh live data when navigating to a cached screen
+            if (controller instanceof Refreshable) {
+                ((Refreshable) controller).refresh();
+            }
+
             return (T) controller;
         } catch (IOException e) {
             e.printStackTrace();
