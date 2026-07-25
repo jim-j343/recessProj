@@ -236,7 +236,7 @@ class TopicController extends Controller
                 $category = $response->successful()
                     ? $response->json('category')
                     : $topic->category;
-            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            } catch (\Exception $e) {
                 $category = $topic->category;
             }
         }
@@ -288,6 +288,7 @@ class TopicController extends Controller
 
 
         return redirect()->route('topics.show', $topic->topic_id)
+            ->withFragment('post-' . $post->post_id)
             ->with('success', 'Reply posted!');
     }
 
