@@ -133,8 +133,11 @@
                 </x-dropdown>
             </div>
 
-            {{-- MOBILE / TABLET: Hamburger --}}
-            <div class="-me-2 flex items-center lg:hidden">
+            {{-- MOBILE / TABLET: Avatar (opens the menu) + Hamburger --}}
+            <div class="-me-2 flex items-center gap-2 lg:hidden">
+                <button @click="open = ! open" class="rounded-full focus:outline-none" aria-label="Open menu">
+                    <x-avatar :name="Auth::user()->username" size="w-8 h-8" />
+                </button>
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
