@@ -21,12 +21,16 @@ class QuizApiController extends Controller
      *  that course unit — mirrors StudentController::dashboard() on web) */
     public function index(Request $request): JsonResponse
     {
-        $groupIds = GroupMembership::where('user_id', $request->user()->user_id)
+        $userId = $request->user()->user_id;
+        $groupIds = GroupMembership::where('user_id', $userId)
             ->where('status', 'active')->pluck('group_id');
 
         $courseNames = Group::whereIn('group_id', $groupIds)->pluck('course_name')->filter();
 
-        $quizzes = Quiz::where(function ($q) use ($groupIds, $courseNames) {
+        $quizzes = Quiz::with(['questions', 'submissions' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }])
+            ->where(function ($q) use ($groupIds, $courseNames) {
                 $q->whereIn('group_id', $groupIds);
                 if ($courseNames->isNotEmpty()) {
                     $q->orWhereIn('course_name', $courseNames);
@@ -249,7 +253,7 @@ class QuizApiController extends Controller
 
     private function quizShape(Quiz $q): array
     {
-        return [
+        $data = [
             'quiz_id'          => (int) $q->quiz_id,
             'title'            => $q->title,
             'group_id'         => (int) $q->group_id,
@@ -258,5 +262,19 @@ class QuizApiController extends Controller
             'is_published'     => (bool) $q->is_published,
             'target_category'  => $q->target_category,
         ];
+
+        if ($q->relationLoaded('submissions')) {
+            $submission = $q->submissions->first();
+            if ($submission && $submission->submitted_at) {
+                $data['my_result'] = [
+                    'score'          => $submission->score,
+                    'total'          => $q->questions->sum('marks'),
+                    'auto_submitted' => $submission->auto_submitted,
+                    'submitted_at'   => $submission->submitted_at?->toIso8601String(),
+                ];
+            }
+        }
+
+        return $data;
     }
 }
