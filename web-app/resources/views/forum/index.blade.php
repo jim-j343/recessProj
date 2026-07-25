@@ -13,65 +13,104 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
+    <div class="py-6 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
 
-            {{-- Search bar --}}
+            {{-- Search bar. Filters as you type via JS; the button still
+                 works normally if JavaScript is unavailable. --}}
             <div class="bg-white p-4 rounded-lg shadow-sm">
-                <form method="GET" action="{{ route('forum.index') }}" class="flex gap-2">
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Search topics..."
+                <form id="topic-search-form" method="GET" action="{{ route('forum.index') }}" class="flex gap-2">
+                    <input type="text" id="topic-search" name="search" value="{{ $search }}"
+                           placeholder="Search topics..." autocomplete="off"
                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                     <button type="submit"
                         class="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
                         Search
                     </button>
-                    @if($search)
-                        <a href="{{ route('forum.index') }}"
-                           class="shrink-0 flex items-center px-3 text-sm text-gray-500 hover:text-gray-700">
-                            Clear
-                        </a>
-                    @endif
+                    <button type="button" id="topic-search-clear"
+                        class="shrink-0 px-3 text-sm text-gray-500 hover:text-gray-700 {{ $search ? '' : 'hidden' }}">
+                        Clear
+                    </button>
                 </form>
             </div>
 
-            {{-- Empty state --}}
-            @if($topics->isEmpty())
-                <div class="bg-white p-8 rounded-lg shadow-sm text-center text-gray-500">
-                    No topics yet. Be the first to start a discussion!
-                </div>
-            @endif
-
-            {{-- Loop through topics from the database --}}
-            @foreach($topics as $topic)
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6 flex justify-between items-start">
-                <div>
-                    <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
-                        {{ $topic->category ?? 'General' }}
-                    </span>
-                    <h3 class="mt-2 text-lg font-bold text-gray-800">
-                        <a href="/topics/{{ $topic->topic_id }}" class="hover:text-indigo-600">
-                            {{ $topic->title }}
-                        </a>
-                    </h3>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Posted by {{ $topic->creator->username ?? 'Unknown' }}
-                        · {{ $topic->posts_count ?? 0 }} replies
-                    </p>
-                </div>
-                <div class="text-right text-sm">
-                    @if($topic->posts_count === 0)
-                        <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-                            Unanswered
-                        </span>
-                    @else
-                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">
-                            Answered
-                        </span>
-                    @endif
-                </div>
+            {{-- Swapped out wholesale when the search text changes --}}
+            <div id="topic-list" class="space-y-4 transition-opacity duration-150">
+                @include('forum._topic-list')
             </div>
-            @endforeach
 
         </div>
     </div>
+
+    <script>
+        // ---- Live topic search ----
+        // Waits until typing pauses, then asks the server for the filtered
+        // list and swaps it in. Server-side so it searches every topic, not
+        // just the ones already on screen.
+        (function () {
+            const form  = document.getElementById('topic-search-form');
+            const input = document.getElementById('topic-search');
+            const clear = document.getElementById('topic-search-clear');
+            const list  = document.getElementById('topic-list');
+
+            let timer = null;
+            let inFlight = null;
+
+            async function runSearch() {
+                const q = input.value.trim();
+
+                // Keep the address bar in step, so refreshing or sharing
+                // the URL reproduces what's on screen
+                const url = new URL(window.location.href);
+                url.searchParams.delete('page');   // a new search starts at page 1
+                if (q) {
+                    url.searchParams.set('search', q);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                window.history.replaceState({}, '', url);
+
+                clear.classList.toggle('hidden', q === '');
+
+                // Cancel any earlier request still running, so a slow
+                // response for "dat" can't land after "database"
+                if (inFlight) inFlight.abort();
+                inFlight = new AbortController();
+
+                list.style.opacity = '0.5';
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        signal: inFlight.signal,
+                    });
+                    if (res.ok) {
+                        list.innerHTML = await res.text();
+                    }
+                } catch (e) {
+                    // aborted or offline — leave the current list in place
+                } finally {
+                    list.style.opacity = '1';
+                }
+            }
+
+            input.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(runSearch, 300);
+            });
+
+            // Enter shouldn't reload the page when live search is available
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                clearTimeout(timer);
+                runSearch();
+            });
+
+            clear.addEventListener('click', () => {
+                input.value = '';
+                clearTimeout(timer);
+                runSearch();
+                input.focus();
+            });
+        })();
+    </script>
 </x-app-layout>
