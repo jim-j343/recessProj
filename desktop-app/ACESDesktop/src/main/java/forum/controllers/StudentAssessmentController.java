@@ -2,6 +2,7 @@ package forum.controllers;
 
 import forum.api.ApiClient;
 import forum.api.dto.StudentProgressDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.Role;
@@ -22,7 +23,7 @@ import javafx.scene.control.Separator;
 
 import java.util.List;
 
-public class StudentAssessmentController {
+public class StudentAssessmentController implements forum.app.Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -81,6 +82,17 @@ public class StudentAssessmentController {
             }
         }
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
+        loadProgress();
+    }
+
+    @Override
+    public void refresh() {
+        forum.models.User user = forum.app.Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(String.valueOf(user.displayName().trim().charAt(0)).toUpperCase());
+        }
+        forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadProgress();
     }
 

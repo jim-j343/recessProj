@@ -3,6 +3,7 @@ package forum.controllers;
 import forum.api.ApiClient;
 import forum.api.ApiException;
 import forum.api.dto.GroupDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -22,7 +23,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
 
-public class QuizManagementController {
+public class QuizManagementController implements forum.app.Refreshable {
 
     @FXML private Label    avatarLabel;
     @FXML private Label    userNameLabel;
@@ -49,6 +50,19 @@ public class QuizManagementController {
         }
         loadGroups();
         onAddQuestion(); // start with one question
+    }
+
+    @Override
+    public void refresh() {
+        User u = Session.currentUser();
+        if (u != null) {
+            userNameLabel.setText(u.displayName());
+            if (avatarLabel != null) {
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+            }
+        }
+        // Could also call loadGroups() if we wanted dynamic updates
     }
 
     private void loadGroups() {

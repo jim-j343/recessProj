@@ -2,6 +2,7 @@ package forum.controllers;
 
 import forum.api.ApiClient;
 import forum.api.ApiException;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -27,7 +28,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParticipationGradingController {
+public class ParticipationGradingController implements forum.app.Refreshable {
 
     @FXML private Label     avatarLabel;
     @FXML private Label     userNameLabel;
@@ -72,6 +73,17 @@ public class ParticipationGradingController {
             renderStudentRows();
         });
 
+        loadStudents();
+    }
+
+    @Override
+    public void refresh() {
+        forum.models.User user = forum.app.Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(String.valueOf(user.displayName().trim().charAt(0)).toUpperCase());
+        }
+        forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadStudents();
     }
 

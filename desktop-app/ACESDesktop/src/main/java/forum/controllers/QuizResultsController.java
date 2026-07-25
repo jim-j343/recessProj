@@ -11,7 +11,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class QuizResultsController {
+import forum.app.Refreshable;
+
+public class QuizResultsController implements Refreshable {
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
@@ -35,6 +37,23 @@ public class QuizResultsController {
             }
         }
 
+        loadResults();
+    }
+
+    @Override
+    public void refresh() {
+        User u = Session.currentUser();
+        if (u != null) {
+            userNameLabel.setText(u.displayName());
+            if (avatarLabel != null) {
+                String name = u.displayName();
+                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
+            }
+        }
+        loadResults();
+    }
+
+    private void loadResults() {
         var quiz = ViewState.getSelectedQuiz();
         if (quiz == null) { SceneManager.goStudentDashboard(); return; }
 
