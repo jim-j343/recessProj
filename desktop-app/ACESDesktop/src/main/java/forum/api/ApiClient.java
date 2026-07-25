@@ -45,11 +45,11 @@ import java.util.Map;
  */
 public class ApiClient {
 
-    private final HttpClient http = HttpClient.newBuilder()
+    private static final HttpClient http = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(60))
             .build();
 
-    private final ObjectMapper mapper = new ObjectMapper()
+    private static final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final String base = DatabaseConfig.API_BASE_URL;
