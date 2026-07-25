@@ -255,6 +255,7 @@ public class ForumDashboardController {
     @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
+        SceneManager.clearCache();
         Thread t = new Thread(() -> new AuthService().logout(token), "aces-logout");
         t.setDaemon(true);
         t.start();

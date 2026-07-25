@@ -58,6 +58,7 @@ private void onSignIn() {
                     + " token: " + result.token());
             javafx.application.Platform.runLater(() -> {
                 Session.begin(result.user(), result.token());
+                SceneManager.preloadScreens(result.user().getRole());
                 SceneManager.showHomeFor(result.user().getRole());
             });
         } catch (AuthService.AuthException e) {

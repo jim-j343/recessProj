@@ -288,6 +288,7 @@ public class StudentAssessmentController {
     @FXML private void onLogout() {
         String token = Session.authToken();
         Session.end();
+        SceneManager.clearCache();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "ACES");
     }

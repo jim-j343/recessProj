@@ -168,6 +168,7 @@ public class TopicCreationController {
     @FXML private void onLogout()    {
         String token = forum.app.Session.authToken();
         forum.app.Session.end();
+        SceneManager.clearCache();
         new Thread(() -> new forum.services.AuthService().logout(token)).start();
         SceneManager.show("Login", "ACES");
     }

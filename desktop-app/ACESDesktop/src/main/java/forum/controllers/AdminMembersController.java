@@ -349,6 +349,7 @@ public class AdminMembersController {
     private void onLogout() {
         String token = Session.authToken();
         Session.end();
+        SceneManager.clearCache();
         new Thread(() -> new AuthService().logout(token), "logout").start();
         SceneManager.show("Login", "ACES");
     }
