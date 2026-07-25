@@ -39,7 +39,14 @@ class TopicController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Live search fetches just the list and swaps it in, so the page
+        // doesn't reload on every keystroke. Same query, same results.
+        if ($request->ajax()) {
+            return view('forum._topic-list', compact('topics', 'search'));
+        }
+
         return view('forum.index', compact('topics', 'search'));
+
     }
 
     // Show form to create a new topic
@@ -217,9 +224,26 @@ class TopicController extends Controller
             'content' => 'required|string',
         ]);
 
+        // A blank category on edit shouldn't silently wipe what's there.
+        // Re-classify the same way store() does; if the ML service is
+        // unreachable, keep whatever the topic already had.
+        $category = $validated['category'] ?: null;
+        if (!$category) {
+            try {
+                $response = Http::timeout(3)->post('http://localhost:5001/classify', [
+                    'text' => $validated['title'] . ' ' . $validated['content'],
+                ]);
+                $category = $response->successful()
+                    ? $response->json('category')
+                    : $topic->category;
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                $category = $topic->category;
+            }
+        }
+
         $topic->update([
             'title' => $validated['title'],
-            'category' => $validated['category'],
+            'category' => $category,
             'group_id' => $validated['group_id'],
         ]);
 
@@ -264,7 +288,6 @@ class TopicController extends Controller
 
 
         return redirect()->route('topics.show', $topic->topic_id)
-            ->withFragment('post-' . $post->post_id)
             ->with('success', 'Reply posted!');
     }
 

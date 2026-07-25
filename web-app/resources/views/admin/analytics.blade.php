@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="min-h-screen bg-gray-50">
-        <div class="max-w-7xl mx-auto px-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 py-6"></div>
 
             {{-- HEADER --}}
             <div class="flex justify-between items-start mb-6">
@@ -11,7 +11,7 @@
             </div>
 
             {{-- MEMBER STATS ROW (SDD: per-group activity reports) --}}
-            <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6"></div>
                 <div class="bg-white border border-gray-200 rounded-lg p-5">
                     <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Total Members</p>
                     <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalMembers) }}</p>
@@ -34,7 +34,7 @@
             </div>
 
             {{-- MAIN GRID --}}
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6"></div>
 
                 {{-- Post Volume Chart --}}
                 <div class="col-span-2 bg-white border border-gray-200 rounded-lg p-6">
