@@ -36,6 +36,10 @@
                             {{ $quiz->is_published ? 'Published' : 'Draft' }}
                         </span>
                         @unless($quiz->is_published)
+                            <a href="{{ route('quiz.edit', $quiz->quiz_id) }}"
+                               class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-md text-xs font-semibold hover:bg-gray-50">
+                                Edit Draft
+                            </a>
                             <form method="POST" action="{{ route('quiz.publish', $quiz->quiz_id) }}"
                                   onsubmit="return confirm('Publish this quiz? Group members will be notified immediately.')">
                                 @csrf
