@@ -146,6 +146,112 @@ class QuizController extends Controller
             ->with('success', 'Quiz published! Group members have been notified.');
     }
 
+    // Lecturer: edit a draft. Only unpublished quizzes are editable — once
+    // students can see a quiz, changing its questions underneath them would
+    // corrupt submissions already in flight.
+    public function edit($id)
+    {
+        $quiz = Quiz::with('questions.answers')->findOrFail($id);
+
+        if ($quiz->lecturer_id !== Auth::id()) {
+            return redirect()->route('lecturer.dashboard')
+                ->with('error', 'You can only edit quizzes you created.');
+        }
+
+        if ($quiz->is_published) {
+            return redirect()->route('quiz.preview', $quiz->quiz_id)
+                ->with('error', 'Published quizzes cannot be edited — students may already have submissions.');
+        }
+
+        $courseNames = \App\Models\Group::whereNotNull('course_name')
+            ->distinct()
+            ->orderBy('course_name')
+            ->pluck('course_name');
+
+        return view('quiz.edit', compact('quiz', 'courseNames'));
+    }
+
+    // Lecturer: save changes to a draft. The question set is replaced
+    // wholesale rather than diffed — safe precisely because an unpublished
+    // quiz cannot have any submissions yet.
+    public function update(Request $request, $id)
+    {
+        $quiz = Quiz::findOrFail($id);
+
+        if ($quiz->lecturer_id !== Auth::id()) {
+            return redirect()->route('lecturer.dashboard')
+                ->with('error', 'You can only edit quizzes you created.');
+        }
+
+        if ($quiz->is_published) {
+            return redirect()->route('quiz.preview', $quiz->quiz_id)
+                ->with('error', 'Published quizzes cannot be edited.');
+        }
+
+        $request->validate([
+            'title'            => ['required', 'string', 'max:255'],
+            'course_name'      => ['required', 'string', 'max:150'],
+            'start_time'       => ['required', 'date'],
+            'duration'         => ['required', 'integer', 'min:1'],
+            'target'           => ['nullable', 'string', 'max:80'],
+            'questions'        => ['required', 'array', 'min:1'],
+            'questions.*.text' => ['required', 'string'],
+            'questions.*.answers'        => ['required', 'array', 'min:2'],
+            'questions.*.answers.*'      => ['required', 'string'],
+            'questions.*.correct_answer' => ['required', 'integer'],
+        ]);
+
+        $quiz->update([
+            'course_name'      => $request->course_name,
+            'title'            => $request->title,
+            'target_category'  => $request->target,
+            'start_time'       => $request->start_time,
+            'duration_minutes' => $request->duration,
+            'is_published'     => $request->has('publish'),
+        ]);
+
+        // Clear the old question set. Answers are deleted explicitly rather
+        // than relying on a cascade, so this works whatever the FK is set to.
+        foreach ($quiz->questions as $oldQuestion) {
+            Answer::where('question_id', $oldQuestion->question_id)->delete();
+        }
+        Question::where('quiz_id', $quiz->quiz_id)->delete();
+
+        foreach ($request->questions as $index => $q) {
+            $question = Question::create([
+                'quiz_id'     => $quiz->quiz_id,
+                'content'     => $q['text'],
+                'type'        => 'mcq',
+                'marks'       => 1,
+                'order_index' => $index + 1,
+            ]);
+
+            foreach ($q['answers'] as $aIndex => $answerText) {
+                Answer::create([
+                    'question_id' => $question->question_id,
+                    'content'     => $answerText,
+                    'is_correct'  => ($aIndex == $q['correct_answer']),
+                ]);
+            }
+        }
+
+        // Publishing straight from the edit screen should notify, same as store()
+        if ($quiz->is_published) {
+            $memberIds = GroupMembership::whereIn('group_id', $quiz->eligibleGroupIds())
+                ->where('status', 'active')
+                ->where('user_id', '!=', Auth::id())
+                ->pluck('user_id')
+                ->unique();
+
+            foreach ($memberIds as $userId) {
+                Notification::notify($userId, 'quiz_announced');
+            }
+        }
+
+        return redirect()->route('quiz.preview', $quiz->quiz_id)
+            ->with('success', $quiz->is_published ? 'Quiz updated and published!' : 'Draft updated.');
+    }
+
     // Student: show quiz to attempt
     public function show($id)
     {
