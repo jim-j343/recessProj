@@ -6,6 +6,7 @@ import forum.api.dto.AdminRemovalDto;
 import forum.api.dto.AdminRemovalsResponseDto;
 import forum.api.dto.AdminReportDto;
 import forum.api.dto.AdminReportsResponseDto;
+import forum.app.Refreshable;
 import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
@@ -19,7 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.io.IOException;
 
-public class AdminModerationController {
+public class AdminModerationController implements forum.app.Refreshable {
 
     // ── Navbar ──────────────────────────────────────────────────────
     @FXML private Label avatarLabel;
@@ -120,6 +121,17 @@ public class AdminModerationController {
             loadData();
         });
 
+        loadData();
+    }
+
+    @Override
+    public void refresh() {
+        User user = Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(initial(user.displayName()));
+        }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         loadData();
     }
 

@@ -29,7 +29,9 @@ import java.util.List;
  *   - Lift blacklist button
  *   - Logout via nav-user chip
  */
-public class AdminMembersController {
+import forum.app.Refreshable;
+
+public class AdminMembersController implements Refreshable {
 
     @FXML private Label      avatarLabel;
     @FXML private Label      userNameLabel;
@@ -68,6 +70,17 @@ public class AdminMembersController {
             load();
         });
 
+        load();
+    }
+
+    @Override
+    public void refresh() {
+        User user = Session.currentUser();
+        if (user != null) {
+            userNameLabel.setText(user.displayName());
+            avatarLabel.setText(initial(user.displayName()));
+        }
+        NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         load();
     }
 
