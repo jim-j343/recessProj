@@ -39,7 +39,14 @@ class TopicController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Live search fetches just the list and swaps it in, so the page
+        // doesn't reload on every keystroke. Same query, same results.
+        if ($request->ajax()) {
+            return view('forum._topic-list', compact('topics', 'search'));
+        }
+
         return view('forum.index', compact('topics', 'search'));
+
     }
 
     // Show form to create a new topic
