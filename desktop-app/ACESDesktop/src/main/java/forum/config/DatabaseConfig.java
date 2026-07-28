@@ -11,9 +11,12 @@ public final class DatabaseConfig {
     public static final String APP_DIR =
             System.getProperty("user.home") + File.separator + ".aces";
 
-    /** Base URL of the Laravel sync API (override with -Daces.api=...). */
+    /** Base URL of the Laravel sync API.
+     *  Defaults to the hosted Railway backend so the app works out of the box
+     *  with no launch flags; pass -Daces.api=http://localhost:8000/api to
+     *  point at a local Laravel instance for development instead. */
     public static final String API_BASE_URL =
-            System.getProperty("aces.api", "http://localhost:8000/api");
+            System.getProperty("aces.api", "https://recessproj-production.up.railway.app/api");
 
     /** Local SQLite cache file (override with -Daces.db=... — used by tests
      *  to point at an isolated temp file instead of the real user cache). */
