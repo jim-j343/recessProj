@@ -78,8 +78,8 @@
                     <!-- Filter Section -->
                     <HBox spacing="16" alignment="CENTER_LEFT" styleClass="card">
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="Filter by Topic" style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
-                            <ComboBox fx:id="topicCombo" promptText="All Topics" maxWidth="Infinity" styleClass="input"/>
+                            <Label text="Course / Group" style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
+                            <ComboBox fx:id="groupCombo" promptText="Select a course" maxWidth="Infinity" styleClass="input"/>
                         </VBox>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label text="Filter by Student" style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
@@ -95,7 +95,11 @@
                     <VBox styleClass="card" spacing="0">
                         <HBox alignment="CENTER_LEFT">
                             <padding><Insets bottom="16"/></padding>
-                            <Label text="Student Forum Participation" styleClass="card-title"/>
+                            <VBox spacing="2">
+                                <Label fx:id="courseLabel" text="Student Forum Participation" styleClass="card-title"/>
+                                <Label text="Participation and quiz average are both from this course only"
+                                       style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;"/>
+                            </VBox>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Button text="💾 Save All Grades"
                                     styleClass="btn-ghost" style="-fx-text-fill: #4f46e5; -fx-font-weight: bold; -fx-background-color: transparent;"
