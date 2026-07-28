@@ -151,36 +151,29 @@
                             </button>
                         @endif
                     </div>
-                    @foreach($group->memberships->take(8) as $membership)
-                        <div class="flex items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                                    <span class="text-indigo-700 text-xs font-semibold">
-                                        {{ strtoupper(substr($membership->user->username ?? 'U', 0, 1)) }}
-                                    </span>
+                    <div class="max-h-80 overflow-y-auto pr-1 -mr-1">
+                        @foreach($group->memberships as $membership)
+                            <div class="flex items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <x-avatar :user="$membership->user" :name="$membership->user->username ?? 'U'" size="w-8 h-8" />
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-gray-800 truncate">
+                                            {{ $membership->user->username ?? 'Unknown' }}
+                                        </p>
+                                        <p class="text-xs text-gray-400">{{ ucfirst($membership->role) }}</p>
+                                    </div>
                                 </div>
-                                <div class="min-w-0">
-                                    <p class="text-sm font-medium text-gray-800 truncate">
-                                        {{ $membership->user->username ?? 'Unknown' }}
-                                    </p>
-                                    <p class="text-xs text-gray-400">{{ ucfirst($membership->role) }}</p>
-                                </div>
-                            </div>
 
-                            @if($group->admin_id === auth()->id() && $membership->user_id !== $group->admin_id)
-                                <button type="button"
-                                    onclick="openRemoveModal({{ $membership->user_id }}, '{{ addslashes($membership->user->username ?? 'this member') }}')"
-                                    class="text-xs text-red-500 hover:text-red-700 font-medium shrink-0">
-                                    Remove
-                                </button>
-                            @endif
-                        </div>
-                    @endforeach
-                    @if($group->memberships->count() > 8)
-                        <p class="text-xs text-gray-400 mt-3 text-center">
-                            +{{ $group->memberships->count() - 8 }} more members
-                        </p>
-                    @endif
+                                @if($group->admin_id === auth()->id() && $membership->user_id !== $group->admin_id)
+                                    <button type="button"
+                                        onclick="openRemoveModal({{ $membership->user_id }}, '{{ addslashes($membership->user->username ?? 'this member') }}')"
+                                        class="text-xs text-red-500 hover:text-red-700 font-medium shrink-0">
+                                        Remove
+                                    </button>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
             </div>
