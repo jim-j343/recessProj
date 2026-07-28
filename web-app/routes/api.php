@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/topics/{topic}',         [ForumController::class, 'update']);
     Route::delete('/topics/{topic}',      [ForumController::class, 'destroy']);
     Route::post('/topics/{topic}/posts',  [ForumController::class, 'storePost']);
+    Route::get('/topics/{topic}/export-pdf', [\App\Http\Controllers\TopicController::class, 'exportPdf']);
     Route::post('/posts/{post}/flag',     [ForumController::class, 'flagPost']);
     // The desktop client calls /report for the same action — alias it rather
     // than forcing a Java rebuild
