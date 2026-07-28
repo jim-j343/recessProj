@@ -73,7 +73,7 @@ class GroupApiController extends Controller
         if ($group->admin_id !== $request->user()->user_id && !$request->user()->isAdmin()) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
-        
+
         $group->delete();
         return response()->json(['message' => 'Group deleted.']);
     }
@@ -93,11 +93,11 @@ class GroupApiController extends Controller
             'user_id'   => $userId,
             'group_id'  => $group->group_id,
             'role'      => 'member',
-            'status'    => 'pending',
+            'status'    => 'active',
             'joined_at' => now(),
         ]);
 
-        return response()->json(['message' => 'Join request sent.']);
+        return response()->json(['message' => 'Joined ' . $group->name . '.']);
     }
 
     /** POST /api/groups/{group}/leave — mirrors GroupController::leave() on web. */
