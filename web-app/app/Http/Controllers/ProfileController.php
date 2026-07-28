@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,21 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
+        // Profile picture — validated here rather than in ProfileUpdateRequest
+        // so the rest of the form still works when no file is chosen
+        if ($request->hasFile('avatar')) {
+            $request->validate([
+                'avatar' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            ]);
+
+            // Delete the previous file so old uploads don't accumulate
+            if ($request->user()->avatar) {
+                Storage::disk('public')->delete($request->user()->avatar);
+            }
+
+            $request->user()->avatar = $request->file('avatar')->store('avatars', 'public');
+        }
+        
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
