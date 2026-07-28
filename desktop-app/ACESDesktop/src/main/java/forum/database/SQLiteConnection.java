@@ -40,6 +40,7 @@ public final class SQLiteConnection {
                 password_hash TEXT NOT NULL,
                 system_role   TEXT NOT NULL DEFAULT 'student',
                 status        TEXT NOT NULL DEFAULT 'active',
+                avatar        TEXT,
                 server_id     INTEGER,
                 updated_at    TEXT DEFAULT CURRENT_TIMESTAMP
             )""";
@@ -105,6 +106,12 @@ public final class SQLiteConnection {
             
             try {
                 st.execute("ALTER TABLE posts ADD COLUMN author_name TEXT");
+            } catch (SQLException ignore) {
+                // column likely already exists
+            }
+
+            try {
+                st.execute("ALTER TABLE users ADD COLUMN avatar TEXT");
             } catch (SQLException ignore) {
                 // column likely already exists
             }

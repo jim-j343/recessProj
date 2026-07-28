@@ -10,4 +10,5 @@ public class UserDto {
     public String email;
     public String system_role;
     public String status;
+    public String avatar;
 }

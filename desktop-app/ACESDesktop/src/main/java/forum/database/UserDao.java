@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class UserDao {
 
     public User findByEmail(String email) {
-        String sql = "SELECT user_id, username, email, system_role, status FROM users WHERE email = ?";
+        String sql = "SELECT user_id, username, email, system_role, status, avatar FROM users WHERE email = ?";
         try (Connection c = SQLiteConnection.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email == null ? "" : email.trim().toLowerCase());
@@ -78,7 +78,7 @@ public class UserDao {
     public User upsertFromServer(UserDto dto, String password) {
         String email = dto.email == null ? "" : dto.email.trim().toLowerCase();
         String update = "UPDATE users SET username = ?, system_role = ?, status = ?, "
-                + "server_id = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?";
+                + "server_id = ?, password_hash = ?, avatar = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?";
         try (Connection c = SQLiteConnection.get()) {
             int rows;
             try (PreparedStatement ps = c.prepareStatement(update)) {
@@ -87,12 +87,13 @@ public class UserDao {
                 ps.setString(3, dto.status);
                 ps.setLong(4, dto.user_id);
                 ps.setString(5, PasswordHash.of(password));
-                ps.setString(6, email);
+                ps.setString(6, dto.avatar);
+                ps.setString(7, email);
                 rows = ps.executeUpdate();
             }
             if (rows == 0) {
-                String insert = "INSERT INTO users(username, email, password_hash, system_role, status, server_id) "
-                        + "VALUES(?,?,?,?,?,?)";
+                String insert = "INSERT INTO users(username, email, password_hash, system_role, status, server_id, avatar) "
+                        + "VALUES(?,?,?,?,?,?,?)";
                 try (PreparedStatement pi = c.prepareStatement(insert)) {
                     pi.setString(1, dto.username);
                     pi.setString(2, email);
@@ -100,13 +101,14 @@ public class UserDao {
                     pi.setString(4, dto.system_role);
                     pi.setString(5, dto.status);
                     pi.setLong(6, dto.user_id);
+                    pi.setString(7, dto.avatar);
                     pi.executeUpdate();
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new User(dto.user_id, dto.username, dto.email, Role.fromDb(dto.system_role), dto.status);
+        return new User(dto.user_id, dto.username, dto.email, Role.fromDb(dto.system_role), dto.status, dto.avatar);
     }
 
     /** Seeds a demo account per role the first time the app runs (password: "password"). */
@@ -132,11 +134,14 @@ public class UserDao {
     }
 
     private User map(ResultSet rs) throws SQLException {
+        String avatar = null;
+        try { avatar = rs.getString("avatar"); } catch (SQLException ignore) {}
         return new User(
                 rs.getLong("user_id"),
                 rs.getString("username"),
                 rs.getString("email"),
                 Role.fromDb(rs.getString("system_role")),
-                rs.getString("status"));
+                rs.getString("status"),
+                avatar);
     }
 }

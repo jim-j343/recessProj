@@ -511,3 +511,86 @@
 .quiz-progress > .track { -fx-background-color: #f3f4f6; -fx-background-radius: 6; }
 .quiz-progress > .bar { -fx-background-color: #4f46e5; -fx-background-radius: 6; -fx-padding: 4px; }
 
+/* ============================================================
+   Dialog / Alert styling — mirrors ACES theme & cards
+   ============================================================ */
+.dialog-pane, .custom-alert {
+    -fx-background-color: -surface;
+    -fx-border-color: -border;
+    -fx-border-width: 1px;
+    -fx-padding: 24px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0, 0, 8);
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: -surface;
+    -fx-padding: 4px 0px 12px 0px;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-font-family: "Figtree", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -ink;
+}
+
+.dialog-pane .content {
+    -fx-background-color: -surface;
+    -fx-padding: 8px 0px 16px 0px;
+}
+
+.dialog-pane .content.label {
+    -fx-font-family: "Figtree", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -ink-700;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 4px;
+}
+
+.dialog-pane .button-bar {
+    -fx-background-color: -surface;
+    -fx-padding: 16px 0px 0px 0px;
+}
+
+.dialog-pane .button {
+    -fx-font-family: "Figtree", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 9 18 9 18;
+    -fx-cursor: hand;
+    -fx-background-color: -surface;
+    -fx-text-fill: -ink-700;
+    -fx-border-color: -border;
+    -fx-border-width: 1;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: -bg-50;
+    -fx-border-color: -border-300;
+}
+
+.dialog-pane .button.btn-danger {
+    -fx-background-color: -danger;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+.dialog-pane .button.btn-danger:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.dialog-pane .button.btn-outline {
+    -fx-background-color: -surface;
+    -fx-text-fill: -ink-700;
+    -fx-border-color: -border;
+    -fx-border-width: 1;
+}
+
+.dialog-pane .button.btn-outline:hover {
+    -fx-background-color: -bg-50;
+}
+

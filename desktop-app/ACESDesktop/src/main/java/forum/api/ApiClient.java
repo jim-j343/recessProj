@@ -32,6 +32,10 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * Thin HTTP client for the Laravel token API (java.net.http + Jackson).
@@ -534,15 +538,71 @@ public StudentProgressDto studentProgress(String token)
      */
     public void updateProfile(String token, String newUsername)
             throws ApiException, IOException, InterruptedException {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("username", newUsername);
+        updateProfile(token, newUsername, null);
+    }
 
+    /**
+     * PATCH/POST /api/profile — update username and/or upload avatar image.
+     */
+    public forum.api.dto.UserDto updateProfile(String token, String newUsername, File avatarFile)
+            throws ApiException, IOException, InterruptedException {
+        HttpRequest req;
+        if (avatarFile != null && avatarFile.exists()) {
+            String boundary = "----AcesFormBoundary" + System.currentTimeMillis();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            if (newUsername != null && !newUsername.isBlank()) {
+                bos.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+                bos.write("Content-Disposition: form-data; name=\"username\"\r\n\r\n".getBytes(StandardCharsets.UTF_8));
+                bos.write((newUsername + "\r\n").getBytes(StandardCharsets.UTF_8));
+            }
+
+            bos.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+            bos.write(("Content-Disposition: form-data; name=\"avatar\"; filename=\"" + avatarFile.getName() + "\"\r\n").getBytes(StandardCharsets.UTF_8));
+            bos.write("Content-Type: image/jpeg\r\n\r\n".getBytes(StandardCharsets.UTF_8));
+            bos.write(Files.readAllBytes(avatarFile.toPath()));
+            bos.write("\r\n".getBytes(StandardCharsets.UTF_8));
+            bos.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+
+            req = HttpRequest.newBuilder()
+                    .uri(URI.create(base + "/profile/avatar"))
+                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .method("POST", HttpRequest.BodyPublishers.ofByteArray(bos.toByteArray()))
+                    .build();
+        } else {
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("username", newUsername);
+
+            req = HttpRequest.newBuilder()
+                    .uri(URI.create(base + "/profile"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                    .build();
+        }
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) throw new ApiException(sc, extractMessage(resp.body(), sc));
+        try {
+            return mapper.readValue(resp.body(), forum.api.dto.UserDto.class);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    /**
+     * DELETE /api/profile — delete the signed-in user's account.
+     */
+    public void deleteAccount(String token) throws ApiException, IOException, InterruptedException {
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(base + "/profile"))
-                .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .header("Authorization", "Bearer " + token)
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+                .DELETE()
                 .build();
 
         HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());

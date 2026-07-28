@@ -31,7 +31,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Profile
     Route::patch('/profile',          [ProfileApiController::class, 'update']);
+    Route::post('/profile/avatar',    [ProfileApiController::class, 'update']);
     Route::patch('/profile/password', [ProfileApiController::class, 'updatePassword']);
+    Route::delete('/profile',         [ProfileApiController::class, 'destroy']);
 
     // Notifications
     Route::get('/notifications',                        [NotificationApiController::class, 'index']);

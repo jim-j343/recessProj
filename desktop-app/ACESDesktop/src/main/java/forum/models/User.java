@@ -8,15 +8,21 @@ public class User {
     private String email;
     private Role role;
     private String status;   // active | blacklisted | suspended
+    private String avatar;   // relative path or URL to avatar image
 
     public User() { }
 
     public User(long userId, String username, String email, Role role, String status) {
+        this(userId, username, email, role, status, null);
+    }
+
+    public User(long userId, String username, String email, Role role, String status, String avatar) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.role = role;
         this.status = status;
+        this.avatar = avatar;
     }
 
     public long getUserId()          { return userId; }
@@ -29,6 +35,8 @@ public class User {
     public void setRole(Role v)       { this.role = v; }
     public String getStatus()         { return status; }
     public void setStatus(String v)   { this.status = v; }
+    public String getAvatar()         { return avatar; }
+    public void setAvatar(String v)   { this.avatar = v; }
 
     public String displayName() {
         return (username != null && !username.isBlank()) ? username : email;

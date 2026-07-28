@@ -82,6 +82,17 @@
                             <Label text="Email" styleClass="field-label"/>
                             <TextField fx:id="emailField" editable="false" disable="true"/>
                         </VBox>
+                        <!-- Profile Picture -->
+                        <VBox spacing="6" maxWidth="576">
+                            <Label text="Profile Picture" styleClass="field-label"/>
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <Label fx:id="profileAvatarPreview" text="A" alignment="CENTER"
+                                       style="-fx-background-color: #2F80ED; -fx-text-fill: white; -fx-font-weight: 700; -fx-font-size: 16px; -fx-background-radius: 20px; -fx-min-width: 40px; -fx-min-height: 40px; -fx-max-width: 40px; -fx-max-height: 40px;"/>
+                                <Button text="Choose File" styleClass="btn,btn-outline" onAction="#onChooseAvatar"/>
+                                <Label fx:id="chosenFileLabel" text="No file chosen" styleClass="subtle"/>
+                            </HBox>
+                            <Label text="JPG, PNG or WebP · up to 2 MB" styleClass="subtle" style="-fx-font-size: 11px;"/>
+                        </VBox>
                         <HBox spacing="12" alignment="CENTER_LEFT">
                             <Button text="SAVE" styleClass="btn,btn-dark" onAction="#onSaveProfile"/>
                             <Label fx:id="saveStatusLabel" managed="false" visible="false"/>
@@ -109,7 +120,7 @@
                             <Label text="Delete Account" styleClass="h-md"/>
                             <Label text="Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data you wish to retain." styleClass="subtle" wrapText="true" maxWidth="576"/>
                         </VBox>
-                        <Button text="DELETE ACCOUNT" styleClass="btn,btn-danger"/>
+                        <Button text="DELETE ACCOUNT" styleClass="btn,btn-danger" onAction="#onDeleteAccount"/>
                     </VBox>
                 </VBox>
             </VBox>

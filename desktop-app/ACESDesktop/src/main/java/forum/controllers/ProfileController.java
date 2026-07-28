@@ -10,10 +10,15 @@ import forum.util.NavbarHelper;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.util.Optional;
 
 public class ProfileController {
 
@@ -31,6 +36,9 @@ public class ProfileController {
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
     @FXML private Label     saveStatusLabel;
+    @FXML private Label     profileAvatarPreview;
+    @FXML private Label     chosenFileLabel;
+    private File            selectedAvatarFile;
 
     // ── Update Password form ─────────────────────────────────────────────────
     @FXML private PasswordField currentPasswordField;
@@ -51,6 +59,7 @@ public class ProfileController {
             // Profile form — populate with real credentials from session
             if (usernameField != null) usernameField.setText(u.getUsername() != null ? u.getUsername() : "");
             if (emailField != null)    emailField.setText(u.getEmail() != null ? u.getEmail() : "");
+            if (profileAvatarPreview != null) profileAvatarPreview.setText(initial(u.displayName()));
 
             // Role-based nav tabs — matches web layouts/navigation.blade.php
             if (u.getRole() == Role.STUDENT && navMyProgress != null) {
@@ -69,7 +78,31 @@ public class ProfileController {
         NavbarHelper.loadNotifications(api, notifButton, notifBadge);
     }
 
-    /** Save the username change via API. */
+    /** Choose a profile picture file from disk. */
+    @FXML
+    private void onChooseAvatar() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select Profile Picture");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files (*.jpg, *.jpeg, *.png, *.webp)", "*.jpg", "*.jpeg", "*.png", "*.webp"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+        File file = chooser.showOpenDialog(null);
+        if (file != null) {
+            long maxBytes = 2L * 1024 * 1024; // 2 MB max
+            if (file.length() > maxBytes) {
+                showSaveStatus("Image size exceeds 2 MB limit.", true);
+                return;
+            }
+            selectedAvatarFile = file;
+            if (chosenFileLabel != null) {
+                chosenFileLabel.setText(file.getName());
+            }
+            showSaveStatus("Selected: " + file.getName(), false);
+        }
+    }
+
+    /** Save the username change and/or profile picture via API. */
     @FXML
     private void onSaveProfile() {
         User u = Session.currentUser();
@@ -87,12 +120,18 @@ public class ProfileController {
         showSaveStatus("Saving…", false);
         new Thread(() -> {
             try {
-                api.updateProfile(token, newUsername);
+                forum.api.dto.UserDto updated = api.updateProfile(token, newUsername, selectedAvatarFile);
                 // Update local session so navbar reflects new name immediately
                 u.setUsername(newUsername);
+                if (updated != null && updated.avatar != null) {
+                    u.setAvatar(updated.avatar);
+                }
+                selectedAvatarFile = null;
                 Platform.runLater(() -> {
                     userNameLabel.setText(newUsername);
                     avatarLabel.setText(initial(newUsername));
+                    if (profileAvatarPreview != null) profileAvatarPreview.setText(initial(newUsername));
+                    if (chosenFileLabel != null) chosenFileLabel.setText("No file chosen");
                     showSaveStatus("Saved successfully.", false);
                     scheduleHideStatus(saveStatusLabel);
                 });
@@ -142,6 +181,49 @@ public class ProfileController {
                 Platform.runLater(() -> showPasswordStatus("Failed: " + e.getMessage(), true));
             }
         }, "save-password").start();
+    }
+
+    /**
+     * DELETE /api/profile — confirm and delete account.
+     */
+    @FXML
+    private void onDeleteAccount() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Account");
+        confirm.setHeaderText("Are you sure you want to delete your account?");
+        confirm.setContentText("Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data you wish to retain.");
+        if (getClass().getResource("/forum/css/aces.css") != null) {
+            confirm.getDialogPane().getStylesheets().add(getClass().getResource("/forum/css/aces.css").toExternalForm());
+        }
+        confirm.getDialogPane().getStyleClass().add("custom-alert");
+        confirm.getDialogPane().setPrefWidth(540);
+        confirm.getDialogPane().setMinHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
+        confirm.setGraphic(null);
+
+        javafx.scene.control.Button okButton = (javafx.scene.control.Button) confirm.getDialogPane().lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.setText("Delete Account");
+            okButton.getStyleClass().addAll("btn", "btn-danger");
+        }
+        javafx.scene.control.Button cancelButton = (javafx.scene.control.Button) confirm.getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (cancelButton != null) {
+            cancelButton.setText("Cancel");
+            cancelButton.getStyleClass().addAll("btn", "btn-outline");
+        }
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String token = Session.authToken();
+            Session.end();
+            SceneManager.clearCache();
+            new Thread(() -> {
+                try {
+                    if (token != null) api.deleteAccount(token);
+                } catch (Exception ignore) {
+                }
+            }, "delete-account").start();
+            SceneManager.show("Login", "ACES");
+        }
     }
 
     // ── Navigation ───────────────────────────────────────────────────────────
