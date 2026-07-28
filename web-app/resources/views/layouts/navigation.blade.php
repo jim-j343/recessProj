@@ -102,7 +102,7 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center gap-2 px-2 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <x-avatar :name="Auth::user()->username" size="w-8 h-8" />
+                            <x-avatar :user="Auth::user()" :name="Auth::user()->username" size="w-8 h-8" />
                             <div>{{ Auth::user()->username }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -139,7 +139,7 @@
             <div class="-me-2 flex items-center gap-2 lg:hidden">
                 <button @click="userOpen = ! userOpen; open = false"
                         class="rounded-full focus:outline-none" aria-label="Account menu">
-                    <x-avatar :name="Auth::user()->username" size="w-8 h-8" />
+                    <x-avatar :user="Auth::user()" :name="Auth::user()->username" size="w-8 h-8" />
                 </button>
                 <button @click="open = ! open; userOpen = false"
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out"

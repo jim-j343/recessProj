@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 
 // 1. Updated with your NEW migration columns
-#[Fillable(['username', 'email', 'password_hash', 'system_role', 'status', 'agreed_to_rules', 'last_active_at'])]
+#[Fillable(['username', 'email', 'avatar', 'password_hash', 'system_role', 'status', 'agreed_to_rules', 'last_active_at'])]
 #[Hidden(['password_hash', 'remember_token'])]
 class User extends Authenticatable
 {
