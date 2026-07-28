@@ -1,23 +1,5 @@
 package forum.controllers;
 
-import forum.api.ApiClient;
-import forum.api.ApiException;
-import forum.app.Refreshable;
-import forum.app.SceneManager;
-import forum.app.Session;
-import forum.models.User;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -28,13 +10,32 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import forum.api.ApiClient;
+import forum.app.SceneManager;
+import forum.app.Session;
+import forum.models.User;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 public class ParticipationGradingController implements forum.app.Refreshable {
 
     @FXML private Label     avatarLabel;
     @FXML private Label     userNameLabel;
     @FXML private Label     statusLabel;
     
-    @FXML private ComboBox<TopicOption> topicCombo;
+    @FXML private ComboBox<GroupOption> groupCombo;
+    @FXML private Label courseLabel;
     @FXML private TextField searchField;
     @FXML private VBox studentListContainer;
 
@@ -43,6 +44,11 @@ public class ParticipationGradingController implements forum.app.Refreshable {
 
     private final ObservableList<GradeRow> rows = FXCollections.observableArrayList();
     private final ApiClient api = new ApiClient();
+
+    /** Which course the visible numbers belong to — sent back when saving. */
+    private Long selectedGroupId = null;
+    /** Stops the combo's listener firing when we set its value after a load. */
+    private boolean suppressReload = false;
 
     @FXML
     private void initialize() {
@@ -58,11 +64,11 @@ public class ParticipationGradingController implements forum.app.Refreshable {
             forum.util.NavbarHelper.loadNotifications(api, notifButton, notifBadge);
         }
 
-        topicCombo.getItems().add(new TopicOption(null, "All Topics"));
-        topicCombo.setValue(topicCombo.getItems().get(0));
-
-        // Auto-reload when topic changes
-        topicCombo.valueProperty().addListener((obs, oldV, newV) -> {
+        // Reload when the lecturer picks a different course. The guard stops
+        // this firing again when we set the value programmatically after a
+        // load, which would otherwise loop forever.
+        groupCombo.valueProperty().addListener((obs, oldV, newV) -> {
+            if (suppressReload) return;
             if (oldV == newV) return;
             if (oldV != null && newV != null && java.util.Objects.equals(oldV.id, newV.id)) return;
             loadStudents();
@@ -91,14 +97,14 @@ public class ParticipationGradingController implements forum.app.Refreshable {
         String token = Session.authToken();
         if (token == null) { showStatus("Offline — cannot load students."); return; }
 
-        TopicOption selectedTopic = topicCombo.getValue();
+        GroupOption selectedGroup = groupCombo.getValue();
         String searchText = searchField.getText();
 
         Thread worker = new Thread(() -> {
             try {
-                String topicQuery = "";
-                if (selectedTopic != null && selectedTopic.id != null) {
-                    topicQuery = "topic=" + selectedTopic.id + "&";
+                String groupQuery = "";
+                if (selectedGroup != null && selectedGroup.id != null) {
+                    groupQuery = "group=" + selectedGroup.id + "&";
                 }
                 String searchQuery = "";
                 if (searchText != null && !searchText.isBlank()) {
@@ -108,7 +114,7 @@ public class ParticipationGradingController implements forum.app.Refreshable {
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(8)).build();
                 HttpRequest req = HttpRequest.newBuilder(
-                        URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json?" + topicQuery + searchQuery))
+                        URI.create(forum.config.DatabaseConfig.API_BASE_URL + "/participation/grade-json?" + groupQuery + searchQuery))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .GET().build();
@@ -118,7 +124,7 @@ public class ParticipationGradingController implements forum.app.Refreshable {
                 if (resp.statusCode() == 200) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode root = mapper.readTree(resp.body());
-                    
+
                     JsonNode rowsNode = root.has("rows") ? root.get("rows") : root;
                     List<GradeRow> result = new ArrayList<>();
                     for (JsonNode node : rowsNode) {
@@ -137,28 +143,51 @@ public class ParticipationGradingController implements forum.app.Refreshable {
                         row.remarks          = row.existingRemark != null ? row.existingRemark : "";
                         result.add(row);
                     }
-                    
-                    List<TopicOption> parsedTopics = new ArrayList<>();
-                    parsedTopics.add(new TopicOption(null, "All Topics"));
-                    if (root.has("topics")) {
-                        for (JsonNode node : root.get("topics")) {
-                            parsedTopics.add(new TopicOption(node.get("topic_id").asLong(), node.get("title").asText()));
+
+                    // The lecturer's courses, and which one this data is for
+                    List<GroupOption> parsedGroups = new ArrayList<>();
+                    if (root.has("groups")) {
+                        for (JsonNode node : root.get("groups")) {
+                            parsedGroups.add(new GroupOption(
+                                    node.get("group_id").asLong(),
+                                    node.get("name").asText(),
+                                    node.hasNonNull("course_name") ? node.get("course_name").asText() : null));
                         }
                     }
 
+                    Long   serverGroupId = null;
+                    String serverHeading = null;
+                    if (root.hasNonNull("selected_group")) {
+                        JsonNode sg = root.get("selected_group");
+                        serverGroupId = sg.get("group_id").asLong();
+                        serverHeading = sg.hasNonNull("course_name")
+                                ? sg.get("course_name").asText()
+                                : sg.get("name").asText();
+                    }
+
+                    final Long   groupId = serverGroupId;
+                    final String heading = serverHeading;
+
                     Platform.runLater(() -> {
                         rows.setAll(result);
-                        
-                        if (root.has("topics")) {
-                            TopicOption current = topicCombo.getValue();
-                            topicCombo.getItems().setAll(parsedTopics);
-                            if (current != null && current.id != null) {
-                                topicCombo.getItems().stream().filter(t -> t.id != null && t.id.equals(current.id)).findFirst().ifPresent(topicCombo::setValue);
-                            } else {
-                                topicCombo.setValue(topicCombo.getItems().get(0));
-                            }
+                        selectedGroupId = groupId;
+
+                        if (heading != null && courseLabel != null) {
+                            courseLabel.setText(heading);
                         }
-                        
+
+                        if (!parsedGroups.isEmpty()) {
+                            suppressReload = true;
+                            groupCombo.getItems().setAll(parsedGroups);
+                            if (groupId != null) {
+                                groupCombo.getItems().stream()
+                                        .filter(g -> g.id.equals(groupId))
+                                        .findFirst()
+                                        .ifPresent(groupCombo::setValue);
+                            }
+                            suppressReload = false;
+                        }
+
                         renderStudentRows();
                     });
                 } else {
@@ -255,7 +284,13 @@ public class ParticipationGradingController implements forum.app.Refreshable {
 
         Thread worker = new Thread(() -> {
             try {
-                StringBuilder json = new StringBuilder("{\"grades\":{");
+                StringBuilder json = new StringBuilder();
+                json.append("{");
+                if (selectedGroupId != null) {
+                    // Tell the server which course these marks belong to
+                    json.append("\"group_id\":").append(selectedGroupId).append(",");
+                }
+                json.append("\"grades\":{");
                 boolean first = true;
                 for (GradeRow row : rows) {
                     if (row.score == null || row.score.isBlank()) continue;
@@ -330,10 +365,20 @@ public class ParticipationGradingController implements forum.app.Refreshable {
         public String remarks = "";
     }
 
-    public static class TopicOption {
-        public final Long id;
-        public final String title;
-        public TopicOption(Long id, String title) { this.id = id; this.title = title; }
-        @Override public String toString() { return title; }
+    public static class GroupOption {
+        public final Long   id;
+        public final String name;
+        public final String courseName;
+
+        public GroupOption(Long id, String name, String courseName) {
+            this.id = id;
+            this.name = name;
+            this.courseName = courseName;
+        }
+
+        /** Shown in the dropdown — e.g. "BSE1206: Software Development Principles — BSSE Year 1" */
+        @Override public String toString() {
+            return courseName == null || courseName.isBlank() ? name : courseName + " — " + name;
+        }
     }
 }
