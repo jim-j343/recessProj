@@ -1,5 +1,12 @@
 package forum.controllers;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import forum.api.ApiClient;
 import forum.api.dto.PostDto;
 import forum.api.dto.TopicDetailResponse;
@@ -11,31 +18,21 @@ import forum.database.TopicDao;
 import forum.models.Post;
 import forum.models.Topic;
 import forum.models.User;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.control.CheckBox;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.Node;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Topic thread — offline-first. Shows cached posts immediately, then (if the
@@ -476,30 +473,43 @@ private void onReply() {
     @FXML
     private void onExportPdf() {
         if (topic == null) return;
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Export Discussion to PDF (Text format)");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Documents", "*.txt"));
-        fc.setInitialFileName("Topic_" + topic.getTopicId() + "_Export.txt");
-        File file = fc.showSaveDialog(null);
-        if (file != null) {
-            try (PrintWriter out = new PrintWriter(file)) {
-                out.println("Topic: " + topic.getTitle());
-                out.println("Category: " + topic.getCategory());
-                out.println("-----------------------------------------");
-                List<Post> posts = postDao.listByTopic(topic.getTopicId());
-                for (Post p : posts) {
-                    out.println("[" + (p.getCreatedAt() != null ? p.getCreatedAt() : "Unknown Time") + "] " +
-                            (p.getAuthorName() != null ? p.getAuthorName() : "Unknown") + ":");
-                    out.println(p.getContent());
-                    out.println();
-                }
-                showThemedWarning("Success", "Discussion successfully exported to " + file.getName());
-            } catch (Exception e) {
-                showThemedWarning("Error", "Failed to export: " + e.getMessage());
-            }
-        }
-    }
 
+        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
+        String token = Session.authToken();
+
+        if (token == null || token.isBlank() || serverTopicId <= 0) {
+            showThemedWarning("Offline", "Cannot export PDF while offline. Please connect to the server.");
+            return;
+        }
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Export Discussion to PDF");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Documents", "*.pdf"));
+        fc.setInitialFileName("Topic_" + topic.getTopicId() + "_Export.pdf");
+        File file = fc.showSaveDialog(null);
+        if (file == null) return;
+
+        File targetFile = file.getName().toLowerCase().endsWith(".pdf")
+                ? file
+                : new File(file.getParentFile(), file.getName() + ".pdf");
+
+        Thread worker = new Thread(() -> {
+            try {
+                byte[] pdfBytes = api.exportTopicPdf(token, serverTopicId);
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(targetFile)) {
+                    fos.write(pdfBytes);
+                }
+                Platform.runLater(() -> showThemedWarning("Success",
+                        "PDF exported to " + targetFile.getName()));
+            } catch (Exception e) {
+                Platform.runLater(() -> showThemedWarning("Error",
+                        "Failed to export PDF: " + e.getMessage()));
+            }
+        }, "aces-export-pdf");
+        worker.setDaemon(true);
+        worker.start();
+    }
+    
     @FXML
     private void onShare() {
         if (topic == null) return;

@@ -216,6 +216,24 @@ public class ApiClient {
         ok(resp);
     }
 
+    /** GET /topics/{id}/export-pdf — download PDF as raw bytes. */
+    public byte[] exportTopicPdf(String token, long topicId)
+            throws ApiException, IOException, InterruptedException {
+        HttpRequest req = HttpRequest.newBuilder(URI.create(base + "/topics/" + topicId + "/export-pdf"))
+                .timeout(Duration.ofSeconds(60))
+                .header("Accept", "application/pdf")
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+        HttpResponse<byte[]> resp = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
+        int sc = resp.statusCode();
+        if (sc < 200 || sc >= 300) {
+            String body = new String(resp.body(), java.nio.charset.StandardCharsets.UTF_8);
+            throw new ApiException(sc, extractMessage(body, sc));
+        }
+        return resp.body();
+    }
+
 // ---------------------------------------------------------------
 //  Groups
 // ---------------------------------------------------------------
