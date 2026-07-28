@@ -268,10 +268,17 @@ public class TopicDetailController {
         bubble.getChildren().add(bodyNode);
         List<String> excludedUsers = excludedUsernamesByPostId.getOrDefault(p.getPostId(), Collections.emptyList());
         if (isOutgoing && !excludedUsers.isEmpty()) {
-            Label excludedLabel = new Label("Hidden from: " + String.join(", ", excludedUsers));
-            excludedLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #b45309; -fx-font-style: italic;");
+            // Matches web's forum/show.blade.php exactly: "🔒 Hidden from X, Y"
+            // on an amber pill, shown only to the post's own author.
+            Label excludedLabel = new Label("🔒 Hidden from " + String.join(", ", excludedUsers));
+            excludedLabel.setStyle(
+                "-fx-font-size: 10px; -fx-text-fill: #b45309; -fx-background-color: #fef3c7; " +
+                "-fx-background-radius: 999; -fx-padding: 2 8 2 8;"
+            );
             excludedLabel.setWrapText(true);
-            bubble.getChildren().add(excludedLabel);
+            HBox excludedLabelRow = new HBox(excludedLabel);
+            excludedLabelRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+            bubble.getChildren().add(excludedLabelRow);
         }
         bubble.getChildren().add(metaRow);
         
@@ -330,52 +337,56 @@ public class TopicDetailController {
     }
 
     @FXML
-    private void onReply() {
-        if (composerField == null || topic == null) return;
-        String content = composerField.getText();
-        if (content == null || content.isBlank()) return;
-        composerField.clear();
+private void onReply() {
+    if (composerField == null || topic == null) return;
+    String content = composerField.getText();
+    if (content == null || content.isBlank()) return;
+    composerField.clear();
 
-        List<Long> excludedUserIds = selectedExcludedUserIds();
-        if (isHiddenMode && !excludedUserIds.isEmpty()) {
-            content = "[Hidden from Students] " + content;
-        }
-        if (isHiddenMode) toggleHideMode(); // reset after send
+    List<Long> excludedUserIds = selectedExcludedUserIds();
+    // NOTE: exclusion is recorded server-side via the excludedUserIds
+    // parameter passed to api.createPost() below — the reply content
+    // itself must stay exactly what the user typed. Previously this
+    // prepended "[Hidden from Students] " into the actual post body,
+    // which permanently corrupted the stored content (visible to
+    // everyone, including the excluded students once un-excluded, and
+    // mismatched with the web side which never touches post content).
+    if (isHiddenMode) toggleHideMode(); // reset after send
 
-        User u = Session.currentUser();
-        long authorId = (u != null) ? u.getUserId() : 0;
-        String token = Session.authToken();
-        long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
-        String body = content.trim();
+    User u = Session.currentUser();
+    long authorId = (u != null) ? u.getUserId() : 0;
+    String token = Session.authToken();
+    long serverTopicId = topicDao.serverIdFor(topic.getTopicId());
+    String body = content.trim();
 
-        Thread worker = new Thread(() -> {
-            // Online — post to the server and cache the result.
-            if (token != null && !token.isBlank() && serverTopicId > 0) {
-                try {
-                    PostDto dto = api.createPost(token, serverTopicId, body, null, excludedUserIds);
-                    cacheExcludedUsers(dto);
-                    postDao.upsertFromServer(dto);
-                    List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-                    Platform.runLater(() -> {
-                        renderPosts(fresh);
-                        scrollToBottom();
-                    });
-                    return;
-                } catch (Exception offline) {
-                    // fall through to the local queue
-                }
+    Thread worker = new Thread(() -> {
+        // Online — post to the server and cache the result.
+        if (token != null && !token.isBlank() && serverTopicId > 0) {
+            try {
+                PostDto dto = api.createPost(token, serverTopicId, body, null, excludedUserIds);
+                cacheExcludedUsers(dto);
+                postDao.upsertFromServer(dto);
+                List<Post> fresh = postDao.listByTopic(topic.getTopicId());
+                Platform.runLater(() -> {
+                    renderPosts(fresh);
+                    scrollToBottom();
+                });
+                return;
+            } catch (Exception offline) {
+                // fall through to the local queue
             }
-            // Offline — save locally and queue for sync.
-            postDao.create(topic.getTopicId(), authorId, null, body);
-            List<Post> fresh = postDao.listByTopic(topic.getTopicId());
-            Platform.runLater(() -> {
-                renderPosts(fresh);
-                scrollToBottom();
-            });
-        }, "aces-reply");
-        worker.setDaemon(true);
-        worker.start();
-    }
+        }
+        // Offline — save locally and queue for sync.
+        postDao.create(topic.getTopicId(), authorId, null, body);
+        List<Post> fresh = postDao.listByTopic(topic.getTopicId());
+        Platform.runLater(() -> {
+            renderPosts(fresh);
+            scrollToBottom();
+        });
+    }, "aces-reply");
+    worker.setDaemon(true);
+    worker.start();
+}
     
     private void scrollToBottom() {
         if (scrollPane != null) {
