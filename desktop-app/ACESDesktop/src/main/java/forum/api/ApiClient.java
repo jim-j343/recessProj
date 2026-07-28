@@ -45,11 +45,16 @@ import java.util.Map;
  */
 public class ApiClient {
 
-    private final HttpClient http = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(60))
+    // Shared across every ApiClient instance (23+ call sites construct their own
+    // ApiClient). HttpClient owns a connection pool internally, but that pool only
+    // helps if the same instance is reused — a fresh HttpClient per screen/thread
+    // means every request re-does a full TCP+TLS handshake to Railway instead of
+    // reusing a keep-alive connection. Making it static fixes that everywhere at once.
+    private static final HttpClient http = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(15))
             .build();
 
-    private final ObjectMapper mapper = new ObjectMapper()
+    private static final ObjectMapper mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final String base = DatabaseConfig.API_BASE_URL;
