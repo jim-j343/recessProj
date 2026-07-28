@@ -47,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/topics/{topic}',      [ForumController::class, 'destroy']);
     Route::post('/topics/{topic}/posts',  [ForumController::class, 'storePost']);
     Route::post('/posts/{post}/flag',     [ForumController::class, 'flagPost']);
+    // The desktop client calls /report for the same action — alias it rather
+    // than forcing a Java rebuild
+    Route::post('/posts/{post}/report',   [ForumController::class, 'flagPost']);
     Route::put('/posts/{post}',           [ForumController::class, 'updatePost']);
     Route::delete('/posts/{post}',        [ForumController::class, 'destroyPost']);
     Route::get('/participation/grade-json', [\App\Http\Controllers\ParticipationController::class, 'gradeJson']);
