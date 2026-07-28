@@ -38,7 +38,7 @@ public final class SceneManager {
         if (stage == null) return;
         java.util.List<String> screens = new java.util.ArrayList<>();
         if (role == forum.models.Role.SYSTEM_ADMIN) {
-            screens.addAll(java.util.List.of("AdminDashboard", "AdminAnalytics", "AdminMembers", "AdminModeration", "GroupsIndex", "NotificationsIndex"));
+            screens.addAll(java.util.List.of("AdminDashboard", "AdminAnalytics", "ComplianceMonitoring", "AdminModeration", "GroupsIndex", "NotificationsIndex"));
         } else if (role == forum.models.Role.LECTURER) {
             screens.addAll(java.util.List.of("LecturerDashboard", "GroupsIndex", "QuizManagement", "ParticipationGrading", "ForumDashboard", "NotificationsIndex"));
         } else {
