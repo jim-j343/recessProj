@@ -1,18 +1,12 @@
 package forum.controllers;
 
 import forum.api.ApiClient;
-import forum.api.ApiException;
-import forum.api.dto.GroupDto;
-import forum.app.Refreshable;
-import forum.app.SceneManager;
 import forum.app.Session;
 import forum.models.User;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -28,8 +22,9 @@ public class QuizManagementController implements forum.app.Refreshable {
     @FXML private Label    avatarLabel;
     @FXML private Label    userNameLabel;
     @FXML private Label    statusLabel;
+    @FXML private Label    draftBanner;
     @FXML private TextField titleField;
-    @FXML private ComboBox<GroupItem> groupCombo;
+    @FXML private TextField courseUnitField;
     @FXML private TextField startTimeField;
     @FXML private TextField durationField;
     @FXML private TextField categoryField;
@@ -41,34 +36,23 @@ public class QuizManagementController implements forum.app.Refreshable {
 
     @FXML
     private void initialize() {
-        User u = Session.currentUser();
-        if (u != null) {
-            userNameLabel.setText(u.displayName());
-            if (avatarLabel != null) {
-                String name = u.displayName();
-                avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
-            }
-        }
-        loadGroups();
-        onAddQuestion(); // start with one question
+        updateUserBadge();
+        resetForm();
     }
 
     /** Populate the form for editing an existing quiz draft. */
     public void loadForEdit(forum.api.dto.QuizDto q) {
         if (q == null) return;
-        // Remember the quiz id for update
         this.editingQuizId = q.quizId;
-        // Populate basic fields — group id, title, times
         Platform.runLater(() -> {
             titleField.setText(q.title == null ? "" : q.title);
+            courseUnitField.setText(q.courseName == null ? "" : q.courseName);
             durationField.setText(String.valueOf(q.durationMinutes));
             categoryField.setText(q.targetCategory == null ? "" : q.targetCategory);
             startTimeField.setText(q.startTime == null ? "" : q.startTime);
-            // Select group if present
-            if (q.groupId != 0) {
-                for (GroupItem it : groupCombo.getItems()) {
-                    if (it.id == q.groupId) { groupCombo.getSelectionModel().select(it); break; }
-                }
+            if (draftBanner != null) {
+                draftBanner.setManaged(true);
+                draftBanner.setVisible(true);
             }
         });
 
@@ -78,7 +62,6 @@ public class QuizManagementController implements forum.app.Refreshable {
                 var detail = api.getQuiz(Session.authToken(), q.quizId);
                 if (detail != null && detail.questions != null) {
                     Platform.runLater(() -> {
-                        // Clear existing
                         for (QuestionEntry e : new ArrayList<>(questions)) removeQuestion(e);
                         int idx = 1;
                         for (var qq : detail.questions) {
@@ -86,18 +69,16 @@ public class QuizManagementController implements forum.app.Refreshable {
                             questions.add(entry);
                             questionsBox.getChildren().add(entry.buildCard(() -> removeQuestion(entry)));
                             entry.questionField.setText(qq.content);
-                            // populate answers
                             List<String> ans = qq.answers.stream().map(a -> a.content).toList();
-                                for (int i = 0; i < ans.size() && i < entry.answerFields.size(); i++) {
-                                    entry.answerFields.get(i).setText(ans.get(i));
-                                    // If API provided correct-answer info (lecturer-only), preselect it
-                                    try {
-                                        var maybe = qq.answers.get(i);
-                                        if (maybe != null && Boolean.TRUE.equals(maybe.isCorrect)) {
-                                            entry.correctBtns.get(i).setSelected(true);
-                                        }
-                                    } catch (Exception ignore) {}
-                                }
+                            for (int i = 0; i < ans.size() && i < entry.answerFields.size(); i++) {
+                                entry.answerFields.get(i).setText(ans.get(i));
+                                try {
+                                    var maybe = qq.answers.get(i);
+                                    if (maybe != null && Boolean.TRUE.equals(maybe.isCorrect)) {
+                                        entry.correctBtns.get(i).setSelected(true);
+                                    }
+                                } catch (Exception ignore) {}
+                            }
                         }
                     });
                 }
@@ -111,6 +92,11 @@ public class QuizManagementController implements forum.app.Refreshable {
 
     @Override
     public void refresh() {
+        updateUserBadge();
+        resetForm();
+    }
+
+    private void updateUserBadge() {
         User u = Session.currentUser();
         if (u != null) {
             userNameLabel.setText(u.displayName());
@@ -119,29 +105,37 @@ public class QuizManagementController implements forum.app.Refreshable {
                 avatarLabel.setText(name == null || name.isBlank() ? "?" : String.valueOf(name.trim().charAt(0)).toUpperCase());
             }
         }
-        // Could also call loadGroups() if we wanted dynamic updates
     }
 
-    private void loadGroups() {
-        String token = Session.authToken();
-        if (token == null) return;
-        Thread t = new Thread(() -> {
-            try {
-                List<GroupDto> groups = api.listGroups(token);
-                List<GroupItem> items = groups.stream()
-                        .filter(g -> "active".equals(g.myStatus))
-                        .map(g -> new GroupItem(g.groupId, g.name))
-                        .toList();
-                Platform.runLater(() -> {
-                    groupCombo.setItems(FXCollections.observableArrayList(items));
-                    if (!items.isEmpty()) groupCombo.getSelectionModel().selectFirst();
-                });
-            } catch (Exception e) {
-                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            }
-        }, "load-groups-quiz");
-        t.setDaemon(true);
-        t.start();
+    /**
+     * Resets the form to a blank "create new quiz" state.
+     *
+     * This screen is cached (see SceneManager.UNCACHED_SCREENS), so without
+     * this, navigating back to "Quiz Center" after previously editing a
+     * draft would leave editingQuizId, the populated text fields, and the
+     * loaded questions from that edit session still sitting in memory —
+     * silently turning the next "create new quiz" submission into an
+     * update of the OLD quiz instead. loadForEdit() always runs right
+     * after this (see showAndGetController()'s refresh-then-populate
+     * flow), so it's safe to unconditionally blank everything here first.
+     */
+    private void resetForm() {
+        editingQuizId = null;
+        titleField.clear();
+        courseUnitField.clear();
+        startTimeField.clear();
+        durationField.clear();
+        categoryField.clear();
+        if (draftBanner != null) {
+            draftBanner.setManaged(false);
+            draftBanner.setVisible(false);
+        }
+        if (statusLabel != null) {
+            statusLabel.setManaged(false);
+            statusLabel.setVisible(false);
+        }
+        for (QuestionEntry e : new ArrayList<>(questions)) removeQuestion(e);
+        onAddQuestion(); // start with one blank question
     }
 
     @FXML
@@ -149,8 +143,7 @@ public class QuizManagementController implements forum.app.Refreshable {
         int qNum = questions.size() + 1;
         QuestionEntry entry = new QuestionEntry(qNum);
         questions.add(entry);
-        questionsBox.getChildren().add(entry.buildCard(
-                () -> removeQuestion(entry)));
+        questionsBox.getChildren().add(entry.buildCard(() -> removeQuestion(entry)));
     }
 
     private void removeQuestion(QuestionEntry entry) {
@@ -165,12 +158,12 @@ public class QuizManagementController implements forum.app.Refreshable {
         String token = Session.authToken();
         if (token == null) { showStatus("Not authenticated."); return; }
 
-        String title    = titleField.getText().trim();
-        String start    = startTimeField.getText().trim();
-        String duration = durationField.getText().trim();
-        GroupItem group = groupCombo.getValue();
+        String title      = titleField.getText().trim();
+        String courseUnit = courseUnitField.getText().trim();
+        String start      = startTimeField.getText().trim();
+        String duration   = durationField.getText().trim();
 
-        if (title.isEmpty() || start.isEmpty() || duration.isEmpty() || group == null) {
+        if (title.isEmpty() || courseUnit.isEmpty() || start.isEmpty() || duration.isEmpty()) {
             showStatus("Please fill in all required fields.");
             return;
         }
@@ -187,21 +180,20 @@ public class QuizManagementController implements forum.app.Refreshable {
 
         showStatus("Saving...");
 
-        // Build JSON payload matching web quiz/store
+        // Build JSON payload matching web quiz/store — course-based, not group-based
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("title",    title);
-        body.put("group_id", group.id);
-        body.put("start_time", start);
-        body.put("duration", Integer.parseInt(duration));
-        body.put("target",   categoryField.getText().trim());
+        body.put("title",       title);
+        body.put("course_name", courseUnit);
+        body.put("start_time",  start);
+        body.put("duration",    Integer.parseInt(duration));
+        body.put("target",      categoryField.getText().trim());
         if (publish) body.put("publish", true);
 
         List<Map<String, Object>> qList = new ArrayList<>();
         for (QuestionEntry q : questions) {
             Map<String, Object> qMap = new LinkedHashMap<>();
             qMap.put("text", q.questionText());
-            List<String> answers = q.answerTexts();
-            qMap.put("answers", answers);
+            qMap.put("answers", q.answerTexts());
             qMap.put("correct_answer", q.correctIndex());
             qList.add(qMap);
         }
@@ -217,7 +209,6 @@ public class QuizManagementController implements forum.app.Refreshable {
                 HttpRequest.Builder reqBuilder;
                 String base = forum.config.DatabaseConfig.API_BASE_URL.replace("/api", "");
                 if (editingQuizId != null) {
-                    // Update existing quiz via PUT /quiz/{id}
                     reqBuilder = HttpRequest.newBuilder(URI.create(base + "/quiz/" + editingQuizId))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
@@ -231,16 +222,14 @@ public class QuizManagementController implements forum.app.Refreshable {
                         .POST(HttpRequest.BodyPublishers.ofString(json));
                 }
                 HttpRequest req = reqBuilder.build();
-
-                HttpResponse<String> resp = http.send(req,
-                        HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
 
                 Platform.runLater(() -> {
                     if (resp.statusCode() == 200 || resp.statusCode() == 302) {
                         showStatus(publish ? "✓ Quiz published!" : "✓ Saved as draft.");
                         new Thread(() -> {
                             try { Thread.sleep(1200); } catch (InterruptedException ignored) {}
-                            Platform.runLater(SceneManager::goLecturerDashboard);
+                            Platform.runLater(forum.app.SceneManager::goLecturerDashboard);
                         }).start();
                     } else {
                         showStatus("Failed (HTTP " + resp.statusCode() + "). Check your inputs.");
@@ -255,30 +244,23 @@ public class QuizManagementController implements forum.app.Refreshable {
         worker.start();
     }
 
-    @FXML private void onDashboard() { SceneManager.goLecturerDashboard(); }
-    @FXML private void onGroups()    { SceneManager.goGroups(); }
-    @FXML private void onGrading()   { SceneManager.goParticipationGrading(); }
-    @FXML private void onNewTopic()  { SceneManager.show("TopicCreation", "ACES — New Topic"); }
-
-    @FXML private void onProfile()   { SceneManager.goProfile(); }
+    @FXML private void onDashboard() { forum.app.SceneManager.goLecturerDashboard(); }
+    @FXML private void onGroups()    { forum.app.SceneManager.goGroups(); }
+    @FXML private void onGrading()   { forum.app.SceneManager.goParticipationGrading(); }
+    @FXML private void onNewTopic()  { forum.app.SceneManager.show("TopicCreation", "ACES — New Topic"); }
+    @FXML private void onProfile()   { forum.app.SceneManager.goProfile(); }
     @FXML private void onLogout()    {
         String token = Session.authToken();
         Session.end();
-        SceneManager.clearCache();
+        forum.app.SceneManager.clearCache();
         new Thread(() -> new forum.services.AuthService().logout(token), "logout").start();
-        SceneManager.show("Login", "ACES");
+        forum.app.SceneManager.show("Login", "ACES");
     }
 
     private void showStatus(String msg) {
         statusLabel.setText(msg);
         statusLabel.setManaged(true);
         statusLabel.setVisible(true);
-    }
-
-    // ── Inner helpers ──────────────────────────────────────────
-
-    record GroupItem(long id, String name) {
-        @Override public String toString() { return name; }
     }
 
     static class QuestionEntry {
@@ -335,18 +317,10 @@ public class QuizManagementController implements forum.app.Refreshable {
             return card;
         }
 
-        String questionText() {
-            return questionField == null ? "" : questionField.getText().trim();
-        }
-
-        List<String> answerTexts() {
-            return answerFields.stream().map(f -> f.getText().trim()).toList();
-        }
-
+        String questionText() { return questionField == null ? "" : questionField.getText().trim(); }
+        List<String> answerTexts() { return answerFields.stream().map(f -> f.getText().trim()).toList(); }
         int correctIndex() {
-            for (int i = 0; i < correctBtns.size(); i++) {
-                if (correctBtns.get(i).isSelected()) return i;
-            }
+            for (int i = 0; i < correctBtns.size(); i++) if (correctBtns.get(i).isSelected()) return i;
             return 0;
         }
     }

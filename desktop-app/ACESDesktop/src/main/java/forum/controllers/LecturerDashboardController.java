@@ -162,14 +162,28 @@ public class LecturerDashboardController implements Refreshable {
             // If quiz is published — open a preview (lecturer view of quiz and results).
             if (q.isPublished) {
                 ViewState.setSelectedQuiz(q);
-                // Load detail + results and show preview screen
+                // Show a busy cursor immediately — the API round-trip below can take
+                // a moment, and without this the click looks like it did nothing.
+                row.setCursor(javafx.scene.Cursor.WAIT);
                 new Thread(() -> {
                     try {
                         var detail = api.getQuiz(Session.authToken(), q.quizId);
                         ViewState.setSelectedQuizDetail(detail);
-                        Platform.runLater(() -> SceneManager.show("QuizPreview", "ACES — Quiz"));
+                        Platform.runLater(() -> {
+                            row.setCursor(javafx.scene.Cursor.HAND);
+                            SceneManager.show("QuizPreview", "ACES — Quiz");
+                        });
                     } catch (Exception e) {
+                        // Previously this only printed to stderr, so any failure here
+                        // (expired token, 403/404/500, no network) made the click look
+                        // completely dead with zero feedback. Surface it instead.
                         e.printStackTrace();
+                        Platform.runLater(() -> {
+                            row.setCursor(javafx.scene.Cursor.HAND);
+                            new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
+                                    "Couldn't open this quiz's preview.\n\n" + e.getMessage())
+                                    .showAndWait();
+                        });
                     }
                 }, "load-quiz-preview").start();
             } else {
