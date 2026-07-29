@@ -23,5 +23,6 @@ public class QuizDetailResponse {
     public static class Answer {
         @JsonProperty("answer_id") public long   answerId;
         @JsonProperty("content")   public String content;
+        @JsonProperty("is_correct") public Boolean isCorrect;
     }
 }
