@@ -237,6 +237,10 @@ class ForumController extends Controller
         ]);
         $post->update(['is_flagged' => true]);
 
+        \App\Models\User::where('system_role', 'system_admin')
+            ->get()
+            ->each(fn ($admin) => \App\Models\Notification::notify($admin->user_id, 'report_filed', $post->post_id, $post->topic_id));
+
         return response()->json(['message' => 'Post reported. A system admin will review it.']);
     }
 

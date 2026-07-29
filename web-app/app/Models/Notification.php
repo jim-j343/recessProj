@@ -64,6 +64,7 @@ class Notification extends Model
             'blacklisted'      => 'shield-check',
             'quiz_announced'   => 'quiz',
             'added_to_group'   => 'users',
+            'report_filed'     => 'flag',
             default            => 'bell',
         };
     }
@@ -92,6 +93,7 @@ class Notification extends Model
             'warning'        => 'You have received an inactivity warning',
             'blacklisted'    => 'Your account has been blacklisted',
             'quiz_announced' => 'A new quiz has been announced in one of your groups',
+            'report_filed'   => 'A post was reported and needs review',
             default          => 'You have a new notification',
         };
     }
@@ -101,6 +103,10 @@ class Notification extends Model
      */
     public function link(): string
     {
+        if ($this->type === 'report_filed') {
+            return route('admin.reports');
+        }
+        
         if ($this->topic_id) {
             return route('topics.show', $this->topic_id);
         }

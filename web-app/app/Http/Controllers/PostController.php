@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\ActivityLog;
@@ -173,6 +175,10 @@ class PostController extends Controller
         ]);
 
         $post->update(['is_flagged' => true]);
+
+        User::where('system_role', 'system_admin')
+            ->get()
+            ->each(fn ($admin) => Notification::notify($admin->user_id, 'report_filed', $post->post_id, $post->topic_id));
 
         return back()->with('success', 'Post reported. A system admin will review it.');
     }
