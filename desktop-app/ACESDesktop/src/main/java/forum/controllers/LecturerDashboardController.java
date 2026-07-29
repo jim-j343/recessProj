@@ -10,6 +10,7 @@ import forum.app.Session;
 import forum.models.User;
 import forum.services.AuthService;
 import forum.util.NavbarHelper;
+import forum.app.ViewState;
 
 import java.time.format.DateTimeFormatter;
 import java.time.ZonedDateTime;
@@ -73,13 +74,15 @@ public class LecturerDashboardController implements Refreshable {
 
         Thread worker = new Thread(() -> {
             try {
+                // Fetch dashboard metadata and the lecturer's quizzes explicitly.
                 LecturerDashboardDto dashboard = api.getLecturerDashboard(token);
+                java.util.List<QuizDto> myQuizzes = api.myQuizzes(token);
 
                 Platform.runLater(() -> {
-                    quizCountLabel.setText(String.valueOf(dashboard.quizCount));
+                    quizCountLabel.setText(String.valueOf(myQuizzes == null ? 0 : myQuizzes.size()));
                     groupCountLabel.setText(String.valueOf(dashboard.groupCount));
                     topicCountLabel.setText(String.valueOf(dashboard.topicCount));
-                    renderQuizList(dashboard.quizzes);
+                    renderQuizList(myQuizzes == null ? java.util.Collections.emptyList() : myQuizzes);
                 });
             } catch (ApiException | java.io.IOException | InterruptedException e) {
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
@@ -153,6 +156,47 @@ public class LecturerDashboardController implements Refreshable {
         HBox row = new HBox(info, badge);
         row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         row.setPadding(new Insets(10, 0, 10, 0));
+
+        // Make the whole row clickable to open quiz details
+        row.setOnMouseClicked(evt -> {
+            // If quiz is published — open a preview (lecturer view of quiz and results).
+            if (q.isPublished) {
+                ViewState.setSelectedQuiz(q);
+                // Show a busy cursor immediately — the API round-trip below can take
+                // a moment, and without this the click looks like it did nothing.
+                row.setCursor(javafx.scene.Cursor.WAIT);
+                new Thread(() -> {
+                    try {
+                        var detail = api.getQuiz(Session.authToken(), q.quizId);
+                        ViewState.setSelectedQuizDetail(detail);
+                        Platform.runLater(() -> {
+                            row.setCursor(javafx.scene.Cursor.HAND);
+                            SceneManager.show("QuizPreview", "ACES — Quiz");
+                        });
+                    } catch (Exception e) {
+                        // Previously this only printed to stderr, so any failure here
+                        // (expired token, 403/404/500, no network) made the click look
+                        // completely dead with zero feedback. Surface it instead.
+                        e.printStackTrace();
+                        Platform.runLater(() -> {
+                            row.setCursor(javafx.scene.Cursor.HAND);
+                            new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
+                                    "Couldn't open this quiz's preview.\n\n" + e.getMessage())
+                                    .showAndWait();
+                        });
+                    }
+                }, "load-quiz-preview").start();
+            } else {
+                // Unpublished — open the quiz management screen preloaded for editing
+                ViewState.setSelectedQuiz(q);
+                QuizManagementController ctl = SceneManager.showAndGetController("QuizManagement", "ACES — Edit Quiz");
+                if (ctl != null) ctl.loadForEdit(q);
+            }
+        });
+
+        row.setOnMouseEntered(e -> row.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.02);"));
+        row.setOnMouseExited(e -> row.setStyle("") );
+
         return row;
     }
 
