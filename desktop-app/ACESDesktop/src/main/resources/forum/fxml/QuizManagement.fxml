@@ -77,10 +77,6 @@
 
                     <Label fx:id="statusLabel" styleClass="muted"
                            managed="false" visible="false"/>
-                    <Label fx:id="draftBanner"
-                           text="This quiz is still a draft, so it can be changed freely. Once published it becomes read-only, because students may already have started it."
-                           wrapText="true" styleClass="banner-warning"
-                           managed="false" visible="false"/>
 
                     <!-- General details -->
                     <VBox styleClass="card-flat" spacing="16">
@@ -93,11 +89,10 @@
                         </VBox>
 
                         <VBox spacing="6">
-                            <Label text="COURSE UNIT *" styleClass="eyebrow"/>
-                            <TextField fx:id="courseUnitField"
-                                       promptText="e.g. CS201: Database Systems"/>
-                            <Label text="Applies to every group teaching this course — you don't need to be a member of each one."
-                                   styleClass="subtle" wrapText="true"/>
+                            <Label text="GROUP *" styleClass="eyebrow"/>
+                            <ComboBox fx:id="groupCombo"
+                                      promptText="-- Select a group --"
+                                      maxWidth="Infinity"/>
                         </VBox>
 
                         <HBox spacing="16">

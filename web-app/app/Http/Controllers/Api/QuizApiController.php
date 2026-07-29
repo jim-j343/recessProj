@@ -142,27 +142,19 @@ class QuizApiController extends Controller
     }
 
     /** GET /api/quizzes/{id} — quiz with questions and answers */
-    public function show(Request $request, $id): JsonResponse
+    public function show($id): JsonResponse
     {
         $quiz = Quiz::with(['questions.answers'])->findOrFail($id);
-        $isOwnerOrAdmin = ($request->user()->user_id === $quiz->lecturer_id) || $request->user()->isAdmin();
-
         return response()->json([
             'quiz'      => $this->quizShape($quiz),
             'questions' => $quiz->questions->map(fn($q) => [
                 'question_id' => $q->question_id,
                 'content'     => $q->content,
                 'marks'       => $q->marks,
-                'answers'     => $q->answers->map(function($a) use ($isOwnerOrAdmin) {
-                    $arr = [
-                        'answer_id' => $a->answer_id,
-                        'content'   => $a->content,
-                    ];
-                    if ($isOwnerOrAdmin) {
-                        $arr['is_correct'] = (bool) $a->is_correct;
-                    }
-                    return $arr;
-                }),
+                'answers'     => $q->answers->map(fn($a) => [
+                    'answer_id' => $a->answer_id,
+                    'content'   => $a->content,
+                ]),
             ]),
         ]);
     }
@@ -262,16 +254,13 @@ class QuizApiController extends Controller
     private function quizShape(Quiz $q): array
     {
         $data = [
-            'quiz_id'              => (int) $q->quiz_id,
-            'title'                => $q->title,
-            'group_id'             => (int) $q->group_id,
-            'course_name'          => $q->course_name,
-            'eligible_group_count' => $q->eligibleGroupIds()->count(),
-            'total_marks'          => $q->questions()->sum('marks'),
-            'start_time'           => $q->start_time?->toIso8601String(),
-            'duration_minutes'     => $q->duration_minutes,
-            'is_published'         => (bool) $q->is_published,
-            'target_category'      => $q->target_category,
+            'quiz_id'          => (int) $q->quiz_id,
+            'title'            => $q->title,
+            'group_id'         => (int) $q->group_id,
+            'start_time'       => $q->start_time?->toIso8601String(),
+            'duration_minutes' => $q->duration_minutes,
+            'is_published'     => (bool) $q->is_published,
+            'target_category'  => $q->target_category,
         ];
 
         if ($q->relationLoaded('submissions')) {
