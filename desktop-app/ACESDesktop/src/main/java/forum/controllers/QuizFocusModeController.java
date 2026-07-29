@@ -82,6 +82,7 @@ public class QuizFocusModeController {
     }
 
     private void showQuestion(int index) {
+        if (questions == null || questions.isEmpty()) return;
         currentIndex = index;
         QuizDetailResponse.Question q = questions.get(index);
 
@@ -129,7 +130,7 @@ public class QuizFocusModeController {
     }
 
     @FXML private void onPrev() { if (currentIndex > 0) showQuestion(currentIndex - 1); }
-    @FXML private void onNext() { if (currentIndex < questions.size() - 1) showQuestion(currentIndex + 1); }
+    @FXML private void onNext() { if (questions != null && currentIndex < questions.size() - 1) showQuestion(currentIndex + 1); }
 
     @FXML
     private void onSubmit() {

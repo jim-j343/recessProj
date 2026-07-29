@@ -145,16 +145,24 @@ class QuizApiController extends Controller
     public function show($id): JsonResponse
     {
         $quiz = Quiz::with(['questions.answers'])->findOrFail($id);
+        $isOwnerOrAdmin = ($request->user()->user_id === $quiz->lecturer_id) || $request->user()->isAdmin();
+
         return response()->json([
             'quiz'      => $this->quizShape($quiz),
             'questions' => $quiz->questions->map(fn($q) => [
                 'question_id' => $q->question_id,
                 'content'     => $q->content,
                 'marks'       => $q->marks,
-                'answers'     => $q->answers->map(fn($a) => [
-                    'answer_id' => $a->answer_id,
-                    'content'   => $a->content,
-                ]),
+                'answers'     => $q->answers->map(function($a) use ($isOwnerOrAdmin) {
+                    $arr = [
+                        'answer_id' => $a->answer_id,
+                        'content'   => $a->content,
+                    ];
+                    if ($isOwnerOrAdmin) {
+                        $arr['is_correct'] = (bool) $a->is_correct;
+                    }
+                    return $arr;
+                }),
             ]),
         ]);
     }

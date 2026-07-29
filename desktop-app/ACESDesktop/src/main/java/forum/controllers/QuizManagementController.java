@@ -37,6 +37,7 @@ public class QuizManagementController implements forum.app.Refreshable {
 
     private final ApiClient api = new ApiClient();
     private final List<QuestionEntry> questions = new ArrayList<>();
+    private Long editingQuizId = null; // when non-null we're editing an existing draft
 
     @FXML
     private void initialize() {
@@ -50,6 +51,62 @@ public class QuizManagementController implements forum.app.Refreshable {
         }
         loadGroups();
         onAddQuestion(); // start with one question
+    }
+
+    /** Populate the form for editing an existing quiz draft. */
+    public void loadForEdit(forum.api.dto.QuizDto q) {
+        if (q == null) return;
+        // Remember the quiz id for update
+        this.editingQuizId = q.quizId;
+        // Populate basic fields — group id, title, times
+        Platform.runLater(() -> {
+            titleField.setText(q.title == null ? "" : q.title);
+            durationField.setText(String.valueOf(q.durationMinutes));
+            categoryField.setText(q.targetCategory == null ? "" : q.targetCategory);
+            startTimeField.setText(q.startTime == null ? "" : q.startTime);
+            // Select group if present
+            if (q.groupId != 0) {
+                for (GroupItem it : groupCombo.getItems()) {
+                    if (it.id == q.groupId) { groupCombo.getSelectionModel().select(it); break; }
+                }
+            }
+        });
+
+        // Load full quiz questions via API and populate entries
+        Thread t = new Thread(() -> {
+            try {
+                var detail = api.getQuiz(Session.authToken(), q.quizId);
+                if (detail != null && detail.questions != null) {
+                    Platform.runLater(() -> {
+                        // Clear existing
+                        for (QuestionEntry e : new ArrayList<>(questions)) removeQuestion(e);
+                        int idx = 1;
+                        for (var qq : detail.questions) {
+                            QuestionEntry entry = new QuestionEntry(idx++);
+                            questions.add(entry);
+                            questionsBox.getChildren().add(entry.buildCard(() -> removeQuestion(entry)));
+                            entry.questionField.setText(qq.content);
+                            // populate answers
+                            List<String> ans = qq.answers.stream().map(a -> a.content).toList();
+                                for (int i = 0; i < ans.size() && i < entry.answerFields.size(); i++) {
+                                    entry.answerFields.get(i).setText(ans.get(i));
+                                    // If API provided correct-answer info (lecturer-only), preselect it
+                                    try {
+                                        var maybe = qq.answers.get(i);
+                                        if (maybe != null && Boolean.TRUE.equals(maybe.isCorrect)) {
+                                            entry.correctBtns.get(i).setSelected(true);
+                                        }
+                                    } catch (Exception ignore) {}
+                                }
+                        }
+                    });
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }, "load-quiz-for-edit");
+        t.setDaemon(true);
+        t.start();
     }
 
     @Override
@@ -157,14 +214,23 @@ public class QuizManagementController implements forum.app.Refreshable {
 
                 HttpClient http = HttpClient.newBuilder()
                         .connectTimeout(Duration.ofSeconds(10)).build();
-                HttpRequest req = HttpRequest.newBuilder(
-                        URI.create(forum.config.DatabaseConfig.API_BASE_URL
-                                .replace("/api", "") + "/quiz/store"))
+                HttpRequest.Builder reqBuilder;
+                String base = forum.config.DatabaseConfig.API_BASE_URL.replace("/api", "");
+                if (editingQuizId != null) {
+                    // Update existing quiz via PUT /quiz/{id}
+                    reqBuilder = HttpRequest.newBuilder(URI.create(base + "/quiz/" + editingQuizId))
                         .header("Authorization", "Bearer " + token)
                         .header("Accept", "application/json")
                         .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(json))
-                        .build();
+                        .method("PUT", HttpRequest.BodyPublishers.ofString(json));
+                } else {
+                    reqBuilder = HttpRequest.newBuilder(URI.create(base + "/quiz/store"))
+                        .header("Authorization", "Bearer " + token)
+                        .header("Accept", "application/json")
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(json));
+                }
+                HttpRequest req = reqBuilder.build();
 
                 HttpResponse<String> resp = http.send(req,
                         HttpResponse.BodyHandlers.ofString());

@@ -430,6 +430,15 @@ public StudentProgressDto studentProgress(String token)
         return mapper.readValue(resp.body(), AdminDashboardDto.class);
     }
 
+    /** POST /api/quizzes/{id}/publish — lecturer: publish a draft quiz */
+    public forum.api.dto.QuizDto publishQuiz(String token, long quizId)
+            throws ApiException, IOException, InterruptedException {
+        HttpResponse<String> resp = send(request("/quizzes/" + quizId + "/publish", token)
+                .POST(HttpRequest.BodyPublishers.noBody()).build());
+        ok(resp);
+        return mapper.readValue(resp.body(), forum.api.dto.QuizDto.class);
+    }
+
     public AdminAnalyticsDto adminAnalytics(String token)
             throws ApiException, IOException, InterruptedException {
         HttpResponse<String> resp = send(request("/admin/analytics", token).GET().build());
